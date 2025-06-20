@@ -4,9 +4,10 @@ const dotenv = require("dotenv");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth")
 const ordersRoute = require("./routes/orders")
+const paymentsRoute = require("./routes/payments")
 
 //Import DB connection
-require("./config/config");
+require("./config/dbConfig");
 
 dotenv.config();
 const app = express();
@@ -36,7 +37,7 @@ app.use(cookieParser())
 //Routes
 app.use("/pioneer-writers/v1/auth", authRoute )
 app.use("/pioneer-writers/v1/orders", ordersRoute)
-
+app.use("/pioneer-writers/v1/payments", paymentsRoute)
 
 //Server start
 const PORT = process.env.PORT || 6100;

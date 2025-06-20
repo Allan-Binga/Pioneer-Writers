@@ -1,4 +1,4 @@
-const client = require("../config/config")
+const client = require("../config/dbConfig")
 
 //Sign Up
 const signUp = async (req, res) => {
