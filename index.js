@@ -5,6 +5,7 @@ const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth")
 const ordersRoute = require("./routes/orders")
 const paymentsRoute = require("./routes/payments")
+const checkoutRoute = require("./routes/orderCheckout")
 
 //Import DB connection
 require("./config/dbConfig");
@@ -16,7 +17,9 @@ const app = express();
 app.use(express.json());
 
 //CORS
-const allowedOrigins = [];
+const allowedOrigins = [
+  "http://localhost:5173"
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -38,6 +41,7 @@ app.use(cookieParser())
 app.use("/pioneer-writers/v1/auth", authRoute )
 app.use("/pioneer-writers/v1/orders", ordersRoute)
 app.use("/pioneer-writers/v1/payments", paymentsRoute)
+app.use("/pioneer-writers/v1/checkout", checkoutRoute)
 
 //Server start
 const PORT = process.env.PORT || 6100;
