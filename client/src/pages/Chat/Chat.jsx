@@ -1,8 +1,8 @@
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 
-function MyOrders() {
-  return (
+function Chat () {
+     return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
       <Navbar />
       <Sidebar />
@@ -10,4 +10,4 @@ function MyOrders() {
   );
 }
 
-export default MyOrders;
+export default Chat
