@@ -82,15 +82,12 @@ const SignIn = () => {
           </div>
 
           {/* OAuth Buttons */}
-          <div className="grid grid-cols-3 gap-3">
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700">
+          <div className="grid grid-cols-2 gap-2">
+            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img src={GoogleIcon} alt="Google" className="w-6 h-6 mx-auto" />
             </button>
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700">
+            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img src={FacebookIcon} alt="Facebook" className="w-6 h-6 mx-auto" />
-            </button>
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700">
-              <img src={AppleIcon} alt="Apple" className="w-6 h-6 mx-auto" />
             </button>
           </div>
         </div>
