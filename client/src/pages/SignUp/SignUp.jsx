@@ -136,31 +136,31 @@ const SignUp = () => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Name */}
             <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
+              <User className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
               <input
                 id="name"
                 name="name"
                 type="text"
-                placeholder="Enter your full name"
+                placeholder="Username"
                 value={formData.name}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-10 py-2 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
               />
             </div>
 
             {/* Email */}
             <div className="relative">
-              <Mail className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
+              <Mail className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="E-mail"
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-10 py-2 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
               />
             </div>
 
@@ -169,7 +169,7 @@ const SignUp = () => {
               <div className="relative" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="w-20 px-3 py-2 border border-purple-300 rounded-full bg-white text-purple-600 flex items-center justify-between focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-20 px-3 py-3 border border-purple-300 rounded-full bg-white text-purple-600 flex items-center justify-between focus:outline-none focus:ring-1 focus:ring-purple-500"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <span>{formData.countryCode}</span>
@@ -192,16 +192,16 @@ const SignUp = () => {
               </div>
 
               <div className="relative flex-1">
-                <Phone className="absolute left-3 top-3 h-4 w-4 text-purple-400" />
+                <Phone className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
                 <input
                   id="phone"
                   name="phone"
                   type="tel"
-                  placeholder="Enter phone number"
+                  placeholder="(000) 000 - 0000"
                   value={formData.phone}
                   onChange={handleInputChange}
                   required
-                  className="w-full pl-10 py-2 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
+                  className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
                 />
               </div>
             </div>
@@ -222,13 +222,13 @@ const SignUp = () => {
               />
               <label htmlFor="terms" className="text-sm text-purple-600">
                 I agree with the{" "}
-                <Link to="/terms" className="text-purple-700 hover:underline">
+                <Link to="/terms" className="text-purple-700 hover:underline font-semibold">
                   Terms & Conditions
                 </Link>{" "}
                 and{" "}
                 <Link
                   to="/fair-use"
-                  className="text-purple-700 hover:underline"
+                  className="text-purple-700 hover:underline font-semibold"
                 >
                   Fair Use Policy
                 </Link>
@@ -238,10 +238,10 @@ const SignUp = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer"
               disabled={!formData.agreeTerms}
             >
-              Register
+              Sign Up
             </button>
           </form>
 
@@ -260,12 +260,12 @@ const SignUp = () => {
           {/* OAuth Buttons */}
           <div className="grid grid-cols-2 gap-3">
             {/* Google */}
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700">
+            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img src={GoogleIcon} alt="Google" className="w-6 h-6 mx-auto" />
             </button>
 
             {/* Facebook */}
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700">
+            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img
                 src={FacebookIcon}
                 alt="Facebook"
@@ -278,9 +278,9 @@ const SignUp = () => {
             Already have an account?{" "}
             <Link
               to="/sign-in"
-              className="text-purple-700 hover:underline font-medium"
+              className="text-purple-700 hover:text-purple-950 font-medium"
             >
-              Log in
+              Sign In
             </Link>
           </p>
         </div>
