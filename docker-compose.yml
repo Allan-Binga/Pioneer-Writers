@@ -1,0 +1,32 @@
+services:
+  frontend:
+    build:
+      context: ./client #Frontend client directory
+    image: allanbinga/pioneer-writers-frontend:v1.0.0 #Image to be pushed to dockerhub - also specifies image name
+    ports:
+      - "5173:5173" #port
+
+  backend:
+    build:
+      context: .
+    image: allanbinga/pioneer-writers-backend:v1.0.0
+    ports:
+      - "6100:6100"
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_DATABASE}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
