@@ -24,7 +24,7 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app .
 
 # Expose port (optional, for documentation)
-EXPOSE 6300
+EXPOSE 6100
 
 #Start command
 CMD ["npm", "start"]
