@@ -144,7 +144,7 @@ const signOut = async (req, res) => {
     if (!req.cookies?.userPioneerSession) {
       return res.status(400).json({ message: "You are not logged in." });
     }
-    res.clearCookie("adminVotingSession");
+    res.clearCookie("userPioneerSession");
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     console.error("Admin Logout Error:", error);
