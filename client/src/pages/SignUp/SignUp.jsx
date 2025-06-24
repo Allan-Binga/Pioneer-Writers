@@ -1,27 +1,36 @@
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   User,
   Mail,
   Phone,
-  CheckCircle,
   BookOpen,
   Users,
   Shield,
   ChevronDown,
+  Lock,
+  Eye,
+  EyeOff,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import GoogleIcon from "../../assets/google.png";
 import FacebookIcon from "../../assets/facebook.png";
-import AppleIcon from "../../assets/apple.png";
+import {endpoint} from "../../server"
+import { notify } from "../../utils/toast";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    userName: "",
     email: "",
-    phone: "",
+    phoneNumber: "",
+    password: "",
     countryCode: "+254",
     agreeTerms: false,
   });
+  const [validationErrors, setValidationErrors] = useState({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -38,22 +47,95 @@ const SignUp = () => {
     { value: "+27", label: "+27 (South Africa)" },
   ];
 
+  //Form input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  //Phone country code selection
   const handleCountryCodeSelect = (value) => {
     setFormData((prev) => ({ ...prev, countryCode: value }));
     setIsDropdownOpen(false);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Sign up form submitted:", formData);
+  //Form validation to ensure correct email and password inputs are inserted
+  const validateForm = () => {
+    const errors = {};
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d\W]).{6,}$/;
+
+    if (!emailRegex.test(formData.email)) {
+      errors.email = "Please enter a valid email address.";
+    }
+
+    if (!passwordRegex.test(formData.password)) {
+      errors.password =
+        "Password must be at least 6 characters, include uppercase, lowercase, and a number or symbol.";
+    }
+
+    if (formData.userName.trim() === "") {
+      errors.userName = "Username is required.";
+    }
+
+    if (formData.phoneNumber.trim() === "") {
+      errors.phoneNumber = "Phone number is required.";
+    }
+
+    return errors;
   };
 
-  // Close dropdown when clicking outside
+  //Sign-up Handle SUbmit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const errors = validateForm();
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    setValidationErrors({}); // clear previous errors
+
+    if (!formData.agreeTerms) return;
+    setIsLoading(true);
+
+    e.preventDefault();
+    if (!formData.agreeTerms) return;
+
+    setIsLoading(true);
+    try {
+      const response = await fetch(`${endpoint}/auth/sign-up`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userName: formData.userName,
+          email: formData.email,
+          phoneNumber: formData.countryCode + formData.phoneNumber,
+          password: formData.password,
+        }),
+      });
+      // console.log(endpoint)
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed");
+      }
+
+      notify.success(data.message || "Successfully registered!");
+      setTimeout(() => navigate("/sign-in"), 4000);
+    } catch (error) {
+      notify.error(error.message || "Failed to register. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  //Outside country code card clicks useEffect
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -64,6 +146,7 @@ const SignUp = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  //Right Section IMplementation
   const featureCards = [
     {
       icon: <Users className="w-8 h-8 text-purple-500" />,
@@ -134,19 +217,24 @@ const SignUp = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Name */}
+            {/* Username */}
             <div className="relative">
-              <User className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
+              <User className="absolute left-4 top-4 h-4 w-4 text-purple-600" />
               <input
-                id="name"
-                name="name"
+                id="userName"
+                name="userName"
                 type="text"
                 placeholder="Username"
-                value={formData.name}
+                value={formData.userName}
                 onChange={handleInputChange}
                 required
                 className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
               />
+              {validationErrors.userName && (
+                <p className="text-red-500 text-sm mt-1 ml-2">
+                  {validationErrors.userName}
+                </p>
+              )}
             </div>
 
             {/* Email */}
@@ -162,6 +250,11 @@ const SignUp = () => {
                 required
                 className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
               />
+              {validationErrors.email && (
+                <p className="text-red-500 text-sm mt-1 ml-2">
+                  {validationErrors.email}
+                </p>
+              )}
             </div>
 
             {/* Phone */}
@@ -175,6 +268,11 @@ const SignUp = () => {
                   <span>{formData.countryCode}</span>
                   <ChevronDown className="w-4 h-4 text-purple-400" />
                 </button>
+                {validationErrors.phoneNumber && (
+                  <p className="text-red-500 text-sm mt-1 ml-2">
+                    {validationErrors.phoneNumber}
+                  </p>
+                )}
 
                 {isDropdownOpen && (
                   <ul className="absolute z-10 mt-1 w-28 bg-white border border-purple-300 rounded-lg shadow-lg max-h-40 overflow-auto transition-all duration-200 ease-in-out">
@@ -184,7 +282,7 @@ const SignUp = () => {
                         className="px-3 py-2 text-purple-600 hover:bg-purple-50 cursor-pointer"
                         onClick={() => handleCountryCodeSelect(code.value)}
                       >
-                        {code.value}
+                        {code.label}
                       </li>
                     ))}
                   </ul>
@@ -194,16 +292,47 @@ const SignUp = () => {
               <div className="relative flex-1">
                 <Phone className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
                 <input
-                  id="phone"
-                  name="phone"
+                  id="phoneNumber"
+                  name="phoneNumber"
                   type="tel"
                   placeholder="(000) 000 - 0000"
-                  value={formData.phone}
+                  value={formData.phoneNumber}
                   onChange={handleInputChange}
                   required
                   className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
                 />
               </div>
+            </div>
+
+            <div className="relative">
+              <Lock className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+                required
+                className="w-full pl-10 pr-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
+              />
+              {validationErrors.password && (
+                <p className="text-red-500 text-sm mt-1 ml-2">
+                  {validationErrors.password}
+                </p>
+              )}
+
+              <button
+                type="button"
+                className="absolute right-4 top-4 text-purple-400 hover:text-purple-600"
+                onClick={() => setShowPassword((prev) => !prev)}
+              >
+                {showPassword ? (
+                  <EyeOff className="w-5 h-5" />
+                ) : (
+                  <Eye className="w-5 h-5" />
+                )}
+              </button>
             </div>
 
             {/* Terms */}
@@ -222,7 +351,10 @@ const SignUp = () => {
               />
               <label htmlFor="terms" className="text-sm text-purple-600">
                 I agree with the{" "}
-                <Link to="/terms" className="text-purple-700 hover:underline font-semibold">
+                <Link
+                  to="/terms"
+                  className="text-purple-700 hover:underline font-semibold"
+                >
                   Terms & Conditions
                 </Link>{" "}
                 and{" "}
@@ -238,10 +370,33 @@ const SignUp = () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer"
-              disabled={!formData.agreeTerms}
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer flex items-center justify-center"
+              disabled={!formData.agreeTerms || isLoading}
             >
-              Sign Up
+              {isLoading ? (
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              ) : (
+                "Sign Up"
+              )}
             </button>
           </form>
 
@@ -259,12 +414,9 @@ const SignUp = () => {
 
           {/* OAuth Buttons */}
           <div className="grid grid-cols-2 gap-3">
-            {/* Google */}
             <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img src={GoogleIcon} alt="Google" className="w-6 h-6 mx-auto" />
             </button>
-
-            {/* Facebook */}
             <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img
                 src={FacebookIcon}

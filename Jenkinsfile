@@ -21,27 +21,27 @@ pipeline {
                 sh 'npm install'
             }
         }
-        stage('Build Docker Images') {
-            steps {
-                script {
-                    sh "docker build -t $FRONTEND_IMAGE ./client"
-                    sh "docker build -t $BACKEND_IMAGE ."
-                }
-            }
-        }
+        // stage('Build Docker Images') {
+        //     steps {
+        //         script {
+        //             sh "docker build -t $FRONTEND_IMAGE ./client"
+        //             sh "docker build -t $BACKEND_IMAGE ."
+        //         }
+        //     }
+        // }
 
-        stage('Login to DockerHub') {
-            steps {
-                sh 'echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin'
-            }
-        }
+        // stage('Login to DockerHub') {
+        //     steps {
+        //         sh 'echo $DOCKER_CREDS_PSW | docker login -u $DOCKER_CREDS_USR --password-stdin'
+        //     }
+        // }
 
-        stage('Push Docker Images') {
-            steps {
-                sh "docker push $FRONTEND_IMAGE"
-                sh "docker push $BACKEND_IMAGE"
-            }
-        }
+        // stage('Push Docker Images') {
+        //     steps {
+        //         sh "docker push $FRONTEND_IMAGE"
+        //         sh "docker push $BACKEND_IMAGE"
+        //     }
+        // }
     }
     post {
         success {

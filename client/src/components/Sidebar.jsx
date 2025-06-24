@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  BookOpen,
+  LogOut,
   User,
   ChevronLeft,
   ChevronRight,
-  MessagesSquare,
   GraduationCap,
   BookOpenText,
   Wallet,
@@ -14,12 +13,17 @@ import {
   Gauge,
   ChevronRight as ArrowRight,
   ChevronDown as ArrowDown,
+  Mail,
 } from "lucide-react";
+import axios from "axios";
+import { endpoint } from "../server";
+import { notify } from "../utils/toast";
 
 function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate()
 
   // Automatically open submenu based on current path
   useEffect(() => {
@@ -41,6 +45,35 @@ function Sidebar() {
     setOpenSubmenu(openSubmenu === itemName ? null : itemName);
   };
 
+  //Logout Handler
+  const handleLogout = async () => {
+    try {
+      const response = await axios.post(
+        `${endpoint}/auth/sign-out`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        document.cookie = "userPioneerSession=; Max-Age=0; path=/;";
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("userEmail");
+
+        notify.success("Successfully logged out.");
+
+        // Delay navigation by 2 seconds (long enough for toast to show)
+        setTimeout(() => {
+          navigate("/sign-in");
+        }, 2000);
+      } else {
+        notify.error("You are not logged in.");
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      notify.error("You are not logged in.");
+    }
+  };
+
   const navItems = [
     { name: "Dashboard", path: "/dashboard", icon: Gauge },
     {
@@ -59,7 +92,7 @@ function Sidebar() {
         { name: "Applications", path: "/writer-applications" },
       ],
     },
-    { name: "Chat", path: "/chat", icon: MessagesSquare },
+    { name: "Inbox", path: "/inbox", icon: Mail },
     { name: "My Wallet", path: "/wallet", icon: Wallet },
     { name: "Profile", path: "/profile", icon: User },
     { name: "News", path: "/news", icon: Newspaper },
@@ -190,6 +223,18 @@ function Sidebar() {
               </li>
             );
           })}
+          {/* Logout Button */}
+          <li className="pt-4 mt-4 border-t border-gray-200">
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-3 w-full text-left p-3 rounded-lg text-purple-700 hover:bg-purple-100 hover:text-purple-900 transition-all duration-200 cursor-pointer"
+            >
+              <LogOut className="w-6 h-6 text-purple-600" />
+              {!isCollapsed && (
+                <span className="text-base font-medium">Logout</span>
+              )}
+            </button>
+          </li>
         </ul>
       </nav>
     </div>
