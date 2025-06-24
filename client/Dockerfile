@@ -23,6 +23,8 @@ COPY --from=builder /app/client/node_modules ./node_modules
 COPY --from=builder /app/client/package*.json ./
 COPY --from=builder /app/client/src ./src  
 COPY --from=builder /app/client/public ./public  
+COPY --from=builder /app/client ./
+
 
 # Expose Port 
 EXPOSE 5173
