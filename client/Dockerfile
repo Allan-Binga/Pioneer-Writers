@@ -1,33 +1,27 @@
-#Base image
+# Step 1: Build the Vite app
 FROM node:22-alpine AS builder
 
-# Working directory
-WORKDIR /app/client
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Set working directory
+WORKDIR /app
 
 # Install dependencies
-RUN npm ci --production  # Use npm ci for reproducible builds
+COPY package*.json ./
+RUN npm ci
 
-# Copy source code
+# Copy all source files
 COPY . .
 
-# Multi-stage build
-FROM node:22-alpine
+# Build the Vite app
+RUN npm run build
 
-WORKDIR /app/client
+# Step 2: Serve with NGINX
+FROM nginx:alpine
 
-# Copy only necessary files from builder
-COPY --from=builder /app/client/node_modules ./node_modules
-COPY --from=builder /app/client/package*.json ./
-COPY --from=builder /app/client/src ./src  
-COPY --from=builder /app/client/public ./public  
-COPY --from=builder /app/client ./
+# Copy built assets from builder stage to NGINX's default HTML directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 
+# Expose port 80 (default for HTTP)
+EXPOSE 80
 
-# Expose Port 
-EXPOSE 5173
-
-# Start command
-CMD ["npm", "run", "dev", "--", "--host"]
+# Start NGINX in the foreground
+CMD ["nginx", "-g", "daemon off;"]

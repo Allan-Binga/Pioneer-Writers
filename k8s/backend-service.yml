@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: pioneer-writers
+spec:
+  selector:
+    app: backend
+  ports:
+    - protocol: TCP
+      port: 6100
+      targetPort: 6100
