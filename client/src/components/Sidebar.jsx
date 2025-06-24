@@ -58,7 +58,7 @@ function Sidebar() {
         document.cookie = "userPioneerSession=; Max-Age=0; path=/;";
         localStorage.removeItem("userRole");
         localStorage.removeItem("userEmail");
-
+        localStorage.removeItem("isLoggedIn")
         notify.success("Successfully logged out.");
 
         // Delay navigation by 2 seconds (long enough for toast to show)

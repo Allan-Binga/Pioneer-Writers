@@ -15,8 +15,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import GoogleIcon from "../../assets/google.png";
 import FacebookIcon from "../../assets/facebook.png";
-import {endpoint} from "../../server"
+import { endpoint } from "../../server";
 import { notify } from "../../utils/toast";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -134,6 +135,44 @@ const SignUp = () => {
       setIsLoading(false);
     }
   };
+
+  //Google OAuth2
+  const handleGoogleSuccess = async (tokenResponse) => {
+    try {
+      const token = tokenResponse.access_token;
+
+      if (!token) throw new Error("No token returned from Google");
+
+      const response = await fetch(`${endpoint}/oauth2/sign-in/google`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok)
+        throw new Error(data.message || "Google sign-in failed");
+
+      localStorage.setItem("userRole", data.user.role);
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("isLoggedIn", "true");
+
+      notify.success("Sign-up successful");
+      setTimeout(() => {
+        navigate(data.user.role === "User" ? "/dashboard" : "/dashboard");
+      }, 1000);
+    } catch (err) {
+      notify.error(err.message || "Google login failed");
+    }
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => notify.error("Google sign-up failed"),
+    flow: "implicit",
+  });
 
   //Outside country code card clicks useEffect
   useEffect(() => {
@@ -402,20 +441,22 @@ const SignUp = () => {
 
           {/* Divider */}
           <div className="my-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-purple-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-purple-600">
-                Or continue with
+            <div className="flex items-center justify-center">
+              <div className="flex-grow border-t border-purple-300"></div>
+              <span className="mx-4 text-sm text-purple-600 bg-white px-2">
+                Or sign up with your social accounts
               </span>
+              <div className="flex-grow border-t border-purple-300"></div>
             </div>
           </div>
 
           {/* OAuth Buttons */}
           <div className="grid grid-cols-2 gap-3">
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
-              <img src={GoogleIcon} alt="Google" className="w-6 h-6 mx-auto" />
+            <button
+              onClick={() => googleLogin()}
+              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer flex items-center justify-center"
+            >
+              <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
             <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img

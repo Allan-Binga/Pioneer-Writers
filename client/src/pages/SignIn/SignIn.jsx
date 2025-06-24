@@ -5,6 +5,7 @@ import GoogleIcon from "../../assets/google.png";
 import FacebookIcon from "../../assets/facebook.png";
 import { notify } from "../../utils/toast";
 import { endpoint } from "../../server";
+import { useGoogleLogin } from "@react-oauth/google";
 
 function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -31,7 +32,6 @@ function SignIn() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
-
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors);
       return;
@@ -43,43 +43,76 @@ function SignIn() {
       const response = await fetch(`${endpoint}/auth/sign-in`, {
         method: "POST",
         credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed, please try again.");
+        throw new Error(data.message || "Login failed");
       }
 
-      // Store user data
       localStorage.setItem("userRole", data.user.role);
       localStorage.setItem("userEmail", data.user.email);
       localStorage.setItem("isLoggedIn", "true");
 
       notify.success("Login successful.");
       setTimeout(() => {
-        if (data.user.role === "Admin") {
-          navigate("/admin/dashboard");
-        } else {
-          navigate("/dashboard");
-        }
+        navigate(
+          data.user.role === "Admin" ? "/admin/dashboard" : "/dashboard"
+        );
       }, 1500);
     } catch (error) {
-      const errorMessage = error.message?.toLowerCase?.();
-      if (errorMessage?.includes("already logged in")) {
-        notify.info("You are already logged in.");
+      const msg = error.message?.toLowerCase?.();
+      if (msg?.includes("already logged in")) {
+        notify.info("Already logged in");
         navigate("/dashboard");
       } else {
-        notify.error(errorMessage || "Something went wrong");
+        notify.error(error.message || "Something went wrong");
       }
     } finally {
       setLoading(false);
     }
   };
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    try {
+      const token = tokenResponse.access_token;
+      // console.log(token)
+
+      if (!token) throw new Error("No token returned from Google");
+
+      const response = await fetch(`${endpoint}/oauth2/sign-in/google`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok)
+        throw new Error(data.message || "Google sign-in failed");
+
+      localStorage.setItem("userRole", data.user.role);
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("isLoggedIn", "true");
+
+      notify.success("Logged in with Google");
+      setTimeout(() => {
+        navigate(data.user.role === "User" ? "/dashboard" : "/dashboard");
+      }, 1000);
+    } catch (err) {
+      notify.error(err.message || "Google login failed");
+    }
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => notify.error("Google sign-in failed"),
+    flow: "implicit",
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex">
@@ -114,7 +147,6 @@ function SignIn() {
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
-            {/* Email */}
             <div className="relative">
               <Mail className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
               <input
@@ -130,7 +162,6 @@ function SignIn() {
               )}
             </div>
 
-            {/* Password */}
             <div className="relative">
               <Lock className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
               <input
@@ -164,11 +195,10 @@ function SignIn() {
               </Link>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
             >
               {loading ? (
                 <svg
@@ -197,23 +227,24 @@ function SignIn() {
             </button>
           </form>
 
-          {/* Divider */}
           <div className="my-6 relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-purple-300"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-purple-600">
-                Or sign in with
+            <div className="flex items-center justify-center">
+              <div className="flex-grow border-t border-purple-300"></div>
+              <span className="mx-4 text-sm text-purple-600 bg-white px-2">
+                Or sign in with your social accounts
               </span>
+              <div className="flex-grow border-t border-purple-300"></div>
             </div>
           </div>
 
-          {/* OAuth Buttons */}
           <div className="grid grid-cols-2 gap-2">
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
-              <img src={GoogleIcon} alt="Google" className="w-6 h-6 mx-auto" />
+            <button
+              onClick={() => googleLogin()}
+              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer flex items-center justify-center"
+            >
+              <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
+
             <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
               <img
                 src={FacebookIcon}
