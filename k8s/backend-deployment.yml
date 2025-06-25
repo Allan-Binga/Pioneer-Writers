@@ -23,6 +23,8 @@ spec:
                 name: db-secret
             - secretRef:
                 name: aws-secret
+            - secretRef:
+                name: jwt-secret
           resources:
             requests:
               cpu: "100m"
