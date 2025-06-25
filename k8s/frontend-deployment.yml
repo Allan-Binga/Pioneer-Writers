@@ -16,6 +16,7 @@ spec:
       containers:
         - name: frontend
           image: allanbinga/pioneer-writers-frontend:v2.0.0
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           envFrom:

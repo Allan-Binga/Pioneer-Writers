@@ -23,5 +23,8 @@ jobs:
 
       - name: Build and push frontend image
         run: |
-          docker build -t allanbinga/pioneer-writers-frontend:v2.0.0 ./client
+          docker build \
+            --build-arg VITE_BACKEND_ENDPOINT=http://backend.pioneer-writers.svc.cluster.local:6100/pioneer-writers/v1 \
+            --build-arg VITE_GOOGLE_CLIENT_ID=204800037322-e6g2gk84rl3tc1rj899sijsto7r3l9vl.apps.googleusercontent.com \
+            -t allanbinga/pioneer-writers-frontend:v2.0.0 ./client
           docker push allanbinga/pioneer-writers-frontend:v2.0.0

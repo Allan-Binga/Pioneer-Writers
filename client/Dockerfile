@@ -1,27 +1,28 @@
 # Step 1: Build the Vite app
 FROM node:22-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Install dependencies
 COPY package*.json ./
 RUN npm ci
 
-# Copy all source files
 COPY . .
 
-# Build the Vite app
+# Pass environment variables to Vite
+ARG VITE_BACKEND_ENDPOINT
+ARG VITE_GOOGLE_CLIENT_ID
+
+ENV VITE_BACKEND_ENDPOINT=$VITE_BACKEND_ENDPOINT
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
+
 RUN npm run build
 
 # Step 2: Serve with NGINX
 FROM nginx:alpine
 
-# Copy built assets from builder stage to NGINX's default HTML directory
 COPY --from=builder /app/dist /usr/share/nginx/html
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80 (default for HTTP)
 EXPOSE 80
 
-# Start NGINX in the foreground
 CMD ["nginx", "-g", "daemon off;"]

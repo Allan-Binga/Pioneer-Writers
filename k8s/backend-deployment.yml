@@ -16,6 +16,7 @@ spec:
       containers:
         - name: backend
           image: allanbinga/pioneer-writers-backend:v2.0.0
+          imagePullPolicy: Always 
           ports:
             - containerPort: 6100
           envFrom:
