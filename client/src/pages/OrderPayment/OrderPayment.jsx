@@ -19,6 +19,127 @@ function OrderPayment() {
     couponCode: "",
   });
 
+  // Calculate prices based on provided rules
+  // useEffect(() => {
+  //   const calculatePrice = () => {
+  //     let basePrice = 20; // Default for Writing from Scratch, Custom Essay, University, 1 page, Double-spaced
+
+  //     // Type of Service
+  //     if (formData.type_of_service === "editing") {
+  //       basePrice -= 9; // $11
+  //     } else if (formData.type_of_service === "calculations") {
+  //       basePrice -= 6; // $14
+  //     }
+
+  //     // Document Type
+  //     if (
+  //       ["article_review", "thesis", "dissertation"].includes(
+  //         formData.document_type
+  //       )
+  //     ) {
+  //       basePrice += 5; // $25
+  //     } else if (formData.document_type === "math-problems") {
+  //       basePrice += 10; // $30
+  //     }
+
+  //     // Writer Level
+  //     if (formData.writer_level === "college") {
+  //       basePrice -= 2;
+  //     } else if (formData.writer_level === "masters") {
+  //       basePrice += 2;
+  //     } else if (formData.writer_level === "phd") {
+  //       basePrice += 4;
+  //     }
+
+  //     // Spacing
+  //     if (formData.spacing === "single") {
+  //       basePrice *= 2;
+  //     }
+
+  //     // Pages
+  //     const pages = parseInt(formData.pages) || 1;
+  //     let totalPrice = basePrice * pages;
+
+  //     // Step 2 Fields
+  //     let additionalFees = 0;
+
+  //     // Writer Type
+  //     if (formData.writer_type === "premium") {
+  //       additionalFees += 7;
+  //     } else if (formData.writer_type === "platinum") {
+  //       additionalFees += 12;
+  //     }
+
+  //     // Deadline
+  //     if (formData.deadline) {
+  //       const deadlineDate = new Date(formData.deadline);
+  //       const now = new Date();
+  //       const hoursUntilDeadline = (deadlineDate - now) / (1000 * 60 * 60);
+  //       if (hoursUntilDeadline < 5) {
+  //         additionalFees += 20;
+  //       } else if (hoursUntilDeadline <= 8) {
+  //         additionalFees += 14;
+  //       } else if (hoursUntilDeadline <= 11) {
+  //         additionalFees += 10;
+  //       } else if (hoursUntilDeadline <= 14) {
+  //         additionalFees += 5;
+  //       } else if (hoursUntilDeadline <= 17) {
+  //         additionalFees += 4;
+  //       } else if (hoursUntilDeadline <= 23) {
+  //         additionalFees += 3;
+  //       } else if (hoursUntilDeadline <= 24) {
+  //         additionalFees += 2;
+  //       } else if (hoursUntilDeadline > 7 * 24) {
+  //         totalPrice = 19.08; // Override for > 7 days, including 6% processing fee
+  //         additionalFees = 0; // Reset additional fees
+  //       } else {
+  //         additionalFees += 2; // Default for >= 24 hours
+  //       }
+  //     }
+
+  //     // Writer's Tip
+  //     additionalFees += parseFloat(formData.writer_tip) || 0;
+
+  //     // Plagiarism Report
+  //     if (formData.plagiarism_report) {
+  //       additionalFees += 6;
+  //     }
+
+  //     // Processing Fee (6%)
+  //     if (
+  //       formData.deadline &&
+  //       (new Date(formData.deadline) - new Date()) / (1000 * 60 * 60) <= 7 * 24
+  //     ) {
+  //       totalPrice += totalPrice * 0.06;
+  //     }
+
+  //     // Apply additional fees
+  //     totalPrice += additionalFees;
+
+  //     setFormData((prev) => ({
+  //       ...prev,
+  //       base_price: basePrice,
+  //       additional_fees: additionalFees,
+  //       total_price: totalPrice,
+  //       amount_paid:
+  //         formData.payment_option === "full" ? totalPrice : totalPrice / 2,
+  //     }));
+  //   };
+
+  //   calculatePrice();
+  // }, [
+  //   formData.type_of_service,
+  //   formData.document_type,
+  //   formData.writer_level,
+  //   formData.spacing,
+  //   formData.pages,
+  //   formData.writer_type,
+  //   formData.deadline,
+  //   formData.writer_tip,
+  //   formData.plagiarism_report,
+  //   formData.payment_option,
+  // ]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -81,6 +202,42 @@ function OrderPayment() {
                   Step 2: Order Payment
                 </h2>
                 <form className="space-y-6">
+                  {/* <FormField
+                    label="Payment Option"
+                    name="payment_option"
+                    type="select"
+                    value={formData.payment_option}
+                    onChange={handleInputChange}
+                    options={[
+                      { value: "full", label: "Pay in Full" },
+                      { value: "installments", label: "Installments" },
+                    ]}
+                    required
+                  /> */}
+                  {/* <FormField
+                    label="Coupon Code"
+                    name="coupon_code"
+                    type="text"
+                    value={formData.coupon_code}
+                    onChange={handleInputChange}
+                    placeholder="Enter coupon code"
+                  /> */}
+                  {/* <FormField
+                    label="Writer's Tip"
+                    name="writer_tip"
+                    type="number"
+                    value={formData.writer_tip}
+                    onChange={handleInputChange}
+                    placeholder="Enter tip amount"
+                    suffix="USD"
+                  /> */}
+                  {/* <FormField
+                    label="Plagiarism Report"
+                    name="plagiarism_report"
+                    type="checkbox"
+                    value={formData.plagiarism_report}
+                    onChange={(name, value) => handleInputChange(name, value)}
+                  /> */}
                   {/* Writer Type */}
                   <div>
                     <label className="block font-medium mb-2">
@@ -93,12 +250,32 @@ function OrderPayment() {
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
                       required
                     >
+                      {/* <div className="flex justify-between items-center">
+                        <span className="text-gray-600">Writer Type</span>
+                        <span className="font-semibold">
+                          {formData.writer_type}
+                        </span>
+                      </div> */}
                       <option value="">-- Choose Writer Type --</option>
                       <option value="standard">Standard Writer</option>
                       <option value="premium">Premium Writer</option>
                       <option value="top">Top 10 Writer</option>
                     </select>
                   </div>
+                  {/* 
+                   <FormField
+                    label="Writer Type"
+                    name="writer_type"
+                    type="select"
+                    value={formData.writer_type}
+                    onChange={handleInputChange}
+                    options={[
+                      { value: "standard", label: "Standard" },
+                      { value: "premium", label: "Premium" },
+                      { value: "platinum", label: "Platinum" },
+                    ]}
+                    required
+                  /> */}
 
                   {/* Tip */}
                   <div>

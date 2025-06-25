@@ -3,6 +3,7 @@ const Joi = require("joi");
 
 //Post an order
 const postOrder = async (req, res) => {
+  console.log("Received request body:", req.body);
   try {
     // Validation schema
     const schema = Joi.object({
@@ -30,13 +31,16 @@ const postOrder = async (req, res) => {
       amount_paid: Joi.number().min(0),
     });
 
+    
+
     const { error, value } = schema.validate(req.body);
     if (error) {
       return res.status(400).json({ error: error.details[0].message });
     }
 
     // File path from multer
-    const uploadedFile = req.file ? req.file.location : null; // Use .location for multer-s3
+    const uploadedFile = req.files?.[0]?.location || null;
+    console.log("Uploaded files:", uploadedFile);
 
     // Add user_id from auth middleware (assuming req.user exists)
     const query = `
@@ -86,6 +90,8 @@ const postOrder = async (req, res) => {
     ];
 
     const { rows } = await client.query(query, values);
+
+    console.log("Order inserted successfully:", rows[0]);
 
     res.status(201).json({
       message: "Order posted successfully, awaiting checkout.",
@@ -231,7 +237,6 @@ const deleteOrder = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 module.exports = {
   postOrder,
