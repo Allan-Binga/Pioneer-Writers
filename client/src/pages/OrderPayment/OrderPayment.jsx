@@ -1,148 +1,136 @@
-import { useState } from "react";
-import { Check } from "lucide-react";
-import { Navigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Check, ChevronDown } from "lucide-react";
 import Navbar from "../../components/Navbar";
 
 function OrderPayment() {
-  const steps = [
-    { number: 1, title: "Assignment Instructions", completed: true },
-    { number: 2, title: "Order Payment", current: true },
-    { number: 3, title: "Order Confirmation", completed: false },
-  ];
+  const [steps, setSteps] = useState([
+    {
+      number: 1,
+      title: "Assignment Instructions",
+      current: false,
+      completed: true,
+    },
+    { number: 2, title: "Order Payment", current: true, completed: false },
+    {
+      number: 3,
+      title: "Order Confirmation",
+      current: false,
+      completed: false,
+    },
+  ]);
 
   const [formData, setFormData] = useState({
-    writerType: "",
+    topic: "",
+    document_type: "",
+    writer_level: "",
+    pages: "",
     deadline: "",
-    tip: "",
-    plagiarismReport: "",
-    paymentOption: "",
-    couponCode: "",
+    writer_type: "",
+    writer_tip: 0,
+    plagiarism_report: false,
+    payment_option: "full",
+    coupon_code: "",
+    base_price: 0,
+    additional_fees: 0,
+    total_price: 0,
+    amount_paid: 0,
   });
 
-  // Calculate prices based on provided rules
-  // useEffect(() => {
-  //   const calculatePrice = () => {
-  //     let basePrice = 20; // Default for Writing from Scratch, Custom Essay, University, 1 page, Double-spaced
+  const DropdownIndicator = ({ selectProps }) => {
+    const isOpen = selectProps.menuIsOpen;
+    return (
+      <div className="mx-2 transition-transform duration-500 ease-[cubic-bezier(0.4, 0, 0.2, 1)]">
+        <ChevronDown
+          size={20}
+          className={`text-purple-600 transform ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+        />
+      </div>
+    );
+  };
 
-  //     // Type of Service
-  //     if (formData.type_of_service === "editing") {
-  //       basePrice -= 9; // $11
-  //     } else if (formData.type_of_service === "calculations") {
-  //       basePrice -= 6; // $14
-  //     }
+  // Fetch data from localStorage on component mount
+  useEffect(() => {
+    const storedOrder = JSON.parse(localStorage.getItem("step1Data")) || {};
+    setFormData((prev) => ({
+      ...prev,
+      ...storedOrder,
+      writer_tip: storedOrder.writer_tip || 0,
+      plagiarism_report: storedOrder.plagiarism_report || false,
+      payment_option: storedOrder.payment_option || "full",
+      coupon_code: storedOrder.coupon_code || "",
+      base_price: storedOrder.base_price || 0,
+      additional_fees: storedOrder.additional_fees || 0,
+      total_price: storedOrder.total_price || 0,
+      amount_paid: storedOrder.amount_paid || 0,
+    }));
+  }, []);
 
-  //     // Document Type
-  //     if (
-  //       ["article_review", "thesis", "dissertation"].includes(
-  //         formData.document_type
-  //       )
-  //     ) {
-  //       basePrice += 5; // $25
-  //     } else if (formData.document_type === "math-problems") {
-  //       basePrice += 10; // $30
-  //     }
+  // Calculate prices based on formData changes
+  useEffect(() => {
+    const calculatePrice = () => {
+      // Start with base_price and additional_fees from localStorage
+      let total =
+        parseFloat(formData.total_price || 0) 
+        parseFloat(formData.additional_fees || 0);
 
-  //     // Writer Level
-  //     if (formData.writer_level === "college") {
-  //       basePrice -= 2;
-  //     } else if (formData.writer_level === "masters") {
-  //       basePrice += 2;
-  //     } else if (formData.writer_level === "phd") {
-  //       basePrice += 4;
-  //     }
+      // Add writer_tip
+      const tip = parseFloat(formData.writer_tip || 0);
+      if (!isNaN(tip) && tip > 0) {
+        total += tip;
+      }
 
-  //     // Spacing
-  //     if (formData.spacing === "single") {
-  //       basePrice *= 2;
-  //     }
+      // Add plagiarism report fee
+      if (formData.plagiarism_report) {
+        total += 6;
+      }
 
-  //     // Pages
-  //     const pages = parseInt(formData.pages) || 1;
-  //     let totalPrice = basePrice * pages;
+      // Calculate amount_paid based on payment_option
+      const amountPaid = formData.payment_option === "full" ? total : total / 2;
 
-  //     // Step 2 Fields
-  //     let additionalFees = 0;
+      setFormData((prev) => ({
+        ...prev,
+        total_price: total,
+        amount_paid: amountPaid,
+      }));
+    };
 
-  //     // Writer Type
-  //     if (formData.writer_type === "premium") {
-  //       additionalFees += 7;
-  //     } else if (formData.writer_type === "platinum") {
-  //       additionalFees += 12;
-  //     }
+    calculatePrice();
+  }, [
+    formData.writer_tip,
+    formData.plagiarism_report,
+    formData.payment_option,
+    formData.base_price,
+    formData.additional_fees,
+  ]);
 
-  //     // Deadline
-  //     if (formData.deadline) {
-  //       const deadlineDate = new Date(formData.deadline);
-  //       const now = new Date();
-  //       const hoursUntilDeadline = (deadlineDate - now) / (1000 * 60 * 60);
-  //       if (hoursUntilDeadline < 5) {
-  //         additionalFees += 20;
-  //       } else if (hoursUntilDeadline <= 8) {
-  //         additionalFees += 14;
-  //       } else if (hoursUntilDeadline <= 11) {
-  //         additionalFees += 10;
-  //       } else if (hoursUntilDeadline <= 14) {
-  //         additionalFees += 5;
-  //       } else if (hoursUntilDeadline <= 17) {
-  //         additionalFees += 4;
-  //       } else if (hoursUntilDeadline <= 23) {
-  //         additionalFees += 3;
-  //       } else if (hoursUntilDeadline <= 24) {
-  //         additionalFees += 2;
-  //       } else if (hoursUntilDeadline > 7 * 24) {
-  //         totalPrice = 19.08; // Override for > 7 days, including 6% processing fee
-  //         additionalFees = 0; // Reset additional fees
-  //       } else {
-  //         additionalFees += 2; // Default for >= 24 hours
-  //       }
-  //     }
-
-  //     // Writer's Tip
-  //     additionalFees += parseFloat(formData.writer_tip) || 0;
-
-  //     // Plagiarism Report
-  //     if (formData.plagiarism_report) {
-  //       additionalFees += 6;
-  //     }
-
-  //     // Processing Fee (6%)
-  //     if (
-  //       formData.deadline &&
-  //       (new Date(formData.deadline) - new Date()) / (1000 * 60 * 60) <= 7 * 24
-  //     ) {
-  //       totalPrice += totalPrice * 0.06;
-  //     }
-
-  //     // Apply additional fees
-  //     totalPrice += additionalFees;
-
-  //     setFormData((prev) => ({
-  //       ...prev,
-  //       base_price: basePrice,
-  //       additional_fees: additionalFees,
-  //       total_price: totalPrice,
-  //       amount_paid:
-  //         formData.payment_option === "full" ? totalPrice : totalPrice / 2,
-  //     }));
-  //   };
-
-  //   calculatePrice();
-  // }, [
-  //   formData.type_of_service,
-  //   formData.document_type,
-  //   formData.writer_level,
-  //   formData.spacing,
-  //   formData.pages,
-  //   formData.writer_type,
-  //   formData.deadline,
-  //   formData.writer_tip,
-  //   formData.plagiarism_report,
-  //   formData.payment_option,
-  // ]);
-
+  // Handle form input changes
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+      ...(name === "plagiarismReport" && {
+        plagiarism_report: value === "yes",
+      }),
+      ...(name === "tip" && { writer_tip: parseFloat(value) || 0 }),
+      ...(name === "paymentOption" && { payment_option: value }),
+      ...(name === "couponCode" && { coupon_code: value }),
+      ...(name === "writerType" && { writer_type: value }),
+    }));
+  };
+
+  // Handle form submission
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    localStorage.setItem("orderData", JSON.stringify(formData));
+    window.location.href = "/order-confirmation";
+  };
+
+  // Handle Previous button
+  const handlePrevious = () => {
+    window.location.href = "/order-instructions";
   };
 
   return (
@@ -201,83 +189,7 @@ function OrderPayment() {
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
                   Step 2: Order Payment
                 </h2>
-                <form className="space-y-6">
-                  {/* <FormField
-                    label="Payment Option"
-                    name="payment_option"
-                    type="select"
-                    value={formData.payment_option}
-                    onChange={handleInputChange}
-                    options={[
-                      { value: "full", label: "Pay in Full" },
-                      { value: "installments", label: "Installments" },
-                    ]}
-                    required
-                  /> */}
-                  {/* <FormField
-                    label="Coupon Code"
-                    name="coupon_code"
-                    type="text"
-                    value={formData.coupon_code}
-                    onChange={handleInputChange}
-                    placeholder="Enter coupon code"
-                  /> */}
-                  {/* <FormField
-                    label="Writer's Tip"
-                    name="writer_tip"
-                    type="number"
-                    value={formData.writer_tip}
-                    onChange={handleInputChange}
-                    placeholder="Enter tip amount"
-                    suffix="USD"
-                  /> */}
-                  {/* <FormField
-                    label="Plagiarism Report"
-                    name="plagiarism_report"
-                    type="checkbox"
-                    value={formData.plagiarism_report}
-                    onChange={(name, value) => handleInputChange(name, value)}
-                  /> */}
-                  {/* Writer Type */}
-                  <div>
-                    <label className="block font-medium mb-2">
-                      Select Writer Type *
-                    </label>
-                    <select
-                      name="writerType"
-                      value={formData.writerType}
-                      onChange={handleChange}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      required
-                    >
-                      {/* <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Writer Type</span>
-                        <span className="font-semibold">
-                          {formData.writer_type}
-                        </span>
-                      </div> */}
-                      <option value="">-- Choose Writer Type --</option>
-                      <option value="standard">Standard Writer</option>
-                      <option value="premium">Premium Writer</option>
-                      <option value="top">Top 10 Writer</option>
-                    </select>
-                  </div>
-                  {/* 
-                   <FormField
-                    label="Writer Type"
-                    name="writer_type"
-                    type="select"
-                    value={formData.writer_type}
-                    onChange={handleInputChange}
-                    options={[
-                      { value: "standard", label: "Standard" },
-                      { value: "premium", label: "Premium" },
-                      { value: "platinum", label: "Platinum" },
-                    ]}
-                    required
-                  /> */}
-
-                  {/* Tip */}
+                <form className="space-y-6" onSubmit={handleSubmit}>
                   <div>
                     <label className="block font-medium mb-2">
                       Writer's Tip (optional)
@@ -285,14 +197,13 @@ function OrderPayment() {
                     <input
                       type="number"
                       name="tip"
-                      value={formData.tip}
+                      value={formData.writer_tip}
                       onChange={handleChange}
                       placeholder="Add tip in USD"
+                      min="0"
                       className="w-full border border-gray-300 rounded-lg px-4 py-3"
                     />
                   </div>
-
-                  {/* Plagiarism Report */}
                   <div>
                     <label className="block font-medium mb-2">
                       Plagiarism Report
@@ -303,25 +214,23 @@ function OrderPayment() {
                           type="radio"
                           name="plagiarismReport"
                           value="yes"
-                          checked={formData.plagiarismReport === "yes"}
+                          checked={formData.plagiarism_report === true}
                           onChange={handleChange}
                         />
-                        Yes, attach
+                        Yes, attach ($6)
                       </label>
                       <label className="flex items-center gap-2">
                         <input
                           type="radio"
                           name="plagiarismReport"
                           value="no"
-                          checked={formData.plagiarismReport === "no"}
+                          checked={formData.plagiarism_report === false}
                           onChange={handleChange}
                         />
                         No, do not attach
                       </label>
                     </div>
                   </div>
-
-                  {/* Payment Option */}
                   <div>
                     <label className="block font-medium mb-2">
                       Payment Option *
@@ -331,26 +240,14 @@ function OrderPayment() {
                         <input
                           type="radio"
                           name="paymentOption"
-                          value="installments"
-                          checked={formData.paymentOption === "installments"}
-                          onChange={handleChange}
-                        />
-                        Pay in Installments
-                      </label>
-                      <label className="flex items-center gap-2">
-                        <input
-                          type="radio"
-                          name="paymentOption"
                           value="full"
-                          checked={formData.paymentOption === "full"}
+                          checked={formData.payment_option === "full"}
                           onChange={handleChange}
                         />
                         Pay in Full
                       </label>
                     </div>
                   </div>
-
-                  {/* Coupon */}
                   <div>
                     <label className="block font-medium mb-2">
                       Coupon Code
@@ -358,11 +255,26 @@ function OrderPayment() {
                     <input
                       type="text"
                       name="couponCode"
-                      value={formData.couponCode}
+                      value={formData.coupon_code}
                       onChange={handleChange}
                       placeholder="Enter coupon if available"
                       className="w-full border border-gray-300 rounded-lg px-4 py-3"
                     />
+                  </div>
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={handlePrevious}
+                      className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg"
+                    >
+                      Previous
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg"
+                    >
+                      Proceed to Confirmation
+                    </button>
                   </div>
                 </form>
               </div>
@@ -375,60 +287,74 @@ function OrderPayment() {
                   <h3 className="text-xl font-bold text-gray-800 mb-6">
                     Summary
                   </h3>
-
                   <div className="space-y-4 mb-6">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Essay</span>
-                      <span className="font-semibold">$16</span>
+                      <span className="text-gray-600">Document Type</span>
+                      <span className="font-semibold capitalize">
+                        {formData.document_type}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Quantity</span>
-                      <span className="font-semibold">1 page</span>
+                      <span className="font-semibold">
+                        {formData.pages} page(s)
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Academic Level</span>
-                      <span className="font-semibold">Undergraduate</span>
+                      <span className="font-semibold capitalize">
+                        {formData.writer_level}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Deadline</span>
                       <span className="font-semibold text-sm">
-                        by 10:07 PM - July 3
+                        {new Date(formData.deadline).toLocaleString("en-US", {
+                          dateStyle: "medium",
+                          timeStyle: "short",
+                        })}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Basic Writer</span>
-                      <span className="font-semibold">Included</span>
+                      <span className="text-gray-600">Writer Type</span>
+                      <span className="font-semibold capitalize">
+                        {formData.writer_type || "Standard"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Writer's Tip</span>
+                      <span className="font-semibold">
+                        ${(formData.writer_tip || 0).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Plagiarism Report</span>
+                      <span className="font-semibold">
+                        {formData.plagiarism_report ? "$6.00" : "Not included"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Base Price</span>
+                      <span className="font-semibold">
+                        ${(formData.base_price || 0).toFixed(2)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Additional Fees</span>
+                      <span className="font-semibold">
+                        ${(formData.additional_fees || 0).toFixed(2)}
+                      </span>
                     </div>
                   </div>
-
                   <div className="border-t border-gray-200 pt-4 mb-6 space-y-2">
                     <div className="flex justify-between font-semibold">
-                      <span>Total (Before Fee)</span>
-                      <span>$20.00</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Processing Fee (6%)</span>
-                      <span>$1.20</span>
+                      <span>Total</span>
+                      <span>${(formData.total_price || 0).toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-lg font-bold text-gray-800 pt-2">
                       <span>Checkout Amount</span>
-                      <span>$21.20</span>
+                      <span>${(formData.amount_paid || 0).toFixed(2)}</span>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      type="button"
-                      className="bg-gray-200 text-gray-800 font-semibold py-3 rounded-xl hover:bg-gray-300 transition"
-                    >
-                      Previous
-                    </button>
-                    <button
-                      type="submit"
-                      className="bg-gradient-to-r from-slate-800 to-slate-900 text-white font-semibold py-3 rounded-xl hover:from-slate-900 hover:to-slate-950 transition"
-                    >
-                      Next
-                    </button>
                   </div>
                 </div>
               </div>
