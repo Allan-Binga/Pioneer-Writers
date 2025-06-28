@@ -24,9 +24,6 @@ function NewOrder() {
     instructions: "",
     writer_type: "standard",
     deadline: "",
-    writer_tip: 0,
-    plagiarism_report: false,
-    payment_option: "full",
     base_price: 20,
     additional_fees: 0,
     total_price: 20,
@@ -168,7 +165,6 @@ function NewOrder() {
     formData.pages,
     formData.writer_type,
     formData.deadline,
-    formData.writer_tip,
     formData.plagiarism_report,
     formData.payment_option,
   ]);
@@ -235,7 +231,6 @@ function NewOrder() {
       "topic",
       "writer_type",
       "deadline",
-      "payment_option",
       "base_price",
       "total_price",
     ];

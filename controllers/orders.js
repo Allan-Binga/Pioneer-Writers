@@ -1,11 +1,9 @@
 const client = require("../config/dbConfig");
 const Joi = require("joi");
 
-//Post an order
+//Post Order
 const postOrder = async (req, res) => {
-  console.log("Received request body:", req.body);
   try {
-    // Validation schema
     const schema = Joi.object({
       topic_field: Joi.string().required(),
       type_of_service: Joi.string().required(),
@@ -21,10 +19,6 @@ const postOrder = async (req, res) => {
       instructions: Joi.string().allow(""),
       writer_type: Joi.string().required(),
       deadline: Joi.date().iso().required(),
-      writer_tip: Joi.number().min(0),
-      plagiarism_report: Joi.boolean(),
-      payment_option: Joi.string().required(),
-      coupon_code: Joi.string().allow(""),
       base_price: Joi.number().min(0).required(),
       additional_fees: Joi.number().min(0),
       total_price: Joi.number().min(0).required(),
@@ -32,31 +26,22 @@ const postOrder = async (req, res) => {
     });
 
     const { error, value } = schema.validate(req.body);
-    if (error) {
-      return res.status(400).json({ error: error.details[0].message });
-    }
+    if (error) return res.status(400).json({ error: error.details[0].message });
 
-    // File path from multer
     const uploadedFile = req.files?.[0]?.location || null;
-    console.log("Uploaded files:", uploadedFile);
 
-    // Add user_id from auth middleware (assuming req.user exists)
     const query = `
       INSERT INTO orders (
         topic_field, type_of_service, document_type, writer_level,
         paper_format, english_type, pages, spacing, number_of_words,
         number_of_sources, topic, instructions, uploaded_file,
-        writer_type, deadline, writer_tip, plagiarism_report,
-        payment_option, coupon_code, base_price, additional_fees,
-        total_price, amount_paid
+        writer_type, deadline, base_price, additional_fees, total_price
       )
       VALUES (
         $1, $2, $3, $4, $5,
         $6, $7, $8, $9, $10,
         $11, $12, $13, $14,
-        $15, $16, $17, $18,
-        $19, $20, $21, $22,
-        $23
+        $15, $16, $17, $18
       )
       RETURNING *;
     `;
@@ -77,26 +62,72 @@ const postOrder = async (req, res) => {
       uploadedFile,
       value.writer_type,
       value.deadline,
-      value.writer_tip,
-      value.plagiarism_report,
-      value.payment_option,
-      value.coupon_code,
       value.base_price,
       value.additional_fees,
       value.total_price,
-      value.amount_paid,
     ];
 
     const { rows } = await client.query(query, values);
-
-    console.log("Order inserted successfully:", rows[0]);
-
     res.status(201).json({
-      message: "Order posted successfully, awaiting checkout.",
+      message: "Order posted successfully. Proceed to checkout.",
       order: rows[0],
     });
   } catch (error) {
     console.error("Error posting order:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//Step 2: Update order information
+const completeOrderPost = async (req, res) => {
+  try {
+    const schema = Joi.object({
+      writer_tip: Joi.number().min(0).allow(null),
+      plagiarism_report: Joi.boolean().required(),
+      payment_option: Joi.string().required(),
+      coupon_code: Joi.string().allow(""),
+      amount_paid: Joi.number().min(0).required(),
+      total_price: Joi.number().min(0).required(),
+    });
+
+    const { error, value } = schema.validate(req.body);
+    if (error) return res.status(400).json({ error: error.details[0].message });
+
+    const query = `
+      UPDATE orders
+      SET
+        writer_tip = $1,
+        plagiarism_report = $2,
+        payment_option = $3,
+        coupon_code = $4,
+        amount_paid = $5,
+        total_price = $6
+      WHERE id = $7
+      RETURNING *;
+    `;
+
+    const values = [
+      value.writer_tip,
+      value.plagiarism_report,
+      value.payment_option,
+      value.coupon_code,
+      value.amount_paid,
+      value.total_price,
+      id,
+    ];
+
+    const { rows } = await client.query(query, values);
+
+    if (!rows.length) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    res.status(200).json({
+      message: "Order checkout updated successfully.",
+      order: rows[0],
+    });
+  } catch (error) {
+    console.error("Error updating checkout:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -238,6 +269,7 @@ const deleteOrder = async (req, res) => {
 
 module.exports = {
   postOrder,
+  completeOrderPost,
   getOrders,
   getUsersOrders,
   updateOrder,

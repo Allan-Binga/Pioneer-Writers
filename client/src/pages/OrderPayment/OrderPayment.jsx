@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import { Check, ChevronDown } from "lucide-react";
 import Navbar from "../../components/Navbar";
+import axios from "axios";
+import { endpoint } from "../../server";
+import { useNavigate } from "react-router-dom";
+import Select from "react-select";
 
 function OrderPayment() {
+  const navigate = useNavigate();
   const [steps, setSteps] = useState([
     {
       number: 1,
@@ -18,7 +23,6 @@ function OrderPayment() {
       completed: false,
     },
   ]);
-
   const [formData, setFormData] = useState({
     topic: "",
     document_type: "",
@@ -26,7 +30,7 @@ function OrderPayment() {
     pages: "",
     deadline: "",
     writer_type: "",
-    writer_tip: 0,
+    writer_tip: "", // Changed from 0 to ""
     plagiarism_report: false,
     payment_option: "full",
     coupon_code: "",
@@ -35,6 +39,8 @@ function OrderPayment() {
     total_price: 0,
     amount_paid: 0,
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const DropdownIndicator = ({ selectProps }) => {
     const isOpen = selectProps.menuIsOpen;
@@ -56,7 +62,6 @@ function OrderPayment() {
     setFormData((prev) => ({
       ...prev,
       ...storedOrder,
-      writer_tip: storedOrder.writer_tip || 0,
       plagiarism_report: storedOrder.plagiarism_report || false,
       payment_option: storedOrder.payment_option || "full",
       coupon_code: storedOrder.coupon_code || "",
@@ -64,20 +69,20 @@ function OrderPayment() {
       additional_fees: storedOrder.additional_fees || 0,
       total_price: storedOrder.total_price || 0,
       amount_paid: storedOrder.amount_paid || 0,
+      writer_tip: storedOrder.writer_tip || "", // Changed to handle empty string
     }));
   }, []);
 
   // Calculate prices based on formData changes
   useEffect(() => {
     const calculatePrice = () => {
-      // Start with base_price and additional_fees from localStorage
       let total =
-        parseFloat(formData.total_price || 0) 
+        parseFloat(formData.base_price || 0) +
         parseFloat(formData.additional_fees || 0);
 
       // Add writer_tip
-      const tip = parseFloat(formData.writer_tip || 0);
-      if (!isNaN(tip) && tip > 0) {
+      const tip = parseFloat(formData.writer_tip);
+      if (!isNaN(tip) && tip >= 0) {
         total += tip;
       }
 
@@ -114,7 +119,9 @@ function OrderPayment() {
       ...(name === "plagiarismReport" && {
         plagiarism_report: value === "yes",
       }),
-      ...(name === "tip" && { writer_tip: parseFloat(value) || 0 }),
+      ...(name === "writer_tip" && {
+        writer_tip: value, // Store as string, including empty string
+      }),
       ...(name === "paymentOption" && { payment_option: value }),
       ...(name === "couponCode" && { coupon_code: value }),
       ...(name === "writerType" && { writer_type: value }),
@@ -122,15 +129,200 @@ function OrderPayment() {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem("orderData", JSON.stringify(formData));
-    window.location.href = "/order-confirmation";
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const orderId = localStorage.getItem("orderId");
+      if (!orderId) {
+        throw new Error("Order ID not found");
+      }
+
+      const payload = {
+        writer_tip:
+          formData.writer_tip === ""
+            ? null
+            : parseFloat(formData.writer_tip) || 0,
+        plagiarism_report: formData.plagiarism_report,
+        payment_option: formData.payment_option,
+        coupon_code: formData.coupon_code,
+        amount_paid: formData.amount_paid,
+        total_price: formData.total_price,
+      };
+
+      const response = await axios.patch(
+        `${endpoint}/orders/post-order/step-two/${orderId}`,
+        payload
+      );
+
+      // Store step 2 data
+      localStorage.setItem(
+        "step2Data",
+        JSON.stringify({
+          ...formData,
+          ...payload,
+        })
+      );
+
+      // Update steps
+      setSteps((prev) =>
+        prev.map((step) =>
+          step.number === 2
+            ? { ...step, current: false, completed: true }
+            : step.number === 3
+            ? { ...step, current: true }
+            : step
+        )
+      );
+
+      // Navigate to confirmation page
+      navigate("/order-confirmation");
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      setError(
+        error.response?.data?.error || "Failed to process payment details"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  // Handle Previous button
   const handlePrevious = () => {
-    window.location.href = "/order-instructions";
+    navigate("/order-instructions");
+  };
+
+  const FormField = ({
+    label,
+    name,
+    type,
+    value,
+    onChange,
+    options,
+    placeholder,
+    required = false,
+    fullWidth = false,
+    readonly = false,
+    prefix,
+  }) => {
+    const baseInputClasses =
+      "w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800";
+    const readonlyClasses = "bg-gray-50 cursor-not-allowed";
+    const selectStyles = {
+      control: (provided, state) => ({
+        ...provided,
+        border: `2px solid ${state.isFocused ? "#7C3AED" : "#D8B4FE"}`,
+        borderRadius: "0.5rem",
+        padding: "0.5rem",
+        backgroundColor: "white",
+        boxShadow: state.isFocused
+          ? "0 0 0 2px rgba(124, 58, 237, 0.2)"
+          : "none",
+        "&:hover": { borderColor: "#7C3AED" },
+        fontSize: "0.875rem",
+        color: "#1F2937",
+      }),
+      menu: (provided) => ({
+        ...provided,
+        borderRadius: "0.5rem",
+        border: "1px solid #D8B4FE",
+        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+        marginTop: "0.25rem",
+        zIndex: 50,
+      }),
+      option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isSelected
+          ? "#7C3AED"
+          : state.isFocused
+          ? "#F3E8FF"
+          : "white",
+        color: state.isSelected ? "white" : "#1F2937",
+        padding: "0.75rem 1rem",
+        fontSize: "0.875rem",
+        "&:hover": { backgroundColor: "#F3E8FF", color: "#1F2937" },
+      }),
+      singleValue: (provided) => ({ ...provided, color: "#1F2937" }),
+      placeholder: (provided) => ({ ...provided, color: "#9CA3AF" }),
+      dropdownIndicator: (provided) => ({
+        ...provided,
+        color: "#7C3AED",
+        "&:hover": { color: "#6B21A8" },
+      }),
+      indicatorSeparator: () => ({ display: "none" }),
+    };
+
+    return (
+      <div className={fullWidth ? "col-span-full" : ""}>
+        <label
+          htmlFor={name}
+          className="block text-sm font-semibold text-gray-700 mb-2"
+        >
+          {label} {required && <span className="text-red-500">*</span>}
+        </label>
+        <div className="relative">
+          {type === "select" ? (
+            <Select
+              value={options?.find((option) => option.value === value) || null}
+              onChange={(selected) =>
+                onChange({
+                  target: { name, value: selected ? selected.value : "" },
+                })
+              }
+              options={options}
+              placeholder={placeholder || "Select an option"}
+              isDisabled={readonly}
+              styles={selectStyles}
+              isSearchable={true}
+              components={{ DropdownIndicator }}
+            />
+          ) : type === "textarea" ? (
+            <textarea
+              id={name}
+              name={name}
+              value={value}
+              onChange={(e) => onChange(e)}
+              placeholder={placeholder}
+              className={`${baseInputClasses} ${
+                readonly ? readonlyClasses : ""
+              } min-h-32 resize-vertical`}
+              readOnly={readonly}
+            />
+          ) : type === "checkbox" ? (
+            <input
+              id={name}
+              name={name}
+              type="checkbox"
+              checked={value}
+              onChange={(e) => onChange(e)}
+              className="h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-400"
+            />
+          ) : (
+            <div className="relative">
+              {prefix && (
+                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+                  {prefix}
+                </span>
+              )}
+              <input
+                id={name}
+                name={name}
+                type={type}
+                value={value}
+                onChange={(e) => onChange(e)}
+                placeholder={placeholder}
+                className={`${baseInputClasses} ${
+                  readonly ? readonlyClasses : ""
+                } ${prefix ? "pl-8" : ""}`}
+                readOnly={readonly}
+                min={type === "number" ? 0 : undefined}
+              />
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -138,13 +330,23 @@ function OrderPayment() {
       <Navbar />
       <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
           {/* Progress Tracker */}
           <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
                 <div
                   className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
-                  style={{ width: "33%" }}
+                  style={{
+                    width: `${
+                      (steps.findIndex((s) => s.current) / (steps.length - 1)) *
+                      100
+                    }%`,
+                  }}
                 />
               </div>
               {steps.map((step) => (
@@ -190,22 +392,17 @@ function OrderPayment() {
                   Step 2: Order Payment
                 </h2>
                 <form className="space-y-6" onSubmit={handleSubmit}>
+                  <FormField
+                    label="Writer's Tip (optional)"
+                    name="writer_tip"
+                    type="number"
+                    value={formData.writer_tip}
+                    onChange={handleChange}
+                    placeholder="Add tip in USD"
+                    prefix="$"
+                  />
                   <div>
-                    <label className="block font-medium mb-2">
-                      Writer's Tip (optional)
-                    </label>
-                    <input
-                      type="number"
-                      name="tip"
-                      value={formData.writer_tip}
-                      onChange={handleChange}
-                      placeholder="Add tip in USD"
-                      min="0"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                    />
-                  </div>
-                  <div>
-                    <label className="block font-medium mb-2">
+                    <label className="block font-medium">
                       Plagiarism Report
                     </label>
                     <div className="space-y-2">
@@ -246,34 +443,43 @@ function OrderPayment() {
                         />
                         Pay in Full
                       </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name="paymentOption"
+                          value="half"
+                          checked={formData.payment_option === "half"}
+                          onChange={handleChange}
+                        />
+                        Pay Half Now
+                      </label>
                     </div>
                   </div>
-                  <div>
-                    <label className="block font-medium mb-2">
-                      Coupon Code
-                    </label>
-                    <input
-                      type="text"
-                      name="couponCode"
-                      value={formData.coupon_code}
-                      onChange={handleChange}
-                      placeholder="Enter coupon if available"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3"
-                    />
-                  </div>
+                  <FormField
+                    label="Coupon Code"
+                    name="couponCode"
+                    type="text"
+                    value={formData.coupon_code}
+                    onChange={handleChange}
+                    placeholder="Enter coupon if available"
+                  />
                   <div className="flex gap-4">
                     <button
                       type="button"
                       onClick={handlePrevious}
                       className="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg"
+                      disabled={isSubmitting}
                     >
                       Previous
                     </button>
                     <button
                       type="submit"
-                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg"
+                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg disabled:opacity-50"
+                      disabled={isSubmitting}
                     >
-                      Proceed to Confirmation
+                      {isSubmitting
+                        ? "Processing..."
+                        : "Proceed to Confirmation"}
                     </button>
                   </div>
                 </form>
@@ -324,7 +530,11 @@ function OrderPayment() {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Writer's Tip</span>
                       <span className="font-semibold">
-                        ${(formData.writer_tip || 0).toFixed(2)}
+                        {formData.writer_tip === ""
+                          ? "Not included"
+                          : `$${parseFloat(formData.writer_tip || 0).toFixed(
+                              2
+                            )}`}
                       </span>
                     </div>
                     <div className="flex justify-between">

@@ -19,6 +19,7 @@ import Settings from "./pages/Profile/Settings";
 import Profile from "./pages/Profile/Profile";
 import News from "./pages/News/News";
 import PlaceOrder from "./pages/NewOrder/PlaceOrder";
+import OrderCheckout from "./pages/OrderCheckout/OrderCheckout";
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/news" element={<News />} />
+        <Route path="/order-checkout" element={<OrderCheckout />} />
       </Routes>
     </Router>
   );
