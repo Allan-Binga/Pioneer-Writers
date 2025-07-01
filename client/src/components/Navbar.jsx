@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+
+  const showAuthButtons = ["/new-order", "/order-payment"].includes(
+    location.pathname
+  );
 
   const navItems = [
     "Services",
@@ -37,20 +42,23 @@ function Navbar() {
                 {item}
               </a>
             ))}
-            <div className="flex items-center space-x-3">
-              <Link
-                to="/sign-in"
-                className="text-purple-600 hover:text-purple-700 transition-colors duration-200 text-sm font-medium"
-              >
-                Log In
-              </Link>
-              <Link
-                to="/sign-up"
-                className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
-              >
-                Sign Up
-              </Link>
-            </div>
+
+            {showAuthButtons && (
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/sign-in"
+                  className="text-purple-600 hover:text-purple-700 transition-colors duration-200 text-sm font-medium"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/sign-up"
+                  className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -77,9 +85,23 @@ function Navbar() {
                   {item}
                 </a>
               ))}
-              <button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-md mt-4 w-fit">
-                Sign In
-              </button>
+
+              {showAuthButtons && (
+                <>
+                  <Link
+                    to="/sign-in"
+                    className="text-purple-600 hover:text-purple-700 transition-colors duration-200 text-sm font-medium"
+                  >
+                    Log In
+                  </Link>
+                  <Link
+                    to="/sign-up"
+                    className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-6 py-2 rounded-full hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-md mt-2 w-fit"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

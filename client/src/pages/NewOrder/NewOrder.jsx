@@ -4,8 +4,6 @@ import Navbar from "../../components/Navbar";
 import { useState, useEffect, useCallback } from "react";
 import { Check, CloudUpload, X, FileText, ChevronDown } from "lucide-react";
 import { notify } from "../../utils/toast";
-import axios from "axios";
-import { endpoint } from "../../server";
 
 function NewOrder() {
   const navigate = useNavigate();
@@ -24,10 +22,7 @@ function NewOrder() {
     instructions: "",
     writer_type: "standard",
     deadline: "",
-    base_price: 20,
-    additional_fees: 0,
     total_price: 20,
-    amount_paid: 0,
   });
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -47,7 +42,9 @@ function NewOrder() {
       completed: false,
     },
   ]);
+  const [error, setError] = useState(null);
 
+  //Dropdown Indicator
   const DropdownIndicator = (props) => {
     const { selectProps } = props;
     const isOpen = selectProps.menuIsOpen;
@@ -64,6 +61,38 @@ function NewOrder() {
     );
   };
 
+  useEffect(() => {
+    const storedOrder = JSON.parse(localStorage.getItem("step1Data")) || {};
+    setFormData((prev) => ({
+      ...prev,
+      topic_field: storedOrder.topic_field || "",
+      type_of_service: storedOrder.type_of_service || "writing",
+      document_type: storedOrder.document_type || "essay",
+      writer_level: storedOrder.writer_level || "university",
+      paper_format: storedOrder.paper_format || "",
+      spacing: storedOrder.spacing || "double",
+      pages: storedOrder.pages ? String(storedOrder.pages) : "1",
+      number_of_words: storedOrder.number_of_words || 275,
+      number_of_sources: storedOrder.number_of_sources || 1,
+      english_type: storedOrder.english_type || "",
+      topic: storedOrder.topic || "",
+      instructions: storedOrder.instructions || "",
+      writer_type: storedOrder.writer_type || "standard",
+      deadline: storedOrder.deadline
+        ? new Date(storedOrder.deadline).toISOString().slice(0, 16)
+        : "",
+      total_price: storedOrder.total_price || 20,
+    }));
+    if (storedOrder.uploadedFiles) {
+      setUploadedFiles(
+        storedOrder.uploadedFiles.map((file) => ({
+          name: file.name,
+          size: file.size,
+        }))
+      );
+    }
+  }, []);
+
   // Calculate prices based on provided rules
   useEffect(() => {
     const calculatePrice = () => {
@@ -71,9 +100,9 @@ function NewOrder() {
 
       // Type of Service
       if (formData.type_of_service === "editing") {
-        basePrice -= 9; // $11
+        basePrice -= 9;
       } else if (formData.type_of_service === "calculations") {
-        basePrice -= 6; // $14
+        basePrice -= 6;
       }
 
       // Document Type
@@ -82,9 +111,9 @@ function NewOrder() {
           formData.document_type
         )
       ) {
-        basePrice += 5; // $25
+        basePrice += 5;
       } else if (formData.document_type === "math-problems") {
-        basePrice += 10; // $30
+        basePrice += 10;
       }
 
       // Writer Level
@@ -105,51 +134,19 @@ function NewOrder() {
       const pages = parseInt(formData.pages) || 1;
       let totalPrice = basePrice * pages;
 
-      // Step 2 Fields
-      let additionalFees = 0;
-
-      // Deadline
+      // Special override for deadlines > 7 days
       if (formData.deadline) {
         const deadlineDate = new Date(formData.deadline);
         const now = new Date();
         const hoursUntilDeadline = (deadlineDate - now) / (1000 * 60 * 60);
-        if (hoursUntilDeadline < 5) {
-          additionalFees += 20;
-        } else if (hoursUntilDeadline <= 8) {
-          additionalFees += 14;
-        } else if (hoursUntilDeadline <= 11) {
-          additionalFees += 10;
-        } else if (hoursUntilDeadline <= 14) {
-          additionalFees += 5;
-        } else if (hoursUntilDeadline <= 17) {
-          additionalFees += 4;
-        } else if (hoursUntilDeadline <= 23) {
-          additionalFees += 3;
-        } else if (hoursUntilDeadline <= 24) {
-          additionalFees += 2;
-        } else if (hoursUntilDeadline > 7 * 24) {
-          totalPrice = 19.08; // Override for > 7 days, including 6% processing fee
-          additionalFees = 0; // Reset additional fees
-        } else {
-          additionalFees += 2; // Default for >= 24 hours
+        if (hoursUntilDeadline > 7 * 24) {
+          totalPrice = 19.08; // Override
         }
       }
-
-      // Processing Fee (6%)
-      if (
-        formData.deadline &&
-        (new Date(formData.deadline) - new Date()) / (1000 * 60 * 60) <= 7 * 24
-      ) {
-        totalPrice += totalPrice * 0.06;
-      }
-
-      // Apply additional fees
-      totalPrice += additionalFees;
 
       setFormData((prev) => ({
         ...prev,
         base_price: basePrice,
-        additional_fees: additionalFees,
         total_price: totalPrice,
         amount_paid:
           formData.payment_option === "full" ? totalPrice : totalPrice / 2,
@@ -165,8 +162,6 @@ function NewOrder() {
     formData.pages,
     formData.writer_type,
     formData.deadline,
-    formData.plagiarism_report,
-    formData.payment_option,
   ]);
 
   const handleInputChange = useCallback((name, value) => {
@@ -184,8 +179,6 @@ function NewOrder() {
       }));
     }
   }, []);
-
-  // console.log("Updating field:", name, "with value:", value);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -231,7 +224,6 @@ function NewOrder() {
       "topic",
       "writer_type",
       "deadline",
-      "base_price",
       "total_price",
     ];
 
@@ -245,68 +237,56 @@ function NewOrder() {
       return;
     }
 
-    try {
-      const data = new FormData();
+    // Prepare data for localStorage
+    const orderData = {
+      topic_field: formData.topic_field,
+      type_of_service: formData.type_of_service,
+      document_type: formData.document_type,
+      writer_level: formData.writer_level,
+      paper_format: formData.paper_format,
+      spacing: formData.spacing,
+      pages: formData.pages,
+      number_of_words: parseInt(formData.number_of_words) || 0,
+      number_of_sources: parseInt(formData.number_of_sources) || 0,
+      english_type: formData.english_type,
+      topic: formData.topic,
+      instructions: formData.instructions,
+      writer_type: formData.writer_type,
+      deadline: new Date(formData.deadline).toISOString(),
+      total_price: formData.total_price,
+      uploadedFiles: uploadedFiles.map((file) => ({
+        name: file.name,
+        size: file.size,
+      })),
+    };
 
-      Object.keys(formData).forEach((key) => {
-        if (key === "deadline") {
-          data.append(key, new Date(formData[key]).toISOString());
-        } else if (
-          key === "pages" ||
-          key === "number_of_words" ||
-          key === "number_of_sources"
-        ) {
-          data.append(key, parseInt(formData[key]) || 0);
-        } else {
-          data.append(key, formData[key]);
-        }
-      });
+    // Save to localStorage
+    localStorage.setItem("step1Data", JSON.stringify(orderData));
+    // console.log("Files to pass to OrderPayment:", uploadedFiles);
 
-      uploadedFiles.forEach((file) => {
-        data.append("uploadedFiles", file);
-      });
+    // console.log("Order data saved to localStorage:", orderData);
 
-      console.log("Submitting order with data:");
-      for (let pair of data.entries()) {
-        console.log(pair[0] + ": " + pair[1]);
-      }
+    notify.success("Order details saved successfully");
 
-      // Save form data temporarily in localStorage
-      localStorage.setItem("step1Data", JSON.stringify(formData));
+    setSteps((prev) =>
+      prev.map((step, index) =>
+        index === 0
+          ? { ...step, current: false, completed: true }
+          : index === 1
+          ? { ...step, current: true }
+          : step
+      )
+    );
 
-      const response = await axios.post(`${endpoint}/orders/post-order`, data, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    navigate("/order-payment", {
+      state: {
+        order: orderData,
+        total_price: formData.total_price,
+        files: uploadedFiles,
+      },
+    });
 
-      console.log("Order creation success:", response.data);
-
-      notify.success(response.data.message);
-      setSteps((prev) =>
-        prev.map((step, index) =>
-          index === 0
-            ? { ...step, current: false, completed: true }
-            : index === 1
-            ? { ...step, current: true }
-            : step
-        )
-      );
-      navigate("/order-payment", {
-        state: {
-          order: response.data.order,
-          total_price: formData.total_price,
-          amount_paid: formData.amount_paid,
-        },
-      });
-    } catch (error) {
-      console.error("Order submission failed:", error);
-      const errorMessage =
-        error.response?.data?.error || "Failed to create order";
-      notify.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitting(false);
   };
 
   const FormField = ({
@@ -446,17 +426,37 @@ function NewOrder() {
     );
   };
 
+  // Format deadline for display
+  const formatDeadline = (dateString) => {
+    if (!dateString) return "Not set";
+    return new Date(dateString).toLocaleString("en-US", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
+          {error && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+              {error}
+            </div>
+          )}
+          {/* Progress Tracker */}
           <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
                 <div
                   className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
-                  style={{ width: "33%" }}
+                  style={{
+                    width: `${
+                      (steps.findIndex((s) => s.current) / (steps.length - 1)) *
+                      100
+                    }%`,
+                  }}
                 />
               </div>
               {steps.map((step) => (
@@ -465,16 +465,13 @@ function NewOrder() {
                   className="flex flex-col items-center relative z-10"
                 >
                   <div
-                    className={`
-                      w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                      ${
-                        step.completed
-                          ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white"
-                          : step.current
-                          ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white shadow-lg"
-                          : "bg-white border-gray-300 text-gray-400"
-                      }
-                    `}
+                    className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                      step.completed
+                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white"
+                        : step.current
+                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white shadow-lg"
+                        : "bg-white border-gray-300 text-gray-400"
+                    }`}
                   >
                     {step.completed ? (
                       <Check size={16} />
@@ -863,6 +860,7 @@ function NewOrder() {
                 </div>
               </div>
             </div>
+            {/* Right - Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 sticky top-6">
                 <h3 className="text-xl font-bold text-gray-800 mb-6">
@@ -896,9 +894,7 @@ function NewOrder() {
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Deadline</span>
                     <span className="font-semibold text-sm">
-                      {formData.deadline
-                        ? new Date(formData.deadline).toLocaleString()
-                        : "Not set"}
+                      {formatDeadline(formData.deadline)}
                     </span>
                   </div>
                 </div>
@@ -907,14 +903,6 @@ function NewOrder() {
                     <span>Total</span>
                     <span>${formData.total_price.toFixed(2)}</span>
                   </div>
-                  <p className="text-sm text-gray-500 text-right mt-1">
-                    {formData.deadline &&
-                    (new Date(formData.deadline) - new Date()) /
-                      (1000 * 60 * 60) <=
-                      7 * 24
-                      ? "Inclusive of the 6% processing fee"
-                      : "Exclusive of the 6% processing fee"}
-                  </p>
                 </div>
                 <button
                   onClick={handleSubmit}
