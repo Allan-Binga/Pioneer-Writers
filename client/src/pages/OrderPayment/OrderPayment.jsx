@@ -110,15 +110,6 @@ function OrderPayment() {
       initial_total_price: storedOrder.total_price || 0,
       checkout_amount: (storedOrder.total_price || 0) * 1.06,
     }));
-
-    // Redirect if no files or order data
-    if (!location.state?.files?.length && !storedOrder.uploadedFiles?.length) {
-      console.warn("No files in location.state or localStorage");
-      notify.error(
-        "No files uploaded. Please upload a file in the previous step."
-      );
-      navigate("/new-order");
-    }
   }, [location.state, navigate]);
 
   useEffect(() => {
@@ -175,16 +166,6 @@ function OrderPayment() {
         {};
       const files = location.state?.files || [];
       // console.log("Frontend files:", files); // Debug
-
-      if (files.length === 0) {
-        console.warn("No files to upload");
-        notify.error(
-          "No files uploaded. Please upload a file in the previous step."
-        );
-        setIsSubmitting(false);
-        navigate("/new-order"); // Redirect instead of proceeding
-        return;
-      }
 
       const orderData = {
         topic_field: storedOrder.topic_field || "",
