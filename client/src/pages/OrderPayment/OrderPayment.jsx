@@ -5,6 +5,7 @@ import axios from "axios";
 import { endpoint } from "../../server";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
+import { notify } from "../../utils/toast";
 
 function OrderPayment() {
   const navigate = useNavigate();
@@ -135,11 +136,6 @@ function OrderPayment() {
     setError(null);
 
     try {
-      const orderId = localStorage.getItem("orderId");
-      if (!orderId) {
-        throw new Error("Order ID not found");
-      }
-
       const payload = {
         writer_tip:
           formData.writer_tip === ""
@@ -153,7 +149,7 @@ function OrderPayment() {
       };
 
       const response = await axios.patch(
-        `${endpoint}/orders/post-order/step-two/${orderId}`,
+        `${endpoint}/orders/post-order/step-two`,
         payload
       );
 
@@ -166,24 +162,11 @@ function OrderPayment() {
         })
       );
 
-      // Update steps
-      setSteps((prev) =>
-        prev.map((step) =>
-          step.number === 2
-            ? { ...step, current: false, completed: true }
-            : step.number === 3
-            ? { ...step, current: true }
-            : step
-        )
-      );
-
       // Navigate to confirmation page
-      navigate("/order-confirmation");
+      navigate("/order-checkout");
     } catch (error) {
       console.error("Error submitting order:", error);
-      setError(
-        error.response?.data?.error || "Failed to process payment details"
-      );
+      notify.error("Failed to process order details.");
     } finally {
       setIsSubmitting(false);
     }
@@ -474,7 +457,7 @@ function OrderPayment() {
                     </button>
                     <button
                       type="submit"
-                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg disabled:opacity-50"
+                      className="px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg disabled:opacity-50 cursor-pointer"
                       disabled={isSubmitting}
                     >
                       {isSubmitting

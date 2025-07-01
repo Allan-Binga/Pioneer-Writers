@@ -102,7 +102,6 @@ const completeOrderPost = async (req, res) => {
         coupon_code = $4,
         amount_paid = $5,
         total_price = $6
-      WHERE id = $7
       RETURNING *;
     `;
 
@@ -113,7 +112,6 @@ const completeOrderPost = async (req, res) => {
       value.coupon_code,
       value.amount_paid,
       value.total_price,
-      id,
     ];
 
     const { rows } = await client.query(query, values);
