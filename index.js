@@ -7,6 +7,7 @@ const ordersRoute = require("./routes/orders");
 const paymentsRoute = require("./routes/payments");
 const checkoutRoute = require("./routes/orderCheckout");
 const oauth2Route = require("./routes/oauth2")
+const usersRoute = require("./routes/users")
 
 //Import DB connection
 require("./config/dbConfig");
@@ -42,6 +43,7 @@ app.use("/pioneer-writers/v1/oauth2", oauth2Route)
 app.use("/pioneer-writers/v1/orders", ordersRoute);
 app.use("/pioneer-writers/v1/payments", paymentsRoute);
 app.use("/pioneer-writers/v1/checkout", checkoutRoute);
+app.use("/pioneer-writers/v1/users", usersRoute)
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {

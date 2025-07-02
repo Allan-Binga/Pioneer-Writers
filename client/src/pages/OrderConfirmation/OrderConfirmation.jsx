@@ -6,7 +6,7 @@ import { endpoint } from "../../server";
 import { useNavigate, useLocation } from "react-router-dom";
 import { notify } from "../../utils/toast";
 
-function OrderPayment() {
+function OrderConfirmation() {
   const navigate = useNavigate();
   const location = useLocation();
   const [steps, setSteps] = useState([
@@ -16,10 +16,10 @@ function OrderPayment() {
       current: false,
       completed: true,
     },
-    { number: 2, title: "Order Payment", current: true, completed: false },
+    { number: 2, title: "Order Confirmation", current: true, completed: false },
     {
       number: 3,
-      title: "Order Confirmation",
+      title: "Order Payment",
       current: false,
       completed: false,
     },
@@ -221,7 +221,7 @@ function OrderPayment() {
       notify.success("Order posted, awaiting payment.");
       localStorage.setItem("step2Data", JSON.stringify({ ...formData }));
       localStorage.removeItem("step1Data");
-      localStorage.removeItem("step2Data");
+      // localStorage.removeItem("step2Data");
 
       setSteps((prev) =>
         prev.map((step, index) =>
@@ -267,6 +267,7 @@ function OrderPayment() {
               {error}
             </div>
           )}
+          {/*Progress Tracking*/}
           <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
@@ -523,4 +524,4 @@ function OrderPayment() {
   );
 }
 
-export default OrderPayment;
+export default OrderConfirmation;

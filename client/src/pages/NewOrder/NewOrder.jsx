@@ -34,10 +34,10 @@ function NewOrder() {
       current: true,
       completed: false,
     },
-    { number: 2, title: "Order Payment", current: false, completed: false },
+    { number: 2, title: "Order Confirmation", current: false, completed: false },
     {
       number: 3,
-      title: "Order Confirmation",
+      title: "Order Payment",
       current: false,
       completed: false,
     },
@@ -278,7 +278,7 @@ function NewOrder() {
       )
     );
 
-    navigate("/order-payment", {
+    navigate("/order-confirmation", {
       state: {
         order: orderData,
         total_price: formData.total_price,

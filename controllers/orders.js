@@ -1,5 +1,6 @@
 const client = require("../config/dbConfig");
 const Joi = require("joi");
+const jwt = require("jsonwebtoken");
 
 // Post an order
 const postOrder = async (req, res) => {
@@ -32,6 +33,18 @@ const postOrder = async (req, res) => {
     const { error, value } = schema.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
+    const token = req.cookies.userPioneerSession;
+    let userId = null;
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.userId; // this must match your `jwt.sign({ userId: ... })`
+      } catch (err) {
+        console.warn("Invalid or expired token. Proceeding as guest.");
+      }
+    }
+
     const uploadedFile = req.files?.[0]?.location || null;
 
     const query = `
@@ -40,14 +53,15 @@ const postOrder = async (req, res) => {
         paper_format, english_type, pages, spacing, number_of_words,
         number_of_sources, topic, instructions, uploaded_file,
         writer_type, deadline, total_price, checkout_amount,
-        writer_tip, plagiarism_report, payment_option, coupon_code
+        writer_tip, plagiarism_report, payment_option, coupon_code,
+        user_id
       )
       VALUES (
         $1, $2, $3, $4, $5,
         $6, $7, $8, $9, $10,
         $11, $12, $13, $14,
         $15, $16, $17, $18, $19, $20,
-        $21
+        $21, $22
       )
       RETURNING *;
     `;
@@ -74,6 +88,7 @@ const postOrder = async (req, res) => {
       value.plagiarism_report ?? false,
       value.payment_option || "",
       value.coupon_code || "",
+      userId,
     ];
 
     const { rows } = await client.query(query, values);
@@ -90,9 +105,9 @@ const postOrder = async (req, res) => {
 
 //Fetch orders
 const getOrders = async (req, res) => {
-  const orders = await client.query("SELECT * FROM orders");
-  res.status(200).json(orders.rows);
   try {
+    const orders = await client.query("SELECT * FROM orders");
+    res.status(200).json(orders.rows);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch orders." });
   }

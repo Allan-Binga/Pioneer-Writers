@@ -23,7 +23,7 @@ function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const location = useLocation();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Automatically open submenu based on current path
   useEffect(() => {
@@ -58,7 +58,7 @@ function Sidebar() {
         document.cookie = "userPioneerSession=; Max-Age=0; path=/;";
         localStorage.removeItem("userRole");
         localStorage.removeItem("userEmail");
-        localStorage.removeItem("isLoggedIn")
+        localStorage.removeItem("isLoggedIn");
         notify.success("Successfully logged out.");
 
         // Delay navigation by 2 seconds (long enough for toast to show)
@@ -81,7 +81,7 @@ function Sidebar() {
       icon: BookOpenText,
       submenu: [
         { name: "My Orders", path: "/my-orders" },
-        { name: "Place Order", path: "/place-order" },
+        { name: "New Order", path: "/new-order" },
       ],
     },
     {
