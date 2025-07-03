@@ -20,6 +20,8 @@ import Settings from "./pages/Profile/Settings";
 import Profile from "./pages/Profile/Profile";
 import News from "./pages/News/News";
 import OrderCheckout from "./pages/OrderCheckout/OrderCheckout";
+import Success from "./pages/Payment Messages/Success";
+import Failure from "./pages/Payment Messages/Failure";
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/news" element={<News />} />
         <Route path="/order-checkout" element={<Layout><OrderCheckout/></Layout>} />
+        <Route path="/payment/successful" element={<Success />} />
+        <Route path="/payment/failed" element={<Failure />} />
       </Routes>
     </Router>
   );

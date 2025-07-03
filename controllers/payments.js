@@ -9,7 +9,11 @@ const makePayment = async (req, res) => {
 //Fetch Payments
 const getPayments = async (req, res) => {
   try {
-  } catch (error) {}
+    const payments = await client.query("SELECT * FROM payments");
+    res.status(200).json(payments.rows);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch payments" });
+  }
 };
 
 module.exports = { makePayment, getPayments };

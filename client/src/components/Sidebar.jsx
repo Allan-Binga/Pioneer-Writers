@@ -82,8 +82,8 @@ function Sidebar() {
       name: "Orders",
       icon: BookOpenText,
       submenu: [
-        { name: "My Orders", path: "/my-orders" },
         { name: "New Order", path: "/new-order" },
+        { name: "My Orders", path: "/my-orders" },
       ],
     },
     {

@@ -4,8 +4,7 @@ const jwt = require("jsonwebtoken");
 
 // Post an order
 const postOrder = async (req, res) => {
-  // console.log("req.body:", req.body);
-  // console.log("req.files:", req.files);
+  const userId = req.userId; // From middleware middleware
   try {
     const schema = Joi.object({
       topic_field: Joi.string().required(),
@@ -23,7 +22,7 @@ const postOrder = async (req, res) => {
       writer_type: Joi.string().required(),
       deadline: Joi.date().iso().required(),
       total_price: Joi.number().min(0).required(),
-      checkout_amount: Joi.number().min(0).required(), // Added checkout_amount
+      checkout_amount: Joi.number().min(0).required(),
       writer_tip: Joi.number().min(0).allow(null),
       plagiarism_report: Joi.boolean(),
       payment_option: Joi.string().allow(""),
@@ -32,18 +31,6 @@ const postOrder = async (req, res) => {
 
     const { error, value } = schema.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
-
-    const token = req.cookies.userPioneerSession;
-    let userId = null;
-
-    if (token) {
-      try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        userId = decoded.userId; // this must match your `jwt.sign({ userId: ... })`
-      } catch (err) {
-        console.warn("Invalid or expired token. Proceeding as guest.");
-      }
-    }
 
     const uploadedFile = req.files?.[0]?.location || null;
 
@@ -83,7 +70,7 @@ const postOrder = async (req, res) => {
       value.writer_type,
       value.deadline,
       value.total_price,
-      value.checkout_amount, // Added checkout_amount
+      value.checkout_amount,
       value.writer_tip || null,
       value.plagiarism_report ?? false,
       value.payment_option || "",
