@@ -17,12 +17,7 @@ function OrderConfirmation() {
       completed: true,
     },
     { number: 2, title: "Order Confirmation", current: true, completed: false },
-    {
-      number: 3,
-      title: "Order Payment",
-      current: false,
-      completed: false,
-    },
+    { number: 3, title: "Order Payment", current: false, completed: false },
   ]);
   const [formData, setFormData] = useState({
     topic: "",
@@ -39,7 +34,7 @@ function OrderConfirmation() {
     number_of_words: 0,
     number_of_sources: 0,
     instructions: "",
-    uploadedFiles: [], // For display only
+    uploadedFiles: [],
     writer_tip: "",
     plagiarism_report: false,
     payment_option: "full",
@@ -83,52 +78,69 @@ function OrderConfirmation() {
   };
 
   useEffect(() => {
-    // console.log("OrderPayment mounted. location.state:", location.state); // Debug
-    const storedOrder = JSON.parse(localStorage.getItem("step1Data")) || {};
+    // Fetch step1Data from localStorage
+    const step1 = JSON.parse(localStorage.getItem("step1Data")) || {};
+    const step2 = JSON.parse(localStorage.getItem("step2Data")) || {};
+
+    // Merge data, with step2 overriding step1 if overlapping
+    const merged = { ...step1, ...step2 };
+
+    // Ensure total_price is a number
+    const initialTotalPrice = parseFloat(merged.total_price) || 0;
+
     setFormData((prev) => ({
       ...prev,
-      topic: storedOrder.topic || "",
-      document_type: storedOrder.document_type || "",
-      writer_level: storedOrder.writer_level || "",
-      pages: storedOrder.pages || "",
-      deadline: storedOrder.deadline || "",
-      writer_type: storedOrder.writer_type || "",
-      topic_field: storedOrder.topic_field || "",
-      type_of_service: storedOrder.type_of_service || "",
-      paper_format: storedOrder.paper_format || "",
-      spacing: storedOrder.spacing || "",
-      english_type: storedOrder.english_type || "",
-      number_of_words: storedOrder.number_of_words || 0,
-      number_of_sources: storedOrder.number_of_sources || 0,
-      instructions: storedOrder.instructions || "",
-      uploadedFiles: storedOrder.uploadedFiles || [],
-      writer_tip: storedOrder.writer_tip || "",
-      plagiarism_report: storedOrder.plagiarism_report || false,
-      payment_option: storedOrder.payment_option || "full",
-      coupon_code: storedOrder.coupon_code || "",
-      total_price: storedOrder.total_price || 0,
-      initial_total_price: storedOrder.total_price || 0,
-      checkout_amount: (storedOrder.total_price || 0) * 1.06,
+      topic: merged.topic || "",
+      document_type: merged.document_type || "",
+      writer_level: merged.writer_level || "",
+      pages: merged.pages || "",
+      deadline: merged.deadline || "",
+      writer_type: merged.writer_type || "",
+      topic_field: merged.topic_field || "",
+      type_of_service: merged.type_of_service || "",
+      paper_format: merged.paper_format || "",
+      spacing: merged.spacing || "",
+      english_type: merged.english_type || "",
+      number_of_words: parseInt(merged.number_of_words) || 0,
+      number_of_sources: parseInt(merged.number_of_sources) || 0,
+      instructions: merged.instructions || "",
+      uploadedFiles: merged.uploadedFiles || [],
+      writer_tip: merged.writer_tip || "",
+      plagiarism_report: merged.plagiarism_report || false,
+      payment_option: merged.payment_option || "full",
+      coupon_code: merged.coupon_code || "",
+      initial_total_price: initialTotalPrice,
+      total_price: initialTotalPrice, // Initialize with base price
+      checkout_amount: initialTotalPrice * 1.06, // Initialize with 6% fee
     }));
-  }, [location.state, navigate]);
+  }, [location.state]);
 
   useEffect(() => {
     const calculatePrice = () => {
-      let total = parseFloat(formData.initial_total_price || 0);
-      const tip = parseFloat(formData.writer_tip);
+      // Start with initial_total_price from localStorage
+      let total = parseFloat(formData.initial_total_price) || 0;
+
+      // Add writer's tip
+      const tip = parseFloat(formData.writer_tip) || 0;
       if (!isNaN(tip) && tip >= 0) {
         total += tip;
       }
+
+      // Add plagiarism report cost
       if (formData.plagiarism_report) {
         total += 6;
       }
+
+      // Apply payment option (full or half)
       const finalTotal = formData.payment_option === "half" ? total / 2 : total;
+
+      // Calculate checkout amount (total + 6% processing fee)
       const checkoutAmount = finalTotal * 1.06;
 
       setFormData((prev) => ({
         ...prev,
-        total_price: finalTotal,
-        checkout_amount: checkoutAmount,
+        total_price: parseFloat(finalTotal.toFixed(2)),
+        checkout_amount: parseFloat(checkoutAmount.toFixed(2)),
       }));
     };
     calculatePrice();
@@ -150,7 +162,7 @@ function OrderConfirmation() {
       ...(name === "writer_tip" && { writer_tip: value }),
       ...(name === "paymentOption" && { payment_option: value }),
       ...(name === "couponCode" && { coupon_code: value }),
-      ...(name === "writerType" && { writer_type: value }),
+      ...(name === "writer_type" && { writer_type: value }),
     }));
   };
 
@@ -160,28 +172,24 @@ function OrderConfirmation() {
     setError(null);
 
     try {
-      const storedOrder =
-        JSON.parse(localStorage.getItem("step1Data")) ||
-        location.state?.order ||
-        {};
+      const storedOrder = JSON.parse(localStorage.getItem("step1Data")) || {};
       const files = location.state?.files || [];
-      // console.log("Frontend files:", files); // Debug
 
       const orderData = {
-        topic_field: storedOrder.topic_field || "",
-        type_of_service: storedOrder.type_of_service || "writing",
-        document_type: storedOrder.document_type || "essay",
-        writer_level: storedOrder.writer_level || "university",
-        paper_format: storedOrder.paper_format || "none",
-        english_type: storedOrder.english_type || "us",
-        pages: parseInt(storedOrder.pages) || 1,
-        spacing: storedOrder.spacing || "double",
-        number_of_words: parseInt(storedOrder.number_of_words) || 0,
-        number_of_sources: parseInt(storedOrder.number_of_sources) || 0,
-        topic: storedOrder.topic || "",
-        instructions: storedOrder.instructions || "",
-        writer_type: storedOrder.writer_type || "standard",
-        deadline: storedOrder.deadline || new Date().toISOString(),
+        topic_field: formData.topic_field || "",
+        type_of_service: formData.type_of_service || "writing",
+        document_type: formData.document_type || "essay",
+        writer_level: formData.writer_level || "university",
+        paper_format: formData.paper_format || "none",
+        english_type: formData.english_type || "us",
+        pages: parseInt(formData.pages) || 1,
+        spacing: formData.spacing || "double",
+        number_of_words: parseInt(formData.number_of_words) || 0,
+        number_of_sources: parseInt(formData.number_of_sources) || 0,
+        topic: formData.topic || "",
+        instructions: formData.instructions || "",
+        writer_type: formData.writer_type || "standard",
+        deadline: formData.deadline || new Date().toISOString(),
         total_price: parseFloat(formData.total_price) || 0,
         checkout_amount: parseFloat(formData.checkout_amount) || 0,
         writer_tip:
@@ -193,8 +201,6 @@ function OrderConfirmation() {
         coupon_code: formData.coupon_code || "",
       };
 
-      // console.log("Payload sent to backend:", orderData);
-
       const payload = new FormData();
       Object.entries(orderData).forEach(([key, value]) => {
         if (value !== null && value !== undefined) {
@@ -202,8 +208,7 @@ function OrderConfirmation() {
         }
       });
 
-      files.forEach((file, index) => {
-        // console.log("Appending file to FormData:", file.name); // Debug
+      files.forEach((file) => {
         payload.append("uploadedFiles", file);
       });
 
@@ -217,12 +222,14 @@ function OrderConfirmation() {
         }
       );
 
-      localStorage.setItem("checkoutAmount", formData.checkout_amount);
-      notify.success("Order posted, awaiting payment.");
-      localStorage.setItem("step2Data", JSON.stringify({ ...formData }));
-      localStorage.removeItem("step1Data");
-      // localStorage.removeItem("step2Data");
+      // Store checkout_amount and order data in localStorage
+      localStorage.setItem(
+        "checkoutAmount",
+        formData.checkout_amount.toString()
+      );
+      localStorage.setItem("step2Data", JSON.stringify(formData));
 
+      notify.success("Order posted, awaiting payment.");
       setSteps((prev) =>
         prev.map((step, index) =>
           index === 1
@@ -233,13 +240,17 @@ function OrderConfirmation() {
         )
       );
 
-      navigate("/order-checkout");
+      // Navigate to checkout with order_id from response
+      navigate("/order-checkout", {
+        state: { order_id: response.data.order_id },
+      });
     } catch (error) {
       console.error("Error submitting order:", error.response?.data || error);
       notify.error(
         "Failed to process order details: " +
           (error.response?.data?.error || error.message)
       );
+      setError(error.response?.data?.error || error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -267,7 +278,7 @@ function OrderConfirmation() {
               {error}
             </div>
           )}
-          {/*Progress Tracking*/}
+          {/* Progress Tracking */}
           <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
@@ -319,7 +330,7 @@ function OrderConfirmation() {
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-sm border border-purple-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Step 2: Order Payment
+                  Step 2: Order Confirmation
                 </h2>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                   <label
@@ -337,6 +348,7 @@ function OrderConfirmation() {
                       onChange={handleChange}
                       placeholder="Add tip in USD"
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 pr-10"
+                      min="0"
                     />
                   </div>
                   <div>
@@ -447,14 +459,6 @@ function OrderConfirmation() {
                     <span className="text-gray-600">Plagiarism Report</span>
                     <span className="font-semibold">
                       {formData.plagiarism_report ? "Included" : "Not included"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Uploaded Files</span>
-                    <span className="font-semibold">
-                      {formData.uploadedFiles.length > 0
-                        ? formData.uploadedFiles.map((f) => f.name).join(", ")
-                        : "None"}
                     </span>
                   </div>
                 </div>

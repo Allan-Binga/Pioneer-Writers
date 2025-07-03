@@ -31,7 +31,30 @@ function OrderPayment() {
     },
   ]);
   const [selectedMethod, setSelectedMethod] = useState(null);
-  const [orderData, setOrderData] = useState(null);
+  const [orderData, setOrderData] = useState({
+    topic: "",
+    document_type: "",
+    writer_level: "",
+    pages: "",
+    deadline: "",
+    writer_type: "",
+    topic_field: "",
+    type_of_service: "",
+    paper_format: "",
+    spacing: "",
+    english_type: "",
+    number_of_words: 0,
+    number_of_sources: 0,
+    instructions: "",
+    uploadedFiles: [], // For display only
+    writer_tip: "",
+    plagiarism_report: false,
+    payment_option: "full",
+    coupon_code: "",
+    total_price: 0,
+    initial_total_price: 0,
+    checkout_amount: 0,
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -109,6 +132,10 @@ function OrderPayment() {
       ))}
     </div>
   );
+
+   const handlePrevious = () => {
+    navigate("/order-confirmation");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
@@ -288,39 +315,47 @@ function OrderPayment() {
                     ${orderData?.checkout_amount?.toFixed(2) || "0.00"}
                   </span>
                 </div>
-                <button
-                  onClick={handleSubmit}
-                  disabled={!selectedMethod || isSubmitting}
-                  className={`w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 ${
-                    selectedMethod && !isSubmitting
-                      ? "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 hover:shadow-lg"
-                      : "bg-gray-300 cursor-not-allowed"
-                  } flex items-center justify-center`}
-                >
-                  {isSubmitting ? (
-                    <svg
-                      className="animate-spin h-5 w-5 text-white mr-2"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                      />
-                    </svg>
-                  ) : null}
-                  {isSubmitting ? "Processing..." : "Proceed to Checkout"}
-                </button>
+                <div className="flex justify-between gap-3">
+                  <button
+                    onClick={handlePrevious}
+                    className="w-1/2 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3 rounded-xl transition-all duration-200 shadow cursor-pointer"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!selectedMethod || isSubmitting}
+                    className={`w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 ${
+                      selectedMethod && !isSubmitting
+                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 hover:shadow-lg"
+                        : "bg-gray-300 cursor-not-allowed"
+                    } flex items-center justify-center`}
+                  >
+                    {isSubmitting ? (
+                      <svg
+                        className="animate-spin h-5 w-5 text-white mr-2"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                    ) : null}
+                    {isSubmitting ? "Processing..." : "Proceed to Checkout"}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

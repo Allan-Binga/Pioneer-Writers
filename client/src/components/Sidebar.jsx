@@ -59,6 +59,8 @@ function Sidebar() {
         localStorage.removeItem("userRole");
         localStorage.removeItem("userEmail");
         localStorage.removeItem("isLoggedIn");
+        localStorage.removeItem("step1Data");
+        localStorage.removeItem("step2Data");
         notify.success("Successfully logged out.");
 
         // Delay navigation by 2 seconds (long enough for toast to show)
