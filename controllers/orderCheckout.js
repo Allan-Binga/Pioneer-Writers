@@ -14,7 +14,7 @@ const paypalClient = new paypal.core.PayPalHttpClient(environment);
 //Create Paypal Checkout
 const paypalCheckout = async (req, res) => {
   const userId = req.userId;
-
+  console.log(userId)
   try {
     // Get the order from your DB
     const orderQuery = `SELECT * FROM orders WHERE user_id = $1 AND order_status = 'Pending'`;

@@ -12,9 +12,13 @@ import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import Visa from "../../assets/visa.png";
 import PayPal from "../../assets/paypal.png";
+import { endpoint } from "../../server";
+import axios from "axios";
+import { notify } from "../../utils/toast";
 
 function OrderPayment() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [steps] = useState([
     {
       number: 1,
@@ -68,14 +72,34 @@ function OrderPayment() {
     setSelectedMethod(method);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    // Simulate payment processing
-    setTimeout(() => {
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${endpoint}/checkout/pay-with-paypal`,
+        {},
+        {
+          withCredentials: true,
+        }
+      );
+
+      const { approvalUrl } = response.data;
+      console.log(approvalUrl)
+
+      if (approvalUrl) {
+        window.location.href = approvalUrl; // 🚀 redirect to PayPal
+      } else {
+        throw new Error("No approval URL received");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      notify.error("Failed to initiate PayPal payment");
+    } finally {
       setIsSubmitting(false);
-      navigate("/order-checkout");
-    }, 1000);
+      setLoading(false);
+    }
   };
 
   const formatDate = (isoDate) => {
@@ -133,7 +157,7 @@ function OrderPayment() {
     </div>
   );
 
-   const handlePrevious = () => {
+  const handlePrevious = () => {
     navigate("/order-confirmation");
   };
 
@@ -325,7 +349,7 @@ function OrderPayment() {
                   <button
                     onClick={handleSubmit}
                     disabled={!selectedMethod || isSubmitting}
-                    className={`w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 ${
+                    className={`w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 cursor-pointer ${
                       selectedMethod && !isSubmitting
                         ? "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 hover:shadow-lg"
                         : "bg-gray-300 cursor-not-allowed"

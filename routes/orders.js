@@ -5,7 +5,7 @@ const {uploadedFile} = require("../middleware/upload")
 
 const router = express.Router()
 
-router.post("/post-order",uploadedFile.array('uploadedFiles', 20),postOrder);
+router.post("/post-order",authUser,uploadedFile.array('uploadedFiles', 20),postOrder);
 router.get("/all/orders", getOrders)
 router.get("/my-orders", getUsersOrders)
 router.patch("/update-order/:orderId", authUser, uploadedFile.array(), updateOrder)

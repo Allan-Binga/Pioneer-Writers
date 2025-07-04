@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 // Post an order
 const postOrder = async (req, res) => {
   const userId = req.userId; // From middleware middleware
+  // console.log(userId)
   try {
     const schema = Joi.object({
       topic_field: Joi.string().required(),

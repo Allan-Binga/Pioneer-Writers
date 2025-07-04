@@ -48,7 +48,7 @@ const signInGoogle = async (req, res) => {
     // Generate JWT
     const userToken = jwt.sign(
       {
-        id: user.user_id,
+        userId: user.user_id,
         role: user.role || "Client", // default if null
         email: user.email,
       },

@@ -15,6 +15,7 @@ import {
   ChevronDown as ArrowDown,
   Mail,
 } from "lucide-react";
+import Logo from "../assets/logo.jpg";
 import axios from "axios";
 import { endpoint } from "../server";
 import { notify } from "../utils/toast";
@@ -61,6 +62,7 @@ function Sidebar() {
         localStorage.removeItem("isLoggedIn");
         localStorage.removeItem("step1Data");
         localStorage.removeItem("step2Data");
+        localStorage.removeItem("checkoutAmount");
         notify.success("Successfully logged out.");
 
         // Delay navigation by 2 seconds (long enough for toast to show)
@@ -104,23 +106,23 @@ function Sidebar() {
     <div
       className={`${
         isCollapsed ? "w-20" : "w-64"
-      } bg-white fixed top-16 left-0 h-[calc(100vh-64px)] flex flex-col shadow-xl transition-all duration-300 z-40 border-r border-purple-200 overflow-y-auto`}
+      } bg-white fixed top-16 left-0 h-[calc(100vh-64px)] flex flex-col shadow-xl transition-all duration-300 z-40 border-r border-sky-200 overflow-y-auto`}
     >
       {/* Logo Section */}
       <div className="flex items-center justify-between p-4">
         {!isCollapsed && (
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-r from-sky-600 to-indigo-600 rounded-full flex items-center justify-center">
               <PenTool className="w-6 h-6 text-white" />
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+            <span className="text-xl font-bold bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
               Pioneer Writers
             </span>
           </div>
         )}
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded-full bg-purple-100 text-purple-600 hover:bg-purple-200 transition-colors"
+          className="p-2 rounded-full bg-sky-100 text-sky-600 hover:bg-sky-200 transition-colors"
         >
           {isCollapsed ? (
             <ChevronRight className="w-5 h-5" />
@@ -150,15 +152,15 @@ function Sidebar() {
                     onClick={() => handleSubmenuToggle(item.name)}
                     className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                       isActive
-                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
-                        : "text-purple-700 hover:bg-purple-100 hover:text-purple-900"
+                        ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-md"
+                        : "text-sky-700 hover:bg-sky-100 hover:text-sky-900"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       {Icon && (
                         <Icon
                           className={`w-6 h-6 ${
-                            isActive ? "text-white" : "text-purple-600"
+                            isActive ? "text-white" : "text-sky-600"
                           }`}
                         />
                       )}
@@ -183,14 +185,14 @@ function Sidebar() {
                     to={item.path}
                     className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
                       isActive
-                        ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md"
-                        : "text-purple-700 hover:bg-purple-100 hover:text-purple-900"
+                        ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-md"
+                        : "text-sky-700 hover:bg-sky-100 hover:text-sky-900"
                     }`}
                   >
                     {Icon && (
                       <Icon
                         className={`w-6 h-6 ${
-                          isActive ? "text-white" : "text-purple-600"
+                          isActive ? "text-white" : "text-sky-600"
                         }`}
                       />
                     )}
@@ -211,8 +213,8 @@ function Sidebar() {
                             to={sub.path}
                             className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                               isSubActive
-                                ? "bg-purple-500 text-white"
-                                : "text-purple-600 hover:bg-purple-100"
+                                ? "bg-sky-500 text-white"
+                                : "text-sky-600 hover:bg-sky-100"
                             }`}
                           >
                             {sub.name}
@@ -229,9 +231,9 @@ function Sidebar() {
           <li className="pt-4 mt-4 border-t border-gray-200">
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 w-full text-left p-3 rounded-lg text-purple-700 hover:bg-purple-100 hover:text-purple-900 transition-all duration-200 cursor-pointer"
+              className="flex items-center space-x-3 w-full text-left p-3 rounded-lg text-sky-700 hover:bg-sky-100 hover:text-sky-900 transition-all duration-200 cursor-pointer"
             >
-              <LogOut className="w-6 h-6 text-purple-600" />
+              <LogOut className="w-6 h-6 text-sky-600" />
               {!isCollapsed && (
                 <span className="text-base font-medium">Logout</span>
               )}
