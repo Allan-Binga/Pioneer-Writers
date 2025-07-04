@@ -152,12 +152,12 @@ const SignUp = () => {
 
   const featureCards = [
     {
-      icon: <Users className="w-8 h-8 text-purple-500" />,
+      icon: <Users className="w-8 h-8 text-slate-500" />,
       title: "Made by humans",
       description: "100% human-created content with no AI involvement",
     },
     {
-      icon: <Shield className="w-8 h-8 text-yellow-500" />,
+      icon: <Shield className="w-8 h-8 text-slate-500" />,
       title: "100% original papers",
       description: "Every paper comes with anti-plagiarism check guarantee",
     },
@@ -169,9 +169,9 @@ const SignUp = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-gray-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-white to-slate-100 flex">
       {/* Left Column */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-dark-blue-700 to-purple-500">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-dark-blue-700 to-slate-500">
         <div className="mb-8 p-8 bg-white rounded-full shadow-lg">
           <div className="w-64 h-64">
             <img
@@ -412,11 +412,11 @@ const SignUp = () => {
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => googleLogin()}
-              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer flex items-center justify-center"
+              className="group border border-slate-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer flex items-center justify-center"
             >
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer">
+            <button className="group border border-slate-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer">
               <img
                 src={FacebookIcon}
                 alt="Facebook"
@@ -429,7 +429,7 @@ const SignUp = () => {
             Already have an account?{" "}
             <Link
               to="/sign-in"
-              className="text-purple-500 hover:text-purple-700 font-medium"
+              className="text-slate-500 hover:text-slate-700 font-medium"
             >
               Sign In
             </Link>

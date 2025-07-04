@@ -12,6 +12,7 @@ import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import Visa from "../../assets/visa.png";
 import PayPal from "../../assets/paypal.png";
+import Googlepay from "../../assets/googlepay.png"
 import { endpoint } from "../../server";
 import axios from "axios";
 import { notify } from "../../utils/toast";
@@ -330,6 +331,7 @@ function OrderPayment() {
                 <div className="space-y-4">
                   <CustomRadio label="PayPal" value="paypal" logo={PayPal} />
                   <CustomRadio label="Visa" value="visa" logo={Visa} />
+                  <CustomRadio label="Google Pay" value="googlepay" logo={Googlepay}/>
                 </div>
               </div>
               <div className="mt-6">

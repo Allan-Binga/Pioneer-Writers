@@ -34,7 +34,12 @@ function NewOrder() {
       current: true,
       completed: false,
     },
-    { number: 2, title: "Order Confirmation", current: false, completed: false },
+    {
+      number: 2,
+      title: "Order Confirmation",
+      current: false,
+      completed: false,
+    },
     {
       number: 3,
       title: "Order Payment",
@@ -53,7 +58,7 @@ function NewOrder() {
       <div className="mx-2 transition-transform duration-500 ease-[cubic-bezier(0.4, 0, 0.2, 1)]">
         <ChevronDown
           size={20}
-          className={`text-purple-600 transform ${
+          className={`text-slate-600 transform ${
             isOpen ? "rotate-180" : "rotate-0"
           }`}
         />
@@ -303,26 +308,27 @@ function NewOrder() {
     suffix,
   }) => {
     const baseInputClasses =
-      "w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800";
-    const readonlyClasses = "bg-gray-50 cursor-not-allowed";
+      "w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-colors duration-200 bg-white placeholder-slate-400 text-slate-800";
+    const readonlyClasses = "bg-slate-100 cursor-not-allowed";
+
     const selectStyles = {
       control: (provided, state) => ({
         ...provided,
-        border: `2px solid ${state.isFocused ? "#7C3AED" : "#D8B4FE"}`,
+        border: `2px solid ${state.isFocused ? "#64748b" : "#cbd5e1"}`, // slate-500 or slate-300
         borderRadius: "0.5rem",
         padding: "0.5rem",
-        backgroundColor: "white",
+        backgroundColor: readonly ? "#f1f5f9" : "white", // slate-100
         boxShadow: state.isFocused
-          ? "0 0 0 2px rgba(124, 58, 237, 0.2)"
+          ? "0 0 0 2px rgba(100, 116, 139, 0.2)"
           : "none",
-        "&:hover": { borderColor: "#7C3AED" },
+        "&:hover": { borderColor: "#64748b" },
         fontSize: "0.875rem",
-        color: "#1F2937",
+        color: "#1e293b", // slate-800
       }),
       menu: (provided) => ({
         ...provided,
         borderRadius: "0.5rem",
-        border: "1px solid #D8B4FE",
+        border: "1px solid #cbd5e1", // slate-300
         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
         marginTop: "0.25rem",
         zIndex: 50,
@@ -330,21 +336,21 @@ function NewOrder() {
       option: (provided, state) => ({
         ...provided,
         backgroundColor: state.isSelected
-          ? "#7C3AED"
+          ? "#64748b" // slate-500
           : state.isFocused
-          ? "#F3E8FF"
+          ? "#f1f5f9" // slate-100
           : "white",
-        color: state.isSelected ? "white" : "#1F2937",
+        color: state.isSelected ? "white" : "#1e293b", // slate-800
         padding: "0.75rem 1rem",
         fontSize: "0.875rem",
-        "&:hover": { backgroundColor: "#F3E8FF", color: "#1F2937" },
+        "&:hover": { backgroundColor: "#f1f5f9", color: "#1e293b" },
       }),
-      singleValue: (provided) => ({ ...provided, color: "#1F2937" }),
-      placeholder: (provided) => ({ ...provided, color: "#9CA3AF" }),
+      singleValue: (provided) => ({ ...provided, color: "#1e293b" }), // slate-800
+      placeholder: (provided) => ({ ...provided, color: "#94a3b8" }), // slate-400
       dropdownIndicator: (provided) => ({
         ...provided,
-        color: "#7C3AED",
-        "&:hover": { color: "#6B21A8" },
+        color: "#64748b", // slate-500
+        "&:hover": { color: "#475569" }, // slate-600
       }),
       indicatorSeparator: () => ({ display: "none" }),
     };
@@ -353,7 +359,7 @@ function NewOrder() {
       <div className={fullWidth ? "col-span-full" : ""}>
         <label
           htmlFor={name}
-          className="block text-sm font-semibold text-gray-700 mb-2"
+          className="block text-sm font-semibold text-slate-700 mb-2"
         >
           {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -390,7 +396,7 @@ function NewOrder() {
               type="checkbox"
               checked={value}
               onChange={(e) => onChange(name, e.target.checked)}
-              className="h-5 w-5 text-purple-600 border-gray-300 rounded focus:ring-purple-400"
+              className="h-5 w-5 text-slate-600 border-slate-300 rounded focus:ring-slate-500"
             />
           ) : (
             <input
@@ -417,7 +423,7 @@ function NewOrder() {
             type !== "select" &&
             type !== "textarea" &&
             type !== "checkbox" && (
-              <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 text-sm">
+              <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-500 text-sm">
                 {suffix}
               </span>
             )}
@@ -436,7 +442,7 @@ function NewOrder() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
@@ -446,11 +452,12 @@ function NewOrder() {
             </div>
           )}
           {/* Progress Tracker */}
-          <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">
-              <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
+              {/* Track line */}
+              <div className="absolute top-6 left-0 w-full h-0.5 bg-slate-300 z-0">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-slate-600 to-slate-800 transition-all duration-500"
                   style={{
                     width: `${
                       (steps.findIndex((s) => s.current) / (steps.length - 1)) *
@@ -459,6 +466,8 @@ function NewOrder() {
                   }}
                 />
               </div>
+
+              {/* Steps */}
               {steps.map((step) => (
                 <div
                   key={step.number}
@@ -467,10 +476,10 @@ function NewOrder() {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                       step.completed
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-800 border-slate-700 text-white"
                         : step.current
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white shadow-lg"
-                        : "bg-white border-gray-300 text-gray-400"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-800 border-slate-700 text-white shadow-md"
+                        : "bg-white border-slate-300 text-slate-400"
                     }`}
                   >
                     {step.completed ? (
@@ -483,7 +492,7 @@ function NewOrder() {
                   </div>
                   <span
                     className={`mt-2 text-sm font-medium text-center ${
-                      step.current ? "text-purple-600" : "text-gray-600"
+                      step.current ? "text-slate-700" : "text-slate-500"
                     }`}
                   >
                     {step.title}
@@ -495,7 +504,7 @@ function NewOrder() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm border border-purple-200 p-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
                   Step 1: Assignment Instructions
                 </h2>
@@ -759,7 +768,7 @@ function NewOrder() {
                     value={formData.topic}
                     onChange={(e) => handleInputChange("topic", e.target.value)}
                     placeholder="E.g. Topic"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 pr-10"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 pr-10"
                   />
                 </div>
                 <div className="mt-6">
@@ -777,7 +786,7 @@ function NewOrder() {
                       handleInputChange("instructions", e.target.value)
                     }
                     placeholder="E.g. Detailed description of your order"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400  transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 min-h-32 resize-vertical"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400  transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 min-h-32 resize-vertical"
                   />
                 </div>
                 <div className="mt-8">
@@ -789,8 +798,8 @@ function NewOrder() {
                     htmlFor="file-upload"
                     className={`block border-2 border-dashed rounded-lg p-8 text-center transition-all duration-200 cursor-pointer ${
                       isDragOver
-                        ? "border-purple-400 bg-purple-50"
-                        : "border-gray-300 hover:border-purple-400 hover:bg-purple-50/50"
+                        ? "border-slate-400 bg-slate-50"
+                        : "border-gray-300 hover:border-slate-400 hover:bg-slate-50/50"
                     }`}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -802,7 +811,7 @@ function NewOrder() {
                     />
                     <p className="text-gray-600 mb-2">
                       Drag and Drop (or){" "}
-                      <span className="text-purple-600 font-medium">
+                      <span className="text-slate-600 font-medium">
                         Choose Files
                       </span>
                     </p>
@@ -862,7 +871,7 @@ function NewOrder() {
             </div>
             {/* Right - Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 sticky top-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-6">
                 <h3 className="text-xl font-bold text-gray-800 mb-6">
                   Summary
                 </h3>

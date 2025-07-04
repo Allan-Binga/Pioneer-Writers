@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
+import Logo from "../assets/logo.jpeg";
+import { isUserLoggedIn, getUserRole } from "../utils/auth";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isLoggedIn = isUserLoggedIn();
   const location = useLocation();
 
   const showAuthButtons = ["/new-order", "/order-payment"].includes(
@@ -26,24 +29,28 @@ function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-              Pioneer Writers
-            </span>
+            <div className="flex items-center">
+              <img
+                src={Logo}
+                alt="Pioneer-Writers"
+                className="h-10 w-auto sm:h-12 object-contain"
+              />
+            </div>
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-6">
+          <div className="hidden md:flex items-center space-x-6 absolute left-1/2 -translate-x-[45%]">
             {navItems.map((item) => (
               <a
                 key={item}
                 href="#"
-                className="text-gray-600 hover:text-purple-600 transition-colors duration-200 text-md font-medium"
+                className="text-gray-600 hover:text-slate-900 transition-colors duration-200 text-md font-medium"
               >
                 {item}
               </a>
             ))}
 
-            {showAuthButtons && (
+            {showAuthButtons && !isLoggedIn && (
               <div className="flex items-center space-x-3">
                 <Link
                   to="/sign-in"

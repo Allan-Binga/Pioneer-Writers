@@ -101,16 +101,18 @@ const getOrders = async (req, res) => {
   }
 };
 
-//Fetch my orders
+// Fetch my orders
 const getUsersOrders = async (req, res) => {
   const userId = req.userId;
-  const usersOrders = await client.query(
-    "SELECT * FROM orders WHERE user_id = $1"
-  );
-  const result = await client.query(usersOrders, [userId]);
-  res.status(200).json(result.rows);
+
   try {
+    const result = await client.query(
+      "SELECT * FROM orders WHERE user_id = $1",
+      [userId]
+    );
+    res.status(200).json(result.rows);
   } catch (error) {
+    console.error("Error fetching user orders:", error.message);
     res.status(500).json({ message: "Failed to fetch orders." });
   }
 };

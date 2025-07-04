@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Mail, Lock, BookCopy, Eye, EyeOff } from "lucide-react";
 import GoogleIcon from "../../assets/google.png";
 import FacebookIcon from "../../assets/facebook.png";
+import Logo from "../../assets/logo.jpg";
 import { notify } from "../../utils/toast";
 import { endpoint } from "../../server";
 import { useGoogleLogin } from "@react-oauth/google";
@@ -115,32 +116,36 @@ function SignIn() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-purple-100 flex">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
       {/* Left Column */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-purple-200 to-purple-300">
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-slate-200 to-slate-300">
         <div className="mb-8 p-8 bg-white rounded-full shadow-lg">
-          <div className="w-32 h-32 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center">
-            <BookCopy className="w-16 h-16 text-white" />
+          <div className="w-64 h-64">
+            <img
+              src={Logo}
+              alt="Pioneer Writers Logo"
+              className="w-full h-full object-contain rounded-full"
+            />
           </div>
         </div>
-        <h2 className="text-3xl font-bold text-purple-900 mb-2 text-center">
+        <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">
           Pioneer Writers
         </h2>
-        <p className="text-purple-700 text-center mb-12 max-w-md">
+        <p className="text-slate-700 text-center mb-12 max-w-md">
           Your trusted writing partner with expert assistance
         </p>
       </div>
 
       {/* Right Column */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6 border border-purple-200">
+        <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6 border border-slate-200">
           <div className="text-center pb-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-purple-700 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-500 to-slate-700 bg-clip-text text-transparent">
               Welcome back!
             </h1>
-            <p className="text-purple-600 mt-2">
+            <p className="text-slate-600 mt-2">
               New to Pioneer Writers?{" "}
-              <Link to="/sign-up" className="text-purple-700 hover:underline">
+              <Link to="/sign-up" className="text-slate-700 hover:underline">
                 Sign Up Now
               </Link>
             </p>
@@ -148,14 +153,14 @@ function SignIn() {
 
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="relative">
-              <Mail className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
+              <Mail className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
-                className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-500"
               />
               {fieldErrors.email && (
                 <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
@@ -163,18 +168,18 @@ function SignIn() {
             </div>
 
             <div className="relative">
-              <Lock className="absolute left-4 top-4 h-4 w-4 text-purple-400" />
+              <Lock className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
-                className="w-full pl-10 py-3 border border-purple-300 rounded-full focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-500"
               />
               <button
                 type="button"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-purple-400 hover:text-purple-600 transition"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition"
                 onClick={() => setShowPassword((prev) => !prev)}
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -189,7 +194,7 @@ function SignIn() {
             <div className="text-right">
               <Link
                 to="/forgot-password"
-                className="text-sm text-purple-700 hover:underline"
+                className="text-sm text-slate-700 hover:underline"
               >
                 Forgot password?
               </Link>
@@ -198,7 +203,7 @@ function SignIn() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-500 to-purple-700 hover:from-purple-600 hover:to-purple-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-slate-500 to-slate-700 hover:from-slate-600 hover:to-slate-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
             >
               {loading ? (
                 <svg
@@ -229,23 +234,23 @@ function SignIn() {
 
           <div className="my-6 relative">
             <div className="flex items-center justify-center">
-              <div className="flex-grow border-t border-purple-300"></div>
-              <span className="mx-4 text-sm text-purple-600 bg-white px-2">
+              <div className="flex-grow border-t border-slate-300"></div>
+              <span className="mx-4 text-sm text-slate-600 bg-white px-2">
                 Or sign in with your social accounts
               </span>
-              <div className="flex-grow border-t border-purple-300"></div>
+              <div className="flex-grow border-t border-slate-300"></div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={() => googleLogin()}
-              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer flex items-center justify-center"
+              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer flex items-center justify-center"
             >
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
 
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-purple-700 cursor-pointer">
+            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer">
               <img
                 src={FacebookIcon}
                 alt="Facebook"

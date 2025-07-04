@@ -1,4 +1,11 @@
 const client = require("../config/dbConfig");
+const dotenv = require("dotenv");
+const Stripe = require("stripe");
+
+dotenv.config();
+
+//Stripe SDK setup
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 //PayPal Webhook Handler
 const handlePaypalWebhook = async (req, res) => {
@@ -89,4 +96,54 @@ const handlePaypalWebhook = async (req, res) => {
   res.status(200).send("Webhook received");
 };
 
-module.exports = { handlePaypalWebhook };
+//Handle Stripe Webhook
+const handleStripeWebhook = async (req, res) => {
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const sig = req.headers["stripe-signature"];
+
+  let event;
+  try {
+    event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+  } catch (error) {
+    console.error("Webhook signature verification failed:", error.message);
+    return res.status(400).send("Webhook error.");
+  }
+
+  // Handle different event types
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+
+    const paymentId = session.metadata?.paymentId;
+    const userId = session.metadata?.userId;
+    const orderNumber = session.metadata?.orderNumber;
+    const userEmail = session.metadata?.userEmail;
+
+    try {
+      if (!paymentId || !orderNumber || !userId) {
+        throw new Error("Required metadata missing.");
+      }
+
+      // Optional: Retrieve the PaymentIntent if you want exact amounts or status
+      const paymentIntent = await stripe.paymentIntents.retrieve(
+        session.payment_intent
+      );
+
+      // Update payment record to "Paid"
+      const updateQuery = `UPDATE payments SET payment_status = $1, updated_at = $2 WHERE payment_id = $3`;
+      await client.query(updateQuery, ["Paid", new Date(), paymentId]);
+
+      console.log(
+        `✅ Payment ${paymentId} marked as paid for order ${orderNumber}.`
+      );
+      return res.status(200).send("Webhook received and processed.");
+    } catch (error) {
+      console.error("Webhook processing error:", error.message);
+      return res.status(500).send("Internal error processing payment.");
+    }
+  } else {
+    // For other events, respond with 200
+    return res.status(200).send("Event received.");
+  }
+};
+
+module.exports = { handlePaypalWebhook, handleStripeWebhook };

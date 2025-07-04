@@ -15,7 +15,7 @@ import {
   ChevronDown as ArrowDown,
   Mail,
 } from "lucide-react";
-import Logo from "../assets/logo.jpg";
+import Logo from "../assets/logo.jpeg";
 import axios from "axios";
 import { endpoint } from "../server";
 import { notify } from "../utils/toast";
@@ -31,11 +31,7 @@ function Sidebar() {
     const currentNavItem = navItems.find((item) =>
       item.submenu?.some((sub) => sub.path === location.pathname)
     );
-    if (currentNavItem) {
-      setOpenSubmenu(currentNavItem.name);
-    } else {
-      setOpenSubmenu(null); // Close submenu if no match
-    }
+    setOpenSubmenu(currentNavItem ? currentNavItem.name : null);
   }, [location.pathname]);
 
   const toggleSidebar = () => {
@@ -46,7 +42,6 @@ function Sidebar() {
     setOpenSubmenu(openSubmenu === itemName ? null : itemName);
   };
 
-  //Logout Handler
   const handleLogout = async () => {
     try {
       const response = await axios.post(
@@ -54,7 +49,6 @@ function Sidebar() {
         {},
         { withCredentials: true }
       );
-
       if (response.status === 200) {
         document.cookie = "userPioneerSession=; Max-Age=0; path=/;";
         localStorage.removeItem("userRole");
@@ -64,17 +58,13 @@ function Sidebar() {
         localStorage.removeItem("step2Data");
         localStorage.removeItem("checkoutAmount");
         notify.success("Successfully logged out.");
-
-        // Delay navigation by 2 seconds (long enough for toast to show)
-        setTimeout(() => {
-          navigate("/sign-in");
-        }, 2000);
+        setTimeout(() => navigate("/sign-in"), 2000);
       } else {
         notify.error("You are not logged in.");
       }
     } catch (error) {
       console.error("Logout error:", error);
-      notify.error("You are not logged in.");
+      notify.error("Failed to log out.");
     }
   };
 
@@ -105,39 +95,39 @@ function Sidebar() {
   return (
     <div
       className={`${
-        isCollapsed ? "w-20" : "w-64"
-      } bg-white fixed top-16 left-0 h-[calc(100vh-64px)] flex flex-col shadow-xl transition-all duration-300 z-40 border-r border-sky-200 overflow-y-auto`}
+        isCollapsed ? "w-20" : "w-72"
+      } bg-white fixed top-16 left-0 h-[calc(100vh-64px)] flex flex-col shadow-2xl transition-all duration-300 z-50 border-r border-slate-200/50 overflow-y-auto`}
     >
       {/* Logo Section */}
-      <div className="flex items-center justify-between p-4">
+      <div className="flex items-center justify-between p-5 border-b border-slate-200/50">
         {!isCollapsed && (
-          <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-sky-600 to-indigo-600 rounded-full flex items-center justify-center">
-              <PenTool className="w-6 h-6 text-white" />
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center">
+              <div className="flex items-center">
+                <img
+                  src={Logo}
+                  alt="Pioneer-Writers"
+                  className="h-10 w-auto sm:h-12 object-contain"
+                />
+              </div>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-sky-600 to-indigo-600 bg-clip-text text-transparent">
-              Pioneer Writers
-            </span>
           </div>
         )}
         <button
           onClick={toggleSidebar}
-          className="p-2 rounded-full bg-sky-100 text-sky-600 hover:bg-sky-200 transition-colors"
+          className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
         >
           {isCollapsed ? (
-            <ChevronRight className="w-5 h-5" />
+            <ChevronRight className="w-6 h-6" />
           ) : (
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-6 h-6" />
           )}
         </button>
       </div>
 
-      {/* Separator */}
-      <div className="border-t border-gray-200 mx-4 my-2" />
-
       {/* Navigation Items */}
       <nav className="flex-1 overflow-y-auto">
-        <ul className="space-y-2 p-4">
+        <ul className="space-y-3 p-5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = item.path
@@ -150,22 +140,22 @@ function Sidebar() {
                 {hasSubmenu ? (
                   <div
                     onClick={() => handleSubmenuToggle(item.name)}
-                    className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                    className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-all duration-200 ${
                       isActive
-                        ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-md"
-                        : "text-sky-700 hover:bg-sky-100 hover:text-sky-900"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-700 text-white shadow-md"
+                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-800"
                     }`}
                   >
                     <div className="flex items-center space-x-3">
                       {Icon && (
                         <Icon
-                          className={`w-6 h-6 ${
-                            isActive ? "text-white" : "text-sky-600"
+                          className={`w-7 h-7 ${
+                            isActive ? "text-white" : "text-slate-600"
                           }`}
                         />
                       )}
                       {!isCollapsed && (
-                        <span className="text-base font-medium">
+                        <span className="text-lg font-semibold">
                           {item.name}
                         </span>
                       )}
@@ -173,9 +163,9 @@ function Sidebar() {
                     {!isCollapsed && (
                       <span>
                         {openSubmenu === item.name ? (
-                          <ArrowDown className="w-4 h-4" />
+                          <ArrowDown className="w-5 h-5" />
                         ) : (
-                          <ArrowRight className="w-4 h-4" />
+                          <ArrowRight className="w-5 h-5" />
                         )}
                       </span>
                     )}
@@ -183,38 +173,38 @@ function Sidebar() {
                 ) : (
                   <Link
                     to={item.path}
-                    className={`flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
+                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
                       isActive
-                        ? "bg-gradient-to-r from-sky-600 to-indigo-600 text-white shadow-md"
-                        : "text-sky-700 hover:bg-sky-100 hover:text-sky-900"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-700 text-white shadow-md"
+                        : "text-slate-700 hover:bg-slate-50 hover:text-slate-800"
                     }`}
                   >
                     {Icon && (
                       <Icon
-                        className={`w-6 h-6 ${
-                          isActive ? "text-white" : "text-sky-600"
+                        className={`w-7 h-7 ${
+                          isActive ? "text-white" : "text-slate-600"
                         }`}
                       />
                     )}
                     {!isCollapsed && (
-                      <span className="text-base font-medium">{item.name}</span>
+                      <span className="text-lg font-semibold">{item.name}</span>
                     )}
                   </Link>
                 )}
 
                 {/* Submenu */}
                 {openSubmenu === item.name && !isCollapsed && (
-                  <ul className="ml-10 mt-2 space-y-1">
+                  <ul className="ml-10 mt-2 space-y-2">
                     {item.submenu.map((sub) => {
                       const isSubActive = location.pathname === sub.path;
                       return (
                         <li key={sub.name}>
                           <Link
                             to={sub.path}
-                            className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                            className={`block px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 ${
                               isSubActive
-                                ? "bg-sky-500 text-white"
-                                : "text-sky-600 hover:bg-sky-100"
+                                ? "bg-slate-100 text-slate-800"
+                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-700"
                             }`}
                           >
                             {sub.name}
@@ -228,14 +218,14 @@ function Sidebar() {
             );
           })}
           {/* Logout Button */}
-          <li className="pt-4 mt-4 border-t border-gray-200">
+          <li className="pt-6 mt-6 border-t border-slate-200/50">
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 w-full text-left p-3 rounded-lg text-sky-700 hover:bg-sky-100 hover:text-sky-900 transition-all duration-200 cursor-pointer"
+              className="flex items-center space-x-3 w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-50 hover:text-slate-800 transition-all duration-200"
             >
-              <LogOut className="w-6 h-6 text-sky-600" />
+              <LogOut className="w-7 h-7 text-slate-600" />
               {!isCollapsed && (
-                <span className="text-base font-medium">Logout</span>
+                <span className="text-lg font-semibold">Logout</span>
               )}
             </button>
           </li>
