@@ -91,7 +91,7 @@ function Writers() {
 
                       <p className="text-sm italic text-gray-600 mt-1">{writer.bio}</p>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-sm text-gray-700">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-md text-gray-700">
                         <WriterDetail icon={Mail} label={writer.email} />
                         <WriterDetail icon={Phone} label={writer.phone_number} />
                         <WriterDetail

@@ -72,13 +72,13 @@ function Profile() {
                     onChange={() => setSmsEnabled(!smsEnabled)}
                     className="w-4 h-4 text-sky-600 border-gray-300 focus:ring-sky-500"
                   />
-                  <span className="text-sm text-gray-700">
+                  <span className="text-md text-gray-700">
                     Enable SMS notifications for order updates
                   </span>
                 </div>
                 <div>
-                  <h3 className="text-sm font-medium text-gray-700 mb-1">Bio</h3>
-                  <p className="text-sm text-gray-600">{userData.bio}</p>
+                  <h3 className="text-md font-medium text-gray-700 mb-1">Bio</h3>
+                  <p className="text-md text-gray-600">{userData.bio}</p>
                 </div>
               </div>
             </div>
@@ -100,7 +100,7 @@ function Profile() {
                       <User className="w-6 h-6" />
                     </div>
                   )}
-                  <label className="text-sm text-sky-600 hover:underline cursor-pointer flex items-center gap-1">
+                  <label className="text-md text-sky-600 hover:underline cursor-pointer flex items-center gap-1">
                     <ImagePlus className="w-4 h-4" />
                     Change Avatar
                     <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
@@ -125,13 +125,13 @@ function Profile() {
 
                 {/* Bio */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+                  <label className="block text-md font-medium text-gray-700 mb-1">Bio</label>
                   <textarea
                     name="bio"
                     rows="3"
                     value={userData.bio}
                     onChange={handleInputChange}
-                    className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full border border-gray-300 rounded-md p-2 text-md focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
 
@@ -153,7 +153,7 @@ function Profile() {
 
             {/* Optional: Reset Password */}
             <div className="text-right">
-              <button className="text-sm text-sky-600 hover:underline flex items-center gap-1">
+              <button className="text-md text-sky-600 hover:underline flex items-center gap-1">
                 <Lock className="w-4 h-4" />
                 Reset Password
               </button>
@@ -168,7 +168,7 @@ function Profile() {
 // Info Row Component
 function InfoRow({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-center gap-3 text-sm text-gray-700">
+    <div className="flex items-center gap-3 text-md text-gray-700">
       <Icon className="w-4 h-4 text-sky-500" />
       <span className="font-medium">{label}:</span>
       <span>{value}</span>
@@ -180,13 +180,13 @@ function InfoRow({ icon: Icon, label, value }) {
 function InputField({ label, name, value, onChange }) {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+      <label className="block text-md font-medium text-gray-700 mb-1">{label}</label>
       <input
         type="text"
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
+        className="w-full border border-gray-300 rounded-md p-2 text-md focus:outline-none focus:ring-2 focus:ring-sky-500"
       />
     </div>
   );

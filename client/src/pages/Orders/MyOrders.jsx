@@ -106,7 +106,7 @@ function MyOrders() {
                         {order.topic}
                       </h2>
 
-                      <div className="flex flex-wrap gap-3 text-sm text-gray-700">
+                      <div className="flex flex-wrap gap-3 text-md text-gray-700">
                         <OrderDetail
                           icon={PenTool}
                           label={order.type_of_service}
@@ -146,7 +146,7 @@ function MyOrders() {
                           href={order.uploaded_file}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-sm text-sky-600 hover:underline"
+                          className="inline-flex items-center gap-1 text-md text-sky-600 hover:underline"
                           download
                         >
                           <Paperclip className="w-4 h-4" /> Download File
@@ -155,7 +155,7 @@ function MyOrders() {
                     </div>
 
                     {/* Right Side */}
-                    <div className="flex flex-col items-start lg:items-end gap-2 text-sm w-full lg:w-1/4">
+                    <div className="flex flex-col items-start lg:items-end gap-2 text-md w-full lg:w-1/4">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
                           order.order_status === "Pending"

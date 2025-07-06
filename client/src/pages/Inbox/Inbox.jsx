@@ -6,18 +6,18 @@ import {
   Star,
   Archive,
   Search,
+  X,
+  Paperclip,
 } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { useState } from "react";
-import { X, Paperclip } from "lucide-react";
 
-// Define ComposeModal inside Inbox or import it if in a separate file
+// Compose Modal
 function ComposeModal({ onClose }) {
   return (
-    <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center px-4">
-      <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl relative">
-        {/* Close button */}
+    <div className="fixed inset-0 z-50 backdrop-blur-md bg-white/30 flex items-center justify-center px-4">
+      <div className="bg-white w-full max-w-2xl rounded-xl shadow-xl relative">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-slate-500 hover:text-red-500 cursor-pointer"
@@ -25,15 +25,13 @@ function ComposeModal({ onClose }) {
           <X className="w-6 h-6" />
         </button>
 
-        {/* Modal content */}
         <div className="p-6 space-y-4">
           <h2 className="text-2xl font-semibold text-slate-800">
             Compose Message
           </h2>
 
-          {/* Course Dropdown */}
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-md font-medium text-slate-700">
               Course
             </label>
             <select className="w-full mt-1 border border-slate-300 rounded px-3 py-2">
@@ -43,17 +41,15 @@ function ComposeModal({ onClose }) {
             </select>
           </div>
 
-          {/* Checkbox */}
           <div className="flex items-center">
             <input type="checkbox" id="individual" className="mr-2" />
-            <label htmlFor="individual" className="text-sm text-slate-700">
+            <label htmlFor="individual" className="text-md text-slate-700">
               Send an individual message to each recipient
             </label>
           </div>
 
-          {/* To Field */}
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-md font-medium text-slate-700">
               To *
             </label>
             <div className="flex border border-slate-300 rounded overflow-hidden">
@@ -62,7 +58,7 @@ function ComposeModal({ onClose }) {
                 placeholder="Insert or Select Names"
                 className="flex-1 px-3 py-2 outline-none"
               />
-              <button className="px-3 bg-slate-100 hover:bg-slate-200">
+              <button className="px-3 bg-slate-100 hover:bg-slate-200 cursor-pointer">
                 <svg
                   className="w-5 h-5 text-slate-600"
                   fill="currentColor"
@@ -74,9 +70,8 @@ function ComposeModal({ onClose }) {
             </div>
           </div>
 
-          {/* Subject */}
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-md font-medium text-slate-700">
               Subject
             </label>
             <input
@@ -86,9 +81,8 @@ function ComposeModal({ onClose }) {
             />
           </div>
 
-          {/* Message */}
           <div>
-            <label className="block text-sm font-medium text-slate-700">
+            <label className="block text-md font-medium text-slate-700">
               Message *
             </label>
             <textarea
@@ -98,10 +92,9 @@ function ComposeModal({ onClose }) {
             />
           </div>
 
-          {/* Footer Buttons */}
           <div className="flex justify-between items-center mt-4">
             <div className="space-x-2">
-              <button className="p-2 border rounded hover:bg-slate-100">
+              <button className="p-2 border rounded hover:bg-slate-100 cursor-pointer">
                 <Paperclip className="w-6 h-6" />
               </button>
             </div>
@@ -123,32 +116,35 @@ function ComposeModal({ onClose }) {
   );
 }
 
+// Inbox Component
 function Inbox() {
   const [selectedMessage, setSelectedMessage] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [isComposeModalOpen, setIsComposeModalOpen] = useState(false); // New state for modal
+  const [isComposeModalOpen, setIsComposeModalOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const openComposeModal = () => setIsComposeModalOpen(true); // Function to open modal
-  const closeComposeModal = () => setIsComposeModalOpen(false); // Function to close modal
+  const openComposeModal = () => setIsComposeModalOpen(true);
+  const closeComposeModal = () => setIsComposeModalOpen(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar toggleMobileSidebar={toggleSidebar} />
       <Sidebar isOpen={isSidebarOpen} />
+
       <main
-        className={`transition-all duration-300 pt-16 px-4 ${
-          isSidebarOpen ? "ml-64" : "ml-0 md:ml-64"
+        className={`transition-all duration-300 pt-16 px-6 ${
+          isSidebarOpen ? "ml-64" : "ml-0 md:ml-72"
         }`}
       >
-        <div className="max-w-screen-xl mx-auto py-8">
-          {/* Inbox Wrapper Card */}
+        <div className="max-w-screen-4xl mx-auto py-10">
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
-            {/* Main Layout */}
             <div className="flex flex-col lg:flex-row">
-              {/* Folder Sidebar */}
+              {/* Sidebar */}
               <aside className="w-full lg:w-64 lg:pr-6 border-b lg:border-b-0 lg:border-r border-slate-100 pt-6 lg:pt-10 mb-6 lg:mb-0">
-                <div className="space-y-3 text-lg">
+                <div className="text-xs uppercase font-medium text-slate-500 mb-4 tracking-wider px-2">
+                  Folders
+                </div>
+                <div className="space-y-3 text-md">
                   {[
                     { icon: Mail, label: "Inbox" },
                     { icon: Star, label: "Starred" },
@@ -158,20 +154,20 @@ function Inbox() {
                   ].map(({ icon: Icon, label, danger }) => (
                     <div
                       key={label}
-                      className={`flex items-center cursor-pointer transition ${
+                      className={`flex items-center px-3 py-2 rounded-lg cursor-pointer transition ${
                         danger
-                          ? "text-slate-700 hover:text-red-600"
-                          : "text-slate-700 hover:text-slate-900"
+                          ? "text-red-600 hover:bg-red-50"
+                          : "text-slate-700 hover:bg-slate-100"
                       }`}
                     >
-                      <Icon className="w-5 h-5 mr-3" />
+                      <Icon className="w-4 h-4 mr-3" />
                       {label}
                     </div>
                   ))}
                 </div>
               </aside>
 
-              {/* Main Content */}
+              {/* Main Panel */}
               <section className="flex-1 lg:pl-6 flex flex-col">
                 {/* Toolbar */}
                 <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
@@ -193,18 +189,18 @@ function Inbox() {
                   </div>
 
                   <button
-                    onClick={openComposeModal} // Trigger modal open
-                    className="flex items-center justify-center px-4 py-2 bg-slate-800 text-white rounded-lg text-md hover:bg-slate-700 transition whitespace-nowrap"
+                    onClick={openComposeModal}
+                    className="flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-md hover:bg-indigo-500 transition whitespace-nowrap"
                   >
                     <SquarePen className="w-4 h-4 mr-2" />
                     Compose
                   </button>
                 </div>
 
-                {/* Content Area */}
+                {/* Main Content */}
                 <div className="flex flex-col lg:flex-row flex-1 overflow-hidden gap-4">
                   {/* Message List */}
-                  <div className="lg:w-1/3 border border-slate-100 overflow-y-auto bg-white rounded-lg max-h-96 lg:max-h-none">
+                  <div className="lg:w-1/3 border border-slate-200 bg-white rounded-xl shadow-sm overflow-y-auto max-h-[30rem]">
                     <ul className="divide-y divide-slate-100">
                       {[...Array(5)].map((_, idx) => (
                         <li
@@ -258,7 +254,7 @@ function Inbox() {
                   </div>
 
                   {/* Message Viewer */}
-                  <div className="flex-1 px-2 bg-slate-50 overflow-y-auto rounded-lg border border-slate-100">
+                  <div className="flex-1 px-2 bg-gradient-to-br from-slate-50 to-white overflow-y-auto rounded-xl border border-slate-200">
                     {selectedMessage ? (
                       <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 space-y-4">
                         <div className="flex justify-between items-center">
@@ -294,7 +290,6 @@ function Inbox() {
           </div>
         </div>
 
-        {/* Render ComposeModal conditionally */}
         {isComposeModalOpen && <ComposeModal onClose={closeComposeModal} />}
       </main>
     </div>
