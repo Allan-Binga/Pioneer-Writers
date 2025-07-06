@@ -1,7 +1,6 @@
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import {
-  History,
   PenTool,
   FileText,
   GraduationCap,
@@ -12,9 +11,8 @@ import {
   CalendarClock,
   AlignJustify,
   LoaderCircle,
-  CheckCircle,
-  XCircle,
   Paperclip,
+  Hourglass,
 } from "lucide-react";
 import { endpoint } from "../../server";
 import axios from "axios";
@@ -25,6 +23,11 @@ import moment from "moment";
 function MyOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  const toggleMobileSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -49,7 +52,7 @@ function MyOrders() {
     const due = moment(deadline);
     const hoursLeft = due.diff(now, "hours");
 
-    if (hoursLeft < 6) return "text-red-600";
+    if (hoursLeft < 6) return "text-orange-600";
     if (hoursLeft < 24) return "text-yellow-500";
     return "text-green-600";
   };
@@ -62,138 +65,144 @@ function MyOrders() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <Sidebar />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <Navbar toggleMobileSidebar={toggleMobileSidebar} />
 
-      <div className="p-6 ml-64 max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-sky-800 mb-8 flex items-center gap-3">
-          <History className="w-8 h-8 text-sky-600" />
-          My Orders
-        </h1>
+      <div className="flex">
+        {/* Sidebar: show on large screens or mobile toggle */}
+        <div
+          className={`fixed z-40 md:static ${
+            isSidebarOpen ? "block" : "hidden"
+          } md:block`}
+        >
+          <Sidebar />
+        </div>
 
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <LoaderCircle className="animate-spin w-12 h-12 text-sky-600" />
-            <span className="ml-3 text-lg text-gray-600">
-              Loading orders...
-            </span>
-          </div>
-        ) : orders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm border border-gray-200">
-            <p className="text-lg text-gray-500">No orders found.</p>
-            <button
-              onClick={() => (window.location.href = "/new-order")}
-              className="mt-4 px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 transition-colors"
-            >
-              Create New Order
-            </button>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {orders.map((order, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-300 p-5 flex flex-col lg:flex-row items-start gap-6"
-              >
-                {/* Left Column */}
-                <div className="flex-1 space-y-2">
-                  <div className="flex items-center gap-2 text-sky-800 text-lg font-semibold">
-                    <History className="w-5 h-5 text-sky-600" /> {order.topic}
-                  </div>
+        {/* Main Content Area */}
+        <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-3xl font-bold text-slate-800 mb-4">
+              My Orders
+            </h1>
 
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-700">
-                    <span className="flex items-center gap-1">
-                      <PenTool className="w-4 h-4 text-teal-600" />{" "}
-                      {order.type_of_service}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <FileText className="w-4 h-4 text-teal-600" />{" "}
-                      {order.document_type}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <GraduationCap className="w-4 h-4 text-teal-600" />{" "}
-                      {order.writer_level}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <LayoutTemplate className="w-4 h-4 text-teal-600" />{" "}
-                      {order.paper_format.toUpperCase()}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Flag className="w-4 h-4 text-teal-600" />{" "}
-                      {order.english_type.toUpperCase()}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <BookOpenText className="w-4 h-4 text-teal-600" />{" "}
-                      {order.pages} pages
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <ClipboardList className="w-4 h-4 text-teal-600" />{" "}
-                      {order.number_of_sources} sources
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <AlignJustify className="w-4 h-4 text-teal-600" />{" "}
-                      {order.spacing} spacing
-                    </span>
-                  </div>
-
-                  {order.uploaded_file && (
-                    <a
-                      href={order.uploaded_file}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-sm text-sky-600 hover:underline"
-                      download
-                    >
-                      <Paperclip className="w-4 h-4" /> Download File
-                    </a>
-                  )}
-                </div>
-
-                {/* Right Column */}
-                <div className="flex flex-col items-start gap-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    <CalendarClock className="w-5 h-5 text-teal-600" />
-                    <span>
-                      Due:{" "}
-                      {moment(order.deadline).format("MMM Do YYYY, h:mm a")}
-                    </span>
-                  </div>
-
-                  <div
-                    className={`flex items-center gap-2 font-medium text-sm ${getCountdownColor(
-                      order.deadline
-                    )}`}
-                  >
-                    ⏳ {formatCountdown(order.deadline)} left
-                  </div>
-
-                  <div className="flex items-center gap-2 text-sm">
-                    {order.order_status === "Pending" ? (
-                      <LoaderCircle className="w-4 h-4 text-yellow-500 animate-spin" />
-                    ) : order.order_status === "Completed" ? (
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <XCircle className="w-4 h-4 text-red-500" />
-                    )}
-                    <span className="text-gray-700">{order.order_status}</span>
-                  </div>
-
-                  <button
-                    className="mt-3 px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 text-sm"
-                    onClick={() =>
-                      (window.location.href = `/order-details/${order.id}`)
-                    }
-                  >
-                    View Details
-                  </button>
-                </div>
+            {loading ? (
+              <div className="flex justify-center items-center h-64">
+                <LoaderCircle className="animate-spin w-12 h-12 text-slate-600" />
               </div>
-            ))}
+            ) : orders.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm border border-gray-200">
+                <p className="text-lg text-gray-500">No orders found.</p>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {orders.map((order, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow p-6 flex flex-col lg:flex-row justify-between gap-4"
+                  >
+                    {/* Left Side */}
+                    <div className="space-y-3 w-full lg:w-3/4">
+                      <h2 className="text-lg font-semibold text-sky-800">
+                        {order.topic}
+                      </h2>
+
+                      <div className="flex flex-wrap gap-3 text-sm text-gray-700">
+                        <OrderDetail
+                          icon={PenTool}
+                          label={order.type_of_service}
+                        />
+                        <OrderDetail
+                          icon={FileText}
+                          label={order.document_type}
+                        />
+                        <OrderDetail
+                          icon={GraduationCap}
+                          label={order.writer_level}
+                        />
+                        <OrderDetail
+                          icon={LayoutTemplate}
+                          label={order.paper_format.toUpperCase()}
+                        />
+                        <OrderDetail
+                          icon={Flag}
+                          label={order.english_type.toUpperCase()}
+                        />
+                        <OrderDetail
+                          icon={BookOpenText}
+                          label={`${order.pages} pages`}
+                        />
+                        <OrderDetail
+                          icon={ClipboardList}
+                          label={`${order.number_of_sources} sources`}
+                        />
+                        <OrderDetail
+                          icon={AlignJustify}
+                          label={`${order.spacing} spacing`}
+                        />
+                      </div>
+
+                      {order.uploaded_file && (
+                        <a
+                          href={order.uploaded_file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-sm text-sky-600 hover:underline"
+                          download
+                        >
+                          <Paperclip className="w-4 h-4" /> Download File
+                        </a>
+                      )}
+                    </div>
+
+                    {/* Right Side */}
+                    <div className="flex flex-col items-start lg:items-end gap-2 text-sm w-full lg:w-1/4">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                          order.order_status === "Pending"
+                            ? "bg-yellow-100 text-yellow-700"
+                            : order.order_status === "Completed"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-blue-100 text-blue-700"
+                        }`}
+                      >
+                        {order.order_status}
+                      </span>
+
+                      <span className="text-lg font-bold text-green-600">
+                        ${parseFloat(order.checkout_amount).toFixed(2)}
+                      </span>
+
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <CalendarClock className="w-4 h-4 text-teal-600" />
+                        {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
+                      </div>
+
+                      <div
+                        className={`flex items-center gap-2 font-medium ${getCountdownColor(
+                          order.deadline
+                        )}`}
+                      >
+                        <Hourglass className="w-4 h-4 text-slate-700" />
+                        {formatCountdown(order.deadline)} remaining
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+        </main>
       </div>
     </div>
+  );
+}
+
+function OrderDetail({ icon: Icon, label }) {
+  return (
+    <span className="flex items-center gap-1">
+      <Icon className="w-4 h-4 text-teal-600" />
+      {label}
+    </span>
   );
 }
 

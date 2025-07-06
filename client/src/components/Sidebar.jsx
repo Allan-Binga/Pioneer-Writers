@@ -14,19 +14,19 @@ import {
   ChevronRight as ArrowRight,
   ChevronDown as ArrowDown,
   Mail,
+  X,
 } from "lucide-react";
 import Logo from "../assets/logo.jpeg";
 import axios from "axios";
 import { endpoint } from "../server";
 import { notify } from "../utils/toast";
 
-function Sidebar() {
+function Sidebar({ isMobile, isMobileSidebarOpen, closeMobileSidebar }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Automatically open submenu based on current path
   useEffect(() => {
     const currentNavItem = navItems.find((item) =>
       item.submenu?.some((sub) => sub.path === location.pathname)
@@ -51,12 +51,7 @@ function Sidebar() {
       );
       if (response.status === 200) {
         document.cookie = "userPioneerSession=; Max-Age=0; path=/;";
-        localStorage.removeItem("userRole");
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("step1Data");
-        localStorage.removeItem("step2Data");
-        localStorage.removeItem("checkoutAmount");
+        localStorage.clear();
         notify.success("Successfully logged out.");
         setTimeout(() => navigate("/sign-in"), 2000);
       } else {
@@ -94,35 +89,35 @@ function Sidebar() {
 
   return (
     <div
-      className={`${
-        isCollapsed ? "w-20" : "w-72"
-      } bg-white fixed top-16 left-0 h-[calc(100vh-64px)] flex flex-col shadow-2xl transition-all duration-300 z-50 border-r border-slate-200/50 overflow-y-auto`}
+      className={`
+        ${isCollapsed ? "w-20" : "w-72"}
+        bg-white fixed top-16 left-0 h-[calc(100vh-64px)]
+        flex flex-col shadow-2xl transition-all duration-300 z-50
+        border-r border-slate-200/50 overflow-y-auto
+        ${isMobile ? (isMobileSidebarOpen ? "block" : "hidden") : "block"}
+      `}
     >
+      {/* Close Button on Mobile */}
+      {isMobile && (
+        <button
+          onClick={closeMobileSidebar}
+          className="absolute top-4 right-4 text-slate-500 hover:text-slate-800 lg:hidden"
+        >
+          <X className="w-6 h-6" />
+        </button>
+      )}
+
       {/* Logo Section */}
       <div className="flex items-center justify-between p-5 border-b border-slate-200/50">
         {!isCollapsed && (
           <div className="flex items-center space-x-3">
-            <div className="flex items-center">
-              <div className="flex items-center">
-                <img
-                  src={Logo}
-                  alt="Pioneer-Writers"
-                  className="h-10 w-auto sm:h-12 object-contain"
-                />
-              </div>
-            </div>
+            <img
+              src={Logo}
+              alt="Pioneer-Writers"
+              className="h-10 w-auto sm:h-12 object-contain"
+            />
           </div>
         )}
-        <button
-          onClick={toggleSidebar}
-          className="p-2 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-100 hover:text-slate-700 transition-colors duration-200"
-        >
-          {isCollapsed ? (
-            <ChevronRight className="w-6 h-6" />
-          ) : (
-            <ChevronLeft className="w-6 h-6" />
-          )}
-        </button>
       </div>
 
       {/* Navigation Items */}

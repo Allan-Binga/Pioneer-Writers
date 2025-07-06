@@ -2,7 +2,7 @@ const client = require("../config/dbConfig")
 const nodemailer = require("nodemailer")
 
 //Send Mail
-const sendMessage = async (req, res) => {
+const sendMessageToWriter = async (req, res) => {
     try {
         
     } catch (error) {
@@ -19,4 +19,4 @@ const getMessages = async (req, res) => {
     }
 }
 
-module.exports = {sendMessage, getMessages}
+module.exports = {sendMessageToWriter, getMessages}

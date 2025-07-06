@@ -11,6 +11,7 @@ const usersRoute = require("./routes/users")
 const draftRoute = require("./routes/drafts")
 const webhookRoute = require("./routes/webhook")
 const inboxRoute = require("./routes/inbox")
+const writersRoute = require("./routes/writers")
 
 //Import DB connection
 require("./config/dbConfig");
@@ -50,6 +51,7 @@ app.use("/pioneer-writers/v1/checkout", checkoutRoute);
 app.use("/pioneer-writers/v1/users", usersRoute)
 app.use("/pioneer-writers/v1/drafts", draftRoute)
 app.use("/pioneer-writers/v1/webhook", webhookRoute)
+app.use("/pioneer-writers/v1/writers", writersRoute)
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {

@@ -8,8 +8,8 @@ function Navbar({ toggleMobileSidebar }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isLoggedIn = isUserLoggedIn();
   const location = useLocation();
-  const userName = localStorage.getItem("userName") || "User"; // Fetch user name or use placeholder
-  const notificationCount = 3; // Hardcoded for demo; replace with dynamic data
+  const userName = localStorage.getItem("userName") || "User";
+  const notificationCount = 3;
 
   const showAuthButtons = ["/new-order", "/order-payment"].includes(
     location.pathname
@@ -40,12 +40,12 @@ function Navbar({ toggleMobileSidebar }) {
               <img
                 src={Logo}
                 alt="Pioneer-Writers"
-                className="h-8 w-auto sm:h-10 lg:h-12 object-contain"
+                className="hidden sm:block h-8 w-auto sm:h-10 lg:h-12 object-contain"
               />
             </Link>
           </div>
 
-          {/* Desktop Menu */}
+          {/* Desktop Center Nav */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-6 absolute left-1/2 -translate-x-1/2">
             {navItems.map((item) => (
               <a
@@ -58,7 +58,7 @@ function Navbar({ toggleMobileSidebar }) {
             ))}
           </div>
 
-          {/* Right Section: Notifications, Auth/Avatar, and Mobile Toggle */}
+          {/* Right Side */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             {/* Notification Bell */}
             <Link
@@ -74,7 +74,7 @@ function Navbar({ toggleMobileSidebar }) {
               )}
             </Link>
 
-            {/* Auth Buttons or Avatar Section */}
+            {/* Auth / Avatar */}
             {isLoggedIn ? (
               <Link
                 to="/profile"
@@ -82,7 +82,7 @@ function Navbar({ toggleMobileSidebar }) {
                 title="Profile"
               >
                 <img
-                  src="https://via.placeholder.com/40" // Replace with actual user avatar
+                  src="https://via.placeholder.com/40"
                   alt="User Avatar"
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-purple-200"
                 />
@@ -107,11 +107,11 @@ function Navbar({ toggleMobileSidebar }) {
               </div>
             ) : null}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Sidebar/Menu Toggle */}
             <button
               onClick={() => {
                 toggleMenu();
-                toggleMobileSidebar(); // Toggle Sidebar for mobile
+                toggleMobileSidebar(); // toggle sidebar separately
               }}
               className="md:hidden text-gray-600 hover:text-purple-600 transition-colors"
             >

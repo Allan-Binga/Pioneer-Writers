@@ -447,10 +447,16 @@ function NewOrder() {
       <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
+          <div className="flex justify-between items-center mb-6 sm:mb-8">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-semibold text-slate-800">
+              Place Order
+            </h1>
+          </div>
+
           {/* Progress Tracker */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">

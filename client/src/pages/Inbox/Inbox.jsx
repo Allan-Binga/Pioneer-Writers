@@ -2,7 +2,6 @@ import {
   Mail,
   Send,
   SquarePen,
-  Pencil,
   Trash2,
   Star,
   Archive,
@@ -11,22 +10,144 @@ import {
 import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { useState } from "react";
+import { X, Paperclip } from "lucide-react";
+
+// Define ComposeModal inside Inbox or import it if in a separate file
+function ComposeModal({ onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center px-4">
+      <div className="bg-white w-full max-w-2xl rounded-lg shadow-xl relative">
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-slate-500 hover:text-red-500 cursor-pointer"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        {/* Modal content */}
+        <div className="p-6 space-y-4">
+          <h2 className="text-2xl font-semibold text-slate-800">
+            Compose Message
+          </h2>
+
+          {/* Course Dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              Course
+            </label>
+            <select className="w-full mt-1 border border-slate-300 rounded px-3 py-2">
+              <option>Select Course</option>
+              <option>Math</option>
+              <option>Science</option>
+            </select>
+          </div>
+
+          {/* Checkbox */}
+          <div className="flex items-center">
+            <input type="checkbox" id="individual" className="mr-2" />
+            <label htmlFor="individual" className="text-sm text-slate-700">
+              Send an individual message to each recipient
+            </label>
+          </div>
+
+          {/* To Field */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              To *
+            </label>
+            <div className="flex border border-slate-300 rounded overflow-hidden">
+              <input
+                type="text"
+                placeholder="Insert or Select Names"
+                className="flex-1 px-3 py-2 outline-none"
+              />
+              <button className="px-3 bg-slate-100 hover:bg-slate-200">
+                <svg
+                  className="w-5 h-5 text-slate-600"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path d="M13 7h4v2h-4v4h-2V9H7V7h4V3h2v4z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Subject */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              Subject
+            </label>
+            <input
+              type="text"
+              placeholder="Insert Subject"
+              className="w-full border border-slate-300 rounded px-3 py-2 mt-1"
+            />
+          </div>
+
+          {/* Message */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700">
+              Message *
+            </label>
+            <textarea
+              placeholder="Type your message..."
+              rows={5}
+              className="w-full border border-slate-300 rounded px-3 py-2 mt-1 resize-none"
+            />
+          </div>
+
+          {/* Footer Buttons */}
+          <div className="flex justify-between items-center mt-4">
+            <div className="space-x-2">
+              <button className="p-2 border rounded hover:bg-slate-100">
+                <Paperclip className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="space-x-2">
+              <button
+                onClick={onClose}
+                className="px-4 py-2 border rounded text-slate-700 hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500">
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Inbox() {
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isComposeModalOpen, setIsComposeModalOpen] = useState(false); // New state for modal
+
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const openComposeModal = () => setIsComposeModalOpen(true); // Function to open modal
+  const closeComposeModal = () => setIsComposeModalOpen(false); // Function to close modal
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
-      <Navbar />
-      <Sidebar />
-      <main className="flex-1 pt-16 ml-64">
-        <div className="container mx-auto px-4 py-8">
+      <Navbar toggleMobileSidebar={toggleSidebar} />
+      <Sidebar isOpen={isSidebarOpen} />
+      <main
+        className={`transition-all duration-300 pt-16 px-4 ${
+          isSidebarOpen ? "ml-64" : "ml-0 md:ml-64"
+        }`}
+      >
+        <div className="max-w-screen-xl mx-auto py-8">
           {/* Inbox Wrapper Card */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
             {/* Main Layout */}
-            <div className="flex">
+            <div className="flex flex-col lg:flex-row">
               {/* Folder Sidebar */}
-              <aside className="w-64 pr-6 border-r border-slate-100 pt-10">
+              <aside className="w-full lg:w-64 lg:pr-6 border-b lg:border-b-0 lg:border-r border-slate-100 pt-6 lg:pt-10 mb-6 lg:mb-0">
                 <div className="space-y-3 text-lg">
                   {[
                     { icon: Mail, label: "Inbox" },
@@ -51,9 +172,9 @@ function Inbox() {
               </aside>
 
               {/* Main Content */}
-              <section className="flex-1 pl-6 flex flex-col">
+              <section className="flex-1 lg:pl-6 flex flex-col">
                 {/* Toolbar */}
-                <div className="flex items-center justify-between space-x-4 mb-6">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
                   <select className="border border-slate-300 text-slate-700 rounded-lg px-3 py-2 text-md bg-white focus:outline-none focus:ring-2 focus:ring-slate-300">
                     <option value="inbox">Inbox</option>
                     <option value="sent">Sent</option>
@@ -62,7 +183,7 @@ function Inbox() {
                     <option value="trash">Trash</option>
                   </select>
 
-                  <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white w-full max-w-md">
+                  <div className="flex items-center border border-slate-300 rounded-lg px-3 py-2 bg-white w-full md:w-auto flex-1 md:flex-initial">
                     <Search className="w-4 h-4 text-slate-500 mr-2" />
                     <input
                       type="text"
@@ -71,16 +192,19 @@ function Inbox() {
                     />
                   </div>
 
-                  <button className="flex items-center px-4 py-2 bg-slate-800 text-white rounded-lg text-md hover:bg-slate-700 transition">
+                  <button
+                    onClick={openComposeModal} // Trigger modal open
+                    className="flex items-center justify-center px-4 py-2 bg-slate-800 text-white rounded-lg text-md hover:bg-slate-700 transition whitespace-nowrap"
+                  >
                     <SquarePen className="w-4 h-4 mr-2" />
-                    Compose Message
+                    Compose
                   </button>
                 </div>
 
                 {/* Content Area */}
-                <div className="flex flex-1 overflow-hidden">
+                <div className="flex flex-col lg:flex-row flex-1 overflow-hidden gap-4">
                   {/* Message List */}
-                  <div className="w-1/3 border-r border-slate-100 overflow-y-auto bg-white rounded-lg">
+                  <div className="lg:w-1/3 border border-slate-100 overflow-y-auto bg-white rounded-lg max-h-96 lg:max-h-none">
                     <ul className="divide-y divide-slate-100">
                       {[...Array(5)].map((_, idx) => (
                         <li
@@ -104,7 +228,6 @@ function Inbox() {
                             selectedMessage?.id === idx ? "bg-slate-100" : ""
                           }`}
                         >
-                          {/* Stylish radio indicator */}
                           <div
                             className={`absolute top-2 left-2 w-4 h-4 rounded-full border-2 z-10 ${
                               selectedMessage?.id === idx
@@ -113,7 +236,6 @@ function Inbox() {
                             }`}
                           ></div>
 
-                          {/* Message Content */}
                           <div className="pl-6">
                             <div className="flex justify-between mb-1">
                               <span className="font-semibold text-slate-800">
@@ -135,8 +257,8 @@ function Inbox() {
                     </ul>
                   </div>
 
-                  {/* Message Viewer / Composer */}
-                  <div className="flex-1 px-6 bg-slate-50 overflow-y-auto">
+                  {/* Message Viewer */}
+                  <div className="flex-1 px-2 bg-slate-50 overflow-y-auto rounded-lg border border-slate-100">
                     {selectedMessage ? (
                       <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 space-y-4">
                         <div className="flex justify-between items-center">
@@ -160,12 +282,9 @@ function Inbox() {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex flex-col items-center justify-center h-full space-y-4 text-center text-slate-400">
-                        <Mail className="w-14 h-14 text-slate-300" />{" "}
-                        {/* 56px size */}
-                        <p className="text-md italic">
-                          No messages selected
-                        </p>
+                      <div className="flex flex-col items-center justify-center h-full space-y-4 text-center text-slate-400 p-8">
+                        <Mail className="w-14 h-14 text-slate-300" />
+                        <p className="text-md italic">No messages selected</p>
                       </div>
                     )}
                   </div>
@@ -174,6 +293,9 @@ function Inbox() {
             </div>
           </div>
         </div>
+
+        {/* Render ComposeModal conditionally */}
+        {isComposeModalOpen && <ComposeModal onClose={closeComposeModal} />}
       </main>
     </div>
   );
