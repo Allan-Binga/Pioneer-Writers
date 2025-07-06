@@ -2,12 +2,14 @@ const client = require("../config/dbConfig");
 const Joi = require("joi");
 const jwt = require("jsonwebtoken");
 
-// Post an order
+// Post or update an order
 const postOrder = async (req, res) => {
-  const userId = req.userId; // From middleware middleware
-  // console.log(userId)
+  const userId = req.userId; // From middleware
   try {
     const schema = Joi.object({
+      order_id: Joi.string()
+        .guid({ version: ["uuidv4"] }) // Validate as UUID v4
+        .optional(), // Add order_id to schema
       topic_field: Joi.string().required(),
       type_of_service: Joi.string().required(),
       document_type: Joi.string().required(),
@@ -35,58 +37,137 @@ const postOrder = async (req, res) => {
 
     const uploadedFile = req.files?.[0]?.location || null;
 
-    const query = `
-      INSERT INTO orders (
-        topic_field, type_of_service, document_type, writer_level,
-        paper_format, english_type, pages, spacing, number_of_words,
-        number_of_sources, topic, instructions, uploaded_file,
-        writer_type, deadline, total_price, checkout_amount,
-        writer_tip, plagiarism_report, payment_option, coupon_code,
-        user_id
-      )
-      VALUES (
-        $1, $2, $3, $4, $5,
-        $6, $7, $8, $9, $10,
-        $11, $12, $13, $14,
-        $15, $16, $17, $18, $19, $20,
-        $21, $22
-      )
-      RETURNING *;
-    `;
+    let query;
+    let values;
 
-    const values = [
-      value.topic_field,
-      value.type_of_service,
-      value.document_type,
-      value.writer_level,
-      value.paper_format,
-      value.english_type,
-      value.pages,
-      value.spacing,
-      value.number_of_words,
-      value.number_of_sources,
-      value.topic,
-      value.instructions,
-      uploadedFile,
-      value.writer_type,
-      value.deadline,
-      value.total_price,
-      value.checkout_amount,
-      value.writer_tip || null,
-      value.plagiarism_report ?? false,
-      value.payment_option || "",
-      value.coupon_code || "",
-      userId,
-    ];
+    if (value.order_id) {
+      // Check if the order exists and belongs to the user
+      const checkQuery = `
+        SELECT 1 FROM orders WHERE order_id = $1 AND user_id = $2
+      `;
+      const checkResult = await client.query(checkQuery, [
+        value.order_id,
+        userId,
+      ]);
+      if (checkResult.rows.length === 0) {
+        return res
+          .status(404)
+          .json({ error: "Order not found or unauthorized" });
+      }
+
+      // Update existing order
+      query = `
+        UPDATE orders SET
+          topic_field = $1,
+          type_of_service = $2,
+          document_type = $3,
+          writer_level = $4,
+          paper_format = $5,
+          english_type = $6,
+          pages = $7,
+          spacing = $8,
+          number_of_words = $9,
+          number_of_sources = $10,
+          topic = $11,
+          instructions = $12,
+          uploaded_file = $13,
+          writer_type = $14,
+          deadline = $15,
+          total_price = $16,
+          checkout_amount = $17,
+          writer_tip = $18,
+          plagiarism_report = $19,
+          payment_option = $20,
+          coupon_code = $21,
+          updated_at = NOW()
+        WHERE order_id = $22 AND user_id = $23
+        RETURNING *;
+      `;
+      values = [
+        value.topic_field,
+        value.type_of_service,
+        value.document_type,
+        value.writer_level,
+        value.paper_format,
+        value.english_type,
+        value.pages,
+        value.spacing,
+        value.number_of_words,
+        value.number_of_sources,
+        value.topic,
+        value.instructions,
+        uploadedFile,
+        value.writer_type,
+        value.deadline,
+        value.total_price,
+        value.checkout_amount,
+        value.writer_tip || null,
+        value.plagiarism_report ?? false,
+        value.payment_option || "",
+        value.coupon_code || "",
+        value.order_id,
+        userId,
+      ];
+    } else {
+      // Insert new order
+      query = `
+        INSERT INTO orders (
+          topic_field, type_of_service, document_type, writer_level,
+          paper_format, english_type, pages, spacing, number_of_words,
+          number_of_sources, topic, instructions, uploaded_file,
+          writer_type, deadline, total_price, checkout_amount,
+          writer_tip, plagiarism_report, payment_option, coupon_code,
+          user_id
+        )
+        VALUES (
+          $1, $2, $3, $4, $5,
+          $6, $7, $8, $9, $10,
+          $11, $12, $13, $14,
+          $15, $16, $17, $18, $19, $20,
+          $21, $22
+        )
+        RETURNING *;
+      `;
+      values = [
+        value.topic_field,
+        value.type_of_service,
+        value.document_type,
+        value.writer_level,
+        value.paper_format,
+        value.english_type,
+        value.pages,
+        value.spacing,
+        value.number_of_words,
+        value.number_of_sources,
+        value.topic,
+        value.instructions,
+        uploadedFile,
+        value.writer_type,
+        value.deadline,
+        value.total_price,
+        value.checkout_amount,
+        value.writer_tip || null,
+        value.plagiarism_report ?? false,
+        value.payment_option || "",
+        value.coupon_code || "",
+        userId,
+      ];
+    }
 
     const { rows } = await client.query(query, values);
 
-    res.status(201).json({
-      message: "Order posted successfully. Proceed to checkout.",
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Order not found or unauthorized" });
+    }
+
+    res.status(value.order_id ? 200 : 201).json({
+      message: value.order_id
+        ? "Order updated successfully."
+        : "Order posted successfully. Proceed to checkout.",
       order: rows[0],
     });
   } catch (error) {
-    console.error("Error posting order:", error);
+    console.error("Error processing order:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };

@@ -12,7 +12,8 @@ import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import Visa from "../../assets/visa.png";
 import PayPal from "../../assets/paypal.png";
-import Googlepay from "../../assets/googlepay.png"
+import Googlepay from "../../assets/googlepay.png";
+import StripeLogo from "../../assets/stripe.png";
 import { endpoint } from "../../server";
 import axios from "axios";
 import { notify } from "../../utils/toast";
@@ -73,35 +74,59 @@ function OrderPayment() {
     setSelectedMethod(method);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setLoading(true);
-    try {
-      const response = await axios.post(
-        `${endpoint}/checkout/pay-with-paypal`,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setLoading(true);
 
-      const { approvalUrl } = response.data;
-      console.log(approvalUrl)
+  try {
+    let response;
+    let redirectUrl;
 
-      if (approvalUrl) {
-        window.location.href = approvalUrl; // 🚀 redirect to PayPal
-      } else {
-        throw new Error("No approval URL received");
-      }
-    } catch (error) {
-      console.error("Payment error:", error);
-      notify.error("Failed to initiate PayPal payment");
-    } finally {
-      setIsSubmitting(false);
-      setLoading(false);
+    switch (selectedMethod) {
+      case "googlepay":
+        response = await axios.post(
+          `${endpoint}/checkout/google`,
+          {},
+          { withCredentials: true }
+        );
+        redirectUrl = response.data.sessionUrl;
+        if (!redirectUrl) throw new Error("No session URL received");
+        break;
+
+      case "paypal":
+        response = await axios.post(
+          `${endpoint}/checkout/pay-with-paypal`,
+          {},
+          { withCredentials: true }
+        );
+        redirectUrl = response.data.approvalUrl;
+        if (!redirectUrl) throw new Error("No approval URL received");
+        break;
+
+      case "stripe":
+        response = await axios.post(
+          `${endpoint}/checkout/stripe`,
+          {},
+          { withCredentials: true }
+        );
+        redirectUrl = response.data.sessionUrl;
+        if (!redirectUrl) throw new Error("No session URL received");
+        break;
+
+      default:
+        throw new Error("Please select a payment method");
     }
-  };
+
+    window.location.href = redirectUrl;
+  } catch (error) {
+    console.error("Payment error:", error);
+    notify.error(`Failed to initiate ${selectedMethod} payment`);
+  } finally {
+    setIsSubmitting(false);
+    setLoading(false);
+  }
+};
 
   const formatDate = (isoDate) => {
     if (!isoDate) return "N/A";
@@ -120,15 +145,15 @@ function OrderPayment() {
       onClick={() => handleSelect(value)}
       className={`flex items-center justify-between p-4 rounded-xl border cursor-pointer transition-all duration-300 transform hover:scale-[1.02] ${
         selectedMethod === value
-          ? "border-purple-500 bg-purple-50 shadow-md ring-1 ring-purple-200"
-          : "border-gray-200 hover:border-purple-300 hover:bg-purple-50/50"
+          ? "border-slate-500 bg-slate-50 shadow-md ring-1 ring-slate-200"
+          : "border-gray-200 hover:border-slate-300 hover:bg-slate-50/50"
       }`}
     >
       <div className="flex items-center gap-3">
         <div
           className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-200 ${
             selectedMethod === value
-              ? "border-purple-500 bg-purple-500"
+              ? "border-slate-500 bg-slate-500"
               : "border-gray-300"
           }`}
         >
@@ -163,16 +188,16 @@ function OrderPayment() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
       <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
           {/* Progress Tracker */}
-          <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-slate-500 to-slate-800 transition-all duration-500"
                   style={{
                     width: `${
                       (steps.findIndex((s) => s.current) / (steps.length - 1)) *
@@ -189,9 +214,9 @@ function OrderPayment() {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                       step.completed
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-950 border-slate-500 text-white"
                         : step.current
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white shadow-lg"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-950 border-slate-500 text-white shadow-lg"
                         : "bg-white border-gray-300 text-gray-400"
                     }`}
                   >
@@ -205,7 +230,7 @@ function OrderPayment() {
                   </div>
                   <span
                     className={`mt-2 text-sm font-medium text-center ${
-                      step.current ? "text-purple-600" : "text-gray-600"
+                      step.current ? "text-slate-600" : "text-gray-600"
                     }`}
                   >
                     {step.title}
@@ -218,16 +243,16 @@ function OrderPayment() {
           {/* Two-Column Layout */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left: Order Summary */}
-            <div className="bg-white rounded-2xl shadow-md border border-purple-100 p-6 transition-all duration-300 hover:shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-500" />
+            <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 transition-all duration-300 hover:shadow-lg relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-slate-500 to-indigo-500" />
               <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <FileText size={20} className="text-purple-500" />
+                <FileText size={20} className="text-slate-500" />
                 Order Summary
               </h2>
               {orderData ? (
                 <div className="space-y-4 text-gray-600">
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <Book size={18} className="text-purple-400" />
+                    <Book size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Topic
@@ -238,7 +263,7 @@ function OrderPayment() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <Layers size={18} className="text-purple-400" />
+                    <Layers size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Service
@@ -249,7 +274,7 @@ function OrderPayment() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <FileText size={18} className="text-purple-400" />
+                    <FileText size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Document Type
@@ -260,7 +285,7 @@ function OrderPayment() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <Book size={18} className="text-purple-400" />
+                    <Book size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Writer Level
@@ -271,7 +296,7 @@ function OrderPayment() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <Hash size={18} className="text-purple-400" />
+                    <Hash size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Pages
@@ -282,7 +307,7 @@ function OrderPayment() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <Calendar size={18} className="text-purple-400" />
+                    <Calendar size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Deadline
@@ -293,7 +318,7 @@ function OrderPayment() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
-                    <DollarSign size={18} className="text-purple-400" />
+                    <DollarSign size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Total Price
@@ -304,7 +329,7 @@ function OrderPayment() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <FileText size={18} className="text-purple-400" />
+                    <FileText size={18} className="text-slate-400" />
                     <div className="flex-1">
                       <span className="text-sm font-medium text-gray-500">
                         Plagiarism Report
@@ -323,7 +348,7 @@ function OrderPayment() {
             </div>
 
             {/* Right: Payment Options */}
-            <div className="bg-white rounded-2xl shadow-md border border-purple-100 p-6 flex flex-col justify-between">
+            <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 flex flex-col justify-between">
               <div>
                 <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                   Choose Payment Method
@@ -331,7 +356,16 @@ function OrderPayment() {
                 <div className="space-y-4">
                   <CustomRadio label="PayPal" value="paypal" logo={PayPal} />
                   <CustomRadio label="Visa" value="visa" logo={Visa} />
-                  <CustomRadio label="Google Pay" value="googlepay" logo={Googlepay}/>
+                  <CustomRadio
+                    label="Google Pay"
+                    value="googlepay"
+                    logo={Googlepay}
+                  />
+                  <CustomRadio
+                    label="Stripe"
+                    value="stripe"
+                    logo={StripeLogo}
+                  />
                 </div>
               </div>
               <div className="mt-6">
@@ -353,7 +387,7 @@ function OrderPayment() {
                     disabled={!selectedMethod || isSubmitting}
                     className={`w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 cursor-pointer ${
                       selectedMethod && !isSubmitting
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 hover:shadow-lg"
+                        ? "bg-gradient-to-r from-slate-500 to-indigo-500 hover:from-slate-600 hover:to-indigo-600 hover:shadow-lg"
                         : "bg-gray-300 cursor-not-allowed"
                     } flex items-center justify-center`}
                   >

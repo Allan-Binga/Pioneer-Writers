@@ -20,6 +20,7 @@ function OrderConfirmation() {
     { number: 3, title: "Order Payment", current: false, completed: false },
   ]);
   const [formData, setFormData] = useState({
+    order_id: null,
     topic: "",
     document_type: "",
     writer_level: "",
@@ -51,13 +52,13 @@ function OrderConfirmation() {
       <label
         className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all duration-200 ${
           checked
-            ? "border-purple-500 bg-purple-50 shadow-sm"
-            : "border-gray-200 hover:border-purple-400 hover:bg-purple-50/50"
+            ? "border-slate-500 bg-slate-50 shadow-sm"
+            : "border-gray-200 hover:border-slate-400 hover:bg-slate-50/50"
         }`}
       >
         <span
           className={`relative w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors duration-200 ${
-            checked ? "border-purple-500 bg-purple-500" : "border-gray-300"
+            checked ? "border-slate-500 bg-slate-500" : "border-gray-300"
           }`}
         >
           {checked && (
@@ -78,9 +79,11 @@ function OrderConfirmation() {
   };
 
   useEffect(() => {
-    // Fetch step1Data from localStorage
+    // Fetch step1Data and step2Data from localStorage
     const step1 = JSON.parse(localStorage.getItem("step1Data")) || {};
     const step2 = JSON.parse(localStorage.getItem("step2Data")) || {};
+    const orderId =
+      localStorage.getItem("order_id") || location.state?.order_id || null;
 
     // Merge data, with step2 overriding step1 if overlapping
     const merged = { ...step1, ...step2 };
@@ -90,6 +93,7 @@ function OrderConfirmation() {
 
     setFormData((prev) => ({
       ...prev,
+      order_id: orderId,
       topic: merged.topic || "",
       document_type: merged.document_type || "",
       writer_level: merged.writer_level || "",
@@ -110,31 +114,22 @@ function OrderConfirmation() {
       payment_option: merged.payment_option || "full",
       coupon_code: merged.coupon_code || "",
       initial_total_price: initialTotalPrice,
-      total_price: initialTotalPrice, // Initialize with base price
-      checkout_amount: initialTotalPrice * 1.06, // Initialize with 6% fee
+      total_price: initialTotalPrice,
+      checkout_amount: initialTotalPrice * 1.06,
     }));
   }, [location.state]);
 
   useEffect(() => {
     const calculatePrice = () => {
-      // Start with initial_total_price from localStorage
       let total = parseFloat(formData.initial_total_price) || 0;
-
-      // Add writer's tip
       const tip = parseFloat(formData.writer_tip) || 0;
       if (!isNaN(tip) && tip >= 0) {
         total += tip;
       }
-
-      // Add plagiarism report cost
       if (formData.plagiarism_report) {
         total += 6;
       }
-
-      // Apply payment option (full or half)
       const finalTotal = formData.payment_option === "half" ? total / 2 : total;
-
-      // Calculate checkout amount (total + 6% processing fee)
       const checkoutAmount = finalTotal * 1.06;
 
       setFormData((prev) => ({
@@ -176,6 +171,7 @@ function OrderConfirmation() {
       const files = location.state?.files || [];
 
       const orderData = {
+        order_id: formData.order_id || undefined,
         topic_field: formData.topic_field || "",
         type_of_service: formData.type_of_service || "writing",
         document_type: formData.document_type || "essay",
@@ -229,8 +225,13 @@ function OrderConfirmation() {
         formData.checkout_amount.toString()
       );
       localStorage.setItem("step2Data", JSON.stringify(formData));
+       localStorage.setItem("order_id", response.data.order.order_id); 
 
-      notify.success("Order posted, awaiting payment.");
+      notify.success(
+        formData.order_id
+          ? "Order updated successfully."
+          : "Order posted, awaiting payment."
+      );
       setSteps((prev) =>
         prev.map((step, index) =>
           index === 1
@@ -243,7 +244,7 @@ function OrderConfirmation() {
 
       // Navigate to checkout with order_id from response
       navigate("/order-checkout", {
-        state: { order_id: response.data.order_id },
+        state: { order_id: response.data.order.order_id }, // Fix: Use response.data.order.order_id
       });
     } catch (error) {
       console.error("Error submitting order:", error.response?.data || error);
@@ -270,7 +271,7 @@ function OrderConfirmation() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
       <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
@@ -280,11 +281,11 @@ function OrderConfirmation() {
             </div>
           )}
           {/* Progress Tracking */}
-          <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 mb-8">
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
             <div className="flex items-center justify-between relative">
               <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
                 <div
-                  className="h-full bg-gradient-to-r from-purple-500 to-indigo-500 transition-all duration-500"
+                  className="h-full bg-gradient-to-r from-slate-600 to-slate-950 transition-all duration-500"
                   style={{
                     width: `${
                       (steps.findIndex((s) => s.current) / (steps.length - 1)) *
@@ -301,9 +302,9 @@ function OrderConfirmation() {
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
                       step.completed
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-950 border-slate-500 text-white"
                         : step.current
-                        ? "bg-gradient-to-r from-purple-500 to-indigo-500 border-purple-500 text-white shadow-lg"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-950 border-slate-500 text-white shadow-lg"
                         : "bg-white border-gray-300 text-gray-400"
                     }`}
                   >
@@ -317,7 +318,7 @@ function OrderConfirmation() {
                   </div>
                   <span
                     className={`mt-2 text-sm font-medium text-center ${
-                      step.current ? "text-purple-600" : "text-gray-600"
+                      step.current ? "text-slate-600" : "text-gray-600"
                     }`}
                   >
                     {step.title}
@@ -329,7 +330,7 @@ function OrderConfirmation() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm border border-purple-200 p-8">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
                 <h2 className="text-2xl font-bold text-gray-800 mb-6">
                   Step 2: Order Confirmation
                 </h2>
@@ -348,7 +349,7 @@ function OrderConfirmation() {
                       value={formData.writer_tip}
                       onChange={handleChange}
                       placeholder="Add tip in USD"
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 pr-10"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 pr-10"
                       min="0"
                     />
                   </div>
@@ -407,13 +408,13 @@ function OrderConfirmation() {
                     value={formData.coupon_code}
                     onChange={handleChange}
                     placeholder="Enter coupon if available"
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 pr-10"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 transition-colors duration-200 bg-white placeholder-gray-400 text-gray-800 pr-10"
                   />
                 </form>
               </div>
             </div>
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-sm border border-purple-100 p-6 sticky top-20">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-20">
                 <h3 className="text-xl font-bold text-gray-800 mb-6">
                   Summary
                 </h3>

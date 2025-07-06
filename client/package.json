@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.2",
+    "@stripe/react-stripe-js": "^3.7.0",
+    "@stripe/stripe-js": "^7.4.0",
     "@tailwindcss/vite": "^4.1.10",
     "@vitejs/plugin-react": "^4.4.1",
     "axios": "^1.10.0",
@@ -25,6 +27,7 @@
     "react-router-dom": "^7.6.2",
     "react-select": "^5.10.1",
     "sonner": "^2.0.5",
+    "stripe": "^18.3.0",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {

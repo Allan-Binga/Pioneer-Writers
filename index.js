@@ -10,6 +10,7 @@ const oauth2Route = require("./routes/oauth2")
 const usersRoute = require("./routes/users")
 const draftRoute = require("./routes/drafts")
 const webhookRoute = require("./routes/webhook")
+const inboxRoute = require("./routes/inbox")
 
 //Import DB connection
 require("./config/dbConfig");
@@ -43,6 +44,7 @@ app.use(cookieParser());
 app.use("/pioneer-writers/v1/auth", authRoute);
 app.use("/pioneer-writers/v1/oauth2", oauth2Route)
 app.use("/pioneer-writers/v1/orders", ordersRoute);
+app.use("/pioneer-writers/v1/inbox", inboxRoute)
 app.use("/pioneer-writers/v1/payments", paymentsRoute);
 app.use("/pioneer-writers/v1/checkout", checkoutRoute);
 app.use("/pioneer-writers/v1/users", usersRoute)

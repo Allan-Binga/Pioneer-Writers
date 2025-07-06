@@ -146,14 +146,12 @@ function Sidebar() {
                         : "text-slate-700 hover:bg-slate-50 hover:text-slate-800"
                     }`}
                   >
-                    <div className="flex items-center space-x-3">
-                      {Icon && (
-                        <Icon
-                          className={`w-7 h-7 ${
-                            isActive ? "text-white" : "text-slate-600"
-                          }`}
-                        />
-                      )}
+                    <div
+                      className={`flex items-center ${
+                        isCollapsed ? "justify-center" : "space-x-3"
+                      }`}
+                    >
+                      <Icon className="w-6 h-6 min-w-[24px] min-h-[24px]" />
                       {!isCollapsed && (
                         <span className="text-lg font-semibold">
                           {item.name}
@@ -173,19 +171,16 @@ function Sidebar() {
                 ) : (
                   <Link
                     to={item.path}
-                    className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${
+                    className={`flex items-center ${
+                      isCollapsed ? "justify-center" : "space-x-3"
+                    } p-3 rounded-xl transition-all duration-200 ${
                       isActive
                         ? "bg-gradient-to-r from-slate-600 to-slate-700 text-white shadow-md"
                         : "text-slate-700 hover:bg-slate-50 hover:text-slate-800"
                     }`}
+                    title={isCollapsed ? item.name : ""}
                   >
-                    {Icon && (
-                      <Icon
-                        className={`w-7 h-7 ${
-                          isActive ? "text-white" : "text-slate-600"
-                        }`}
-                      />
-                    )}
+                    <Icon className="w-6 h-6 min-w-[24px] min-h-[24px]" />
                     {!isCollapsed && (
                       <span className="text-lg font-semibold">{item.name}</span>
                     )}
@@ -201,6 +196,7 @@ function Sidebar() {
                         <li key={sub.name}>
                           <Link
                             to={sub.path}
+                            title={isCollapsed ? sub.name : ""}
                             className={`block px-4 py-2 rounded-lg text-base font-medium transition-colors duration-200 ${
                               isSubActive
                                 ? "bg-slate-100 text-slate-800"
@@ -221,9 +217,12 @@ function Sidebar() {
           <li className="pt-6 mt-6 border-t border-slate-200/50">
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-3 w-full text-left p-3 rounded-xl text-slate-700 hover:bg-slate-50 hover:text-slate-800 transition-all duration-200"
+              className={`flex items-center w-full text-left p-3 rounded-xl transition-all duration-200 ${
+                isCollapsed ? "justify-center" : "space-x-3"
+              } text-slate-700 hover:bg-slate-50 hover:text-slate-800`}
+              title={isCollapsed ? "Logout" : ""}
             >
-              <LogOut className="w-7 h-7 text-slate-600" />
+              <LogOut className="w-6 h-6 min-w-[24px] min-h-[24px] text-slate-600" />
               {!isCollapsed && (
                 <span className="text-lg font-semibold">Logout</span>
               )}
