@@ -4,9 +4,6 @@ import {
   User,
   Mail,
   Phone,
-  BookOpen,
-  Users,
-  Shield,
   ChevronDown,
   Lock,
   Eye,
@@ -150,24 +147,6 @@ const SignUp = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const featureCards = [
-    {
-      icon: <Users className="w-8 h-8 text-slate-500" />,
-      title: "Made by humans",
-      description: "100% human-created content with no AI involvement",
-    },
-    {
-      icon: <Shield className="w-8 h-8 text-slate-500" />,
-      title: "100% original papers",
-      description: "Every paper comes with anti-plagiarism check guarantee",
-    },
-    {
-      icon: <BookOpen className="w-8 h-8 text-dark-blue-700" />,
-      title: "PhD and MA writers",
-      description: "Our expert writers deliver the best results",
-    },
-  ];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-slate-100 flex">
       {/* Left Column */}
@@ -182,33 +161,12 @@ const SignUp = () => {
           </div>
         </div>
 
-        <h2 className="text-3xl font-bold text-gold-500 mb-2 text-center">
+        <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">
           Welcome to Pioneer Writers
         </h2>
-        <p className="text-white text-center mb-12 max-w-md">
+        <p className="text-slate-700 text-center mb-12 max-w-md">
           Your trusted academic writing partner, powered by expert human writers
         </p>
-
-        <div className="space-y-6 w-full max-w-md">
-          {featureCards.map((feature, index) => (
-            <div
-              key={index}
-              className="p-4 bg-white rounded-lg border border-amber-300 shadow hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-start space-x-4">
-                {feature.icon}
-                <div>
-                  <h3 className="font-semibold text-amber-900 mb-1">
-                    {feature.title}
-                  </h3>
-                  <p className="text-sm text-amber-700">
-                    {feature.description}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Right Column */}
@@ -352,15 +310,15 @@ const SignUp = () => {
               <label htmlFor="terms" className="text-sm text-dark-blue-700">
                 I agree with the{" "}
                 <Link
-                  to="/terms"
-                  className="text-sky-300 hover:underline font-semibold"
+                  to="/sign-up"
+                  className="text-slate-500 hover:underline font-semibold"
                 >
                   Terms & Conditions
                 </Link>{" "}
                 and{" "}
                 <Link
-                  to="/fair-use"
-                  className="text-sky-300 hover:underline font-semibold"
+                  to="/sign-up"
+                  className="text-slate-500 hover:underline font-semibold"
                 >
                   Fair Use Policy
                 </Link>

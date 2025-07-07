@@ -273,7 +273,7 @@ function OrderConfirmation() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
-      <main className="pt-16">
+      <main className="flex pt-16 ml-0 lg:ml-64">
         <div className="container mx-auto px-4 py-8">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4">

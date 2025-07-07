@@ -204,7 +204,7 @@ function OrderPayment() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
-      <main className="pt-16">
+      <main className="pt-16 ml-0 lg:ml-64">
         <div className="container mx-auto px-4 py-8">
           {/* Progress Tracker */}
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">

@@ -4,11 +4,9 @@ import Navbar from "../../components/Navbar";
 import { useState, useEffect, useCallback } from "react";
 import { Check, CloudUpload, X, FileText, ChevronDown } from "lucide-react";
 import { notify } from "../../utils/toast";
-import Sidebar from "../../components/Sidebar";
 
 function NewOrder() {
   const navigate = useNavigate();
-  const [showSidebar, setShowSidebar] = useState(false);
   const [formData, setFormData] = useState({
     topic_field: "",
     type_of_service: "writing",
@@ -446,8 +444,8 @@ function NewOrder() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
-      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-      <main className="flex-1 pt-16 ml-10">
+
+      <main className="flex-1 pt-16 ml-0 lg:ml-64">
         <div className="container mx-auto px-4 py-8">
           {error && (
             <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-2">
