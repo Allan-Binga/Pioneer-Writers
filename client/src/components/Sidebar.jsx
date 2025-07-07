@@ -74,7 +74,7 @@ function Sidebar() {
     { name: "My Wallet", path: "/wallet", icon: Wallet },
     { name: "Profile", path: "/profile", icon: User },
     { name: "News", path: "/news", icon: Newspaper },
-  ];
+  ]; 
 
   return (
     <>
@@ -175,7 +175,7 @@ function Sidebar() {
             <li className="pt-6 mt-6 border-t border-slate-200/50">
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-3 w-full text-left p-3 rounded-xl transition-all duration-200 text-slate-700 hover:bg-slate-50 hover:text-slate-800"
+                className="flex items-center space-x-3 w-full text-left p-3 rounded-xl transition-all duration-200 text-slate-700 hover:bg-slate-50 hover:text-slate-800 cursor-pointer"
               >
                 <LogOut className="w-6 h-6 text-slate-600" />
                 <span className="text-lg font-semibold">Logout</span>
