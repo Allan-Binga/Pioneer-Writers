@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const path = require("path")
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth");
 const ordersRoute = require("./routes/orders");
@@ -20,14 +21,14 @@ require("./config/dbConfig");
 dotenv.config();
 const app = express();
 
-// ✅ Stripe webhook raw-body middleware
+// Stripe webhook raw-body middleware
 app.use(
   "/pioneer-writers/v1/webhook",
   express.raw({ type: "application/json" }),
   webhookRoute
 );
 
-// ✅ All other routes use JSON
+// All other routes use JSON
 app.use(express.json());
 
 //CORS

@@ -132,9 +132,9 @@ const handleStripeWebhook = async (req, res) => {
       const updateQuery = `UPDATE payments SET payment_status = $1, updated_at = $2 WHERE payment_id = $3`;
       await client.query(updateQuery, ["completed", new Date(), paymentId]);
 
-      console.log(
-        `✅ Payment ${paymentId} marked as paid for order ${orderNumber}.`
-      );
+      // console.log(
+      //   `✅ Payment ${paymentId} marked as paid for order ${orderNumber}.`
+      // );
       return res.status(200).send("Webhook received and processed.");
     } catch (error) {
       console.error("Webhook processing error:", error.message);
