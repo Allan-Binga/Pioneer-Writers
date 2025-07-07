@@ -10,13 +10,15 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 //PayPal Webhook Handler
 const handlePaypalWebhook = async (req, res) => {
   const event = req.body;
-  console.log("Webhook received: ", event.event_type);
+  // console.log("Webhook received: ", event.event_type);
+  // console.log(event)
 
   switch (event.event_type) {
     case "PAYMENT.CAPTURE.COMPLETED": {
       const capture = event.resource;
-      const orderId = capture.purchase_units?.[0]?.reference_id;
+      const orderId = capture.custom_id;
       const transactionId = capture.id;
+      // console.log(orderId)
 
       try {
         // Fetch order details
@@ -41,10 +43,10 @@ const handlePaypalWebhook = async (req, res) => {
           `UPDATE orders SET order_status = $1 WHERE order_id = $2`,
           ["Paid", orderId]
         );
-        console.log(
-          `✅ Order status updated for order ${orderId}`,
-          updateResult.rowCount
-        );
+        // console.log(
+        //   `✅ Order status updated for order ${orderId}`,
+        //   updateResult.rowCount
+        // );
 
         // 2. Insert into payments table
         const insertQuery = `

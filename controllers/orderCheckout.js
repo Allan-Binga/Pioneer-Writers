@@ -2,7 +2,7 @@ const client = require("../config/dbConfig");
 const dotenv = require("dotenv");
 const paypal = require("@paypal/checkout-server-sdk");
 const Stripe = require("stripe");
-const Joi = require("joi")
+const Joi = require("joi");
 
 dotenv.config();
 
@@ -40,6 +40,7 @@ const paypalCheckout = async (req, res) => {
       purchase_units: [
         {
           reference_id: orderId.toString(),
+          custom_id: orderId.toString(),
           amount: {
             currency_code: "USD",
             value: totalAmount.toString(),

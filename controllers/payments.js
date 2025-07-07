@@ -43,7 +43,7 @@ const capturePayment = async (req, res) => {
     const capture = await paypalClient.execute(request);
     const captureData = capture.result;
 
-    // console.log("✅ PayPal capture successful:", captureData);
+    console.log("✅ PayPal capture successful:", captureData);
 
     // Optional: Save captureData to DB here if needed
 
