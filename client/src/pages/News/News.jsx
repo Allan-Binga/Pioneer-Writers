@@ -4,6 +4,7 @@ import { useState } from "react";
 import { CalendarDays } from "lucide-react";
 
 function News() {
+  const [showSidebar, setShowSidebar] = useState(false);
   const [activeTab, setActiveTab] = useState("unread");
 
   const allNews = [
@@ -45,7 +46,7 @@ function News() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
       <div className="flex">
-        <Sidebar />
+        <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
 
         <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
           <div className="max-w-6xl mx-auto space-y-8">

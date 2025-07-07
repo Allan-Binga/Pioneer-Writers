@@ -74,59 +74,73 @@ function OrderPayment() {
     setSelectedMethod(method);
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setLoading(true);
 
-  try {
-    let response;
-    let redirectUrl;
+    try {
+      let response;
+      let redirectUrl;
 
-    switch (selectedMethod) {
-      case "googlepay":
-        response = await axios.post(
-          `${endpoint}/checkout/google`,
-          {},
-          { withCredentials: true }
-        );
-        redirectUrl = response.data.sessionUrl;
-        if (!redirectUrl) throw new Error("No session URL received");
-        break;
+      switch (selectedMethod) {
+        case "googlepay":
+          response = await axios.post(
+            `${endpoint}/checkout/google`,
+            {},
+            { withCredentials: true }
+          );
+          redirectUrl = response.data.sessionUrl;
+          if (!redirectUrl) throw new Error("No session URL received");
+          break;
 
-      case "paypal":
-        response = await axios.post(
-          `${endpoint}/checkout/pay-with-paypal`,
-          {},
-          { withCredentials: true }
-        );
-        redirectUrl = response.data.approvalUrl;
-        if (!redirectUrl) throw new Error("No approval URL received");
-        break;
+        case "paypal":
+          response = await axios.post(
+            `${endpoint}/checkout/pay-with-paypal`,
+            {},
+            { withCredentials: true }
+          );
+          redirectUrl = response.data.approvalUrl;
+          if (!redirectUrl) throw new Error("No approval URL received");
+          break;
 
-      case "stripe":
-        response = await axios.post(
-          `${endpoint}/checkout/stripe`,
-          {},
-          { withCredentials: true }
-        );
-        redirectUrl = response.data.sessionUrl;
-        if (!redirectUrl) throw new Error("No session URL received");
-        break;
+        case "stripe":
+          response = await axios.post(
+            `${endpoint}/checkout/stripe`,
+            {},
+            { withCredentials: true }
+          );
+          redirectUrl = response.data.sessionUrl;
+          if (!redirectUrl) throw new Error("No session URL received");
+          break;
+        
+        case "visa":
+          response = await axios.post(
+            `${endpoint}/checkout/stripe`,
+            {},
+            { withCredentials: true }
+          );
+          redirectUrl = response.data.sessionUrl;
+          if (!redirectUrl) throw new Error("No session URL received");
+          break;  
+        default:
+          throw new Error("Please select a payment method");
+      }
 
-      default:
-        throw new Error("Please select a payment method");
+      // ✅ Clear localStorage on success
+      localStorage.removeItem("step1Data");
+      localStorage.removeItem("step2Data");
+
+      // Redirect after clearing
+      window.location.href = redirectUrl;
+    } catch (error) {
+      console.error("Payment error:", error);
+      notify.error(`Failed to initiate ${selectedMethod} payment`);
+    } finally {
+      setIsSubmitting(false);
+      setLoading(false);
     }
-
-    window.location.href = redirectUrl;
-  } catch (error) {
-    console.error("Payment error:", error);
-    notify.error(`Failed to initiate ${selectedMethod} payment`);
-  } finally {
-    setIsSubmitting(false);
-    setLoading(false);
-  }
-};
+  };
 
   const formatDate = (isoDate) => {
     if (!isoDate) return "N/A";
@@ -161,7 +175,7 @@ const handleSubmit = async (e) => {
             <div className="w-2.5 h-2.5 rounded-full bg-white" />
           )}
         </div>
-        <span className="text-sm font-medium text-gray-700">{label}</span>
+        <span className="text-md font-medium text-gray-700">{label}</span>
       </div>
       <img
         src={logo}
@@ -223,13 +237,13 @@ const handleSubmit = async (e) => {
                     {step.completed ? (
                       <Check size={16} />
                     ) : (
-                      <span className="text-sm font-semibold">
+                      <span className="text-md font-semibold">
                         {step.number}
                       </span>
                     )}
                   </div>
                   <span
-                    className={`mt-2 text-sm font-medium text-center ${
+                    className={`mt-2 text-md font-medium text-center ${
                       step.current ? "text-slate-600" : "text-gray-600"
                     }`}
                   >
@@ -254,7 +268,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <Book size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Topic
                       </span>
                       <p className="text-base font-semibold text-gray-800">
@@ -265,7 +279,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <Layers size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Service
                       </span>
                       <p className="text-base font-semibold text-gray-800 capitalize">
@@ -276,7 +290,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <FileText size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Document Type
                       </span>
                       <p className="text-base font-semibold text-gray-800 capitalize">
@@ -287,7 +301,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <Book size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Writer Level
                       </span>
                       <p className="text-base font-semibold text-gray-800 capitalize">
@@ -298,7 +312,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <Hash size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Pages
                       </span>
                       <p className="text-base font-semibold text-gray-800">
@@ -309,7 +323,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <Calendar size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Deadline
                       </span>
                       <p className="text-base font-semibold text-gray-800">
@@ -320,7 +334,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3 border-b border-gray-100 pb-3">
                     <DollarSign size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Total Price
                       </span>
                       <p className="text-base font-semibold text-gray-800">
@@ -331,7 +345,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center gap-3">
                     <FileText size={18} className="text-slate-400" />
                     <div className="flex-1">
-                      <span className="text-sm font-medium text-gray-500">
+                      <span className="text-md font-medium text-gray-500">
                         Plagiarism Report
                       </span>
                       <p className="text-base font-semibold text-gray-800">
@@ -356,11 +370,11 @@ const handleSubmit = async (e) => {
                 <div className="space-y-4">
                   <CustomRadio label="PayPal" value="paypal" logo={PayPal} />
                   <CustomRadio label="Visa" value="visa" logo={Visa} />
-                  <CustomRadio
+                  {/* <CustomRadio
                     label="Google Pay"
                     value="googlepay"
                     logo={Googlepay}
-                  />
+                  /> */}
                   <CustomRadio
                     label="Stripe"
                     value="stripe"

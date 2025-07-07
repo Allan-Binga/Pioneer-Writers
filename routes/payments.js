@@ -1,9 +1,9 @@
-const express = require("express")
-const { getPayments, makePayment } = require("../controllers/payments")
+const express = require("express");
+const { getMyPayments } = require("../controllers/payments");
+const { authUser } = require("../middleware/jwt");
 
-const router = express.Router()
+const router = express.Router();
 
-router.get("/get-payments", getPayments)
-router.post("/make-payment", makePayment)
+router.get("/all/my-payments", authUser, getMyPayments);
 
-module.exports = router
+module.exports = router;

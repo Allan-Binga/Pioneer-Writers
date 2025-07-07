@@ -105,7 +105,7 @@ const stripeCheckout = async (req, res) => {
       orderAmount,
       paymentType,
       "pending",
-      "Google Pay",
+      "Stripe",
       orderNumber, // Assuming this doubles as reference
       now,
       now,

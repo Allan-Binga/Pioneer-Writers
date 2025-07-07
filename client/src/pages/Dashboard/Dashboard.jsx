@@ -71,34 +71,15 @@ const dashboardItems = [
 ];
 
 function Dashboard() {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-  // Sync main content margin with sidebar collapse state
-  useEffect(() => {
-    const handleResize = () => {
-      // Collapse sidebar for tablet and smaller screens (768px and below)
-      if (window.innerWidth <= 768) {
-        setIsSidebarCollapsed(true);
-      } else {
-        setIsSidebarCollapsed(false);
-      }
-    };
-
-    // Run on mount and when window is resized
-    handleResize();
-    window.addEventListener("resize", handleResize);
-
-    // Cleanup listener on unmount
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const [showSidebar, setShowSidebar] = useState(false);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
-      <Sidebar />
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       <main
         className={`pt-20 px-8 transition-all duration-300 ${
-          isSidebarCollapsed ? "ml-20" : "ml-72"
+          showSidebar ? "lg:ml-[calc(18rem)] ml-0" : "lg:ml-[calc(18rem)] ml-0"
         } md:ml-72`}
       >
         <h1 className="text-3xl font-semibold text-slate-800 mb-8">

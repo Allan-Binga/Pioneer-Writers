@@ -98,7 +98,7 @@ const handlePaypalWebhook = async (req, res) => {
 
 //Handle Stripe Webhook
 const handleStripeWebhook = async (req, res) => {
-  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const endpointSecret = process.env.STRIPE_WEBHOOK;
   const sig = req.headers["stripe-signature"];
 
   let event;
@@ -130,7 +130,7 @@ const handleStripeWebhook = async (req, res) => {
 
       // Update payment record to "Paid"
       const updateQuery = `UPDATE payments SET payment_status = $1, updated_at = $2 WHERE payment_id = $3`;
-      await client.query(updateQuery, ["Paid", new Date(), paymentId]);
+      await client.query(updateQuery, ["completed", new Date(), paymentId]);
 
       console.log(
         `✅ Payment ${paymentId} marked as paid for order ${orderNumber}.`

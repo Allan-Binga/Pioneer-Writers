@@ -11,11 +11,7 @@ import {
 } from "lucide-react";
 
 function Wallet() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const toggleMobileSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const [showSidebar, setShowSidebar] = useState(false);
 
   // Dummy wallet data
   const balance = 128.75;
@@ -45,17 +41,9 @@ function Wallet() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <Navbar toggleMobileSidebar={toggleMobileSidebar} />
+      <Navbar />
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       <div className="flex">
-        {/* Sidebar */}
-        <div
-          className={`fixed z-40 md:static ${
-            isSidebarOpen ? "block" : "hidden"
-          } md:block`}
-        >
-          <Sidebar />
-        </div>
-
         {/* Main */}
         <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
           <div className="max-w-6xl mx-auto">

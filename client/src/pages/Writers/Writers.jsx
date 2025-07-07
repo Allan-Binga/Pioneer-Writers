@@ -18,13 +18,9 @@ import { notify } from "../../utils/toast";
 import moment from "moment";
 
 function Writers() {
+  const [showSidebar, setShowSidebar] = useState(false);
   const [writers, setWriters] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const toggleMobileSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   useEffect(() => {
     const fetchWriters = async () => {
@@ -43,14 +39,9 @@ function Writers() {
   }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <Navbar toggleMobileSidebar={toggleMobileSidebar} />
+      <Navbar />
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       <div className="flex">
-        <div
-          className={`fixed z-40 md:static ${isSidebarOpen ? "block" : "hidden"} md:block`}
-        >
-          <Sidebar />
-        </div>
-
         {/* Main Content Area */}
         <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
           <div className="max-w-6xl mx-auto">
@@ -58,7 +49,9 @@ function Writers() {
 
             {loading ? (
               <div className="flex justify-center items-center h-64">
-                <span className="text-lg text-gray-500">Loading writers...</span>
+                <span className="text-lg text-gray-500">
+                  Loading writers...
+                </span>
               </div>
             ) : writers.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm border border-gray-200">
@@ -89,35 +82,57 @@ function Writers() {
                         </span>
                       </div>
 
-                      <p className="text-sm italic text-gray-600 mt-1">{writer.bio}</p>
+                      <p className="text-sm italic text-gray-600 mt-1">
+                        {writer.bio}
+                      </p>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-md text-gray-700">
                         <WriterDetail icon={Mail} label={writer.email} />
-                        <WriterDetail icon={Phone} label={writer.phone_number} />
+                        <WriterDetail
+                          icon={Phone}
+                          label={writer.phone_number}
+                        />
                         <WriterDetail
                           icon={MapPin}
                           label={`${writer.state}, ${writer.country}`}
                         />
-                        <WriterDetail icon={BadgeCheck} label={`Level: ${writer.writer_level}`} />
-                        <WriterDetail icon={UserCheck} label={`Type: ${writer.writer_type}`} />
+                        <WriterDetail
+                          icon={BadgeCheck}
+                          label={`Level: ${writer.writer_level}`}
+                        />
+                        <WriterDetail
+                          icon={UserCheck}
+                          label={`Type: ${writer.writer_type}`}
+                        />
                         <WriterDetail
                           icon={Layers}
-                          label={`Field: ${writer.primary_topic_field.replace(/-/g, " ")}`}
+                          label={`Field: ${writer.primary_topic_field.replace(
+                            /-/g,
+                            " "
+                          )}`}
                         />
                         <WriterDetail
                           icon={BookOpenCheck}
                           label={`Orders: ${writer.completed_orders}`}
                         />
-                        <WriterDetail icon={Star} label={`Rating: ${writer.rating}`} />
+                        <WriterDetail
+                          icon={Star}
+                          label={`Rating: ${writer.rating}`}
+                        />
                         <WriterDetail
                           icon={CircleCheck}
                           label={
                             writer.is_available ? "Available" : "Unavailable"
                           }
-                          iconClassName={writer.is_available ? "text-green-500" : "text-red-500"}
+                          iconClassName={
+                            writer.is_available
+                              ? "text-green-500"
+                              : "text-red-500"
+                          }
                         />
                         <p className="text-gray-500 col-span-full mt-2">
-                          Joined: {moment(writer.joined_at).format("MMM Do, YYYY")}
+                          Joined:{" "}
+                          {moment(writer.joined_at).format("MMM Do, YYYY")}
                         </p>
                       </div>
                     </div>
@@ -132,7 +147,11 @@ function Writers() {
   );
 }
 
-function WriterDetail({ icon: Icon, label, iconClassName = "text-indigo-500" }) {
+function WriterDetail({
+  icon: Icon,
+  label,
+  iconClassName = "text-indigo-500",
+}) {
   return (
     <p className="flex items-center gap-2">
       <Icon className={`w-4 h-4 ${iconClassName}`} />

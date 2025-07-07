@@ -21,13 +21,9 @@ import { notify } from "../../utils/toast";
 import moment from "moment";
 
 function MyOrders() {
+  const [showSidebar, setShowSidebar] = useState(false);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const toggleMobileSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -66,18 +62,9 @@ function MyOrders() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <Navbar toggleMobileSidebar={toggleMobileSidebar} />
-
+      <Navbar />
+      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       <div className="flex">
-        {/* Sidebar: show on large screens or mobile toggle */}
-        <div
-          className={`fixed z-40 md:static ${
-            isSidebarOpen ? "block" : "hidden"
-          } md:block`}
-        >
-          <Sidebar />
-        </div>
-
         {/* Main Content Area */}
         <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
           <div className="max-w-6xl mx-auto">
