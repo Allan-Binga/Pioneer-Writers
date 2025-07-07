@@ -113,7 +113,7 @@ function OrderPayment() {
           redirectUrl = response.data.sessionUrl;
           if (!redirectUrl) throw new Error("No session URL received");
           break;
-        
+
         case "visa":
           response = await axios.post(
             `${endpoint}/checkout/stripe`,
@@ -122,7 +122,7 @@ function OrderPayment() {
           );
           redirectUrl = response.data.sessionUrl;
           if (!redirectUrl) throw new Error("No session URL received");
-          break;  
+          break;
         default:
           throw new Error("Please select a payment method");
       }
@@ -130,6 +130,7 @@ function OrderPayment() {
       // ✅ Clear localStorage on success
       localStorage.removeItem("step1Data");
       localStorage.removeItem("step2Data");
+      localStorage.removeItem("checkoutAmount");
 
       // Redirect after clearing
       window.location.href = redirectUrl;
@@ -399,7 +400,7 @@ function OrderPayment() {
                   <button
                     onClick={handleSubmit}
                     disabled={!selectedMethod || isSubmitting}
-                    className={`w-full py-3 rounded-xl text-white font-semibold transition-all duration-300 cursor-pointer ${
+                    className={`w-1/2 py-3 rounded-xl text-white font-semibold transition-all duration-300 cursor-pointer ${
                       selectedMethod && !isSubmitting
                         ? "bg-gradient-to-r from-slate-500 to-indigo-500 hover:from-slate-600 hover:to-indigo-600 hover:shadow-lg"
                         : "bg-gray-300 cursor-not-allowed"

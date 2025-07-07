@@ -57,7 +57,7 @@ const handlePaypalWebhook = async (req, res) => {
           userId,
           amount,
           paymentType,
-          "Completed",
+          "completed",
           "PayPal",
           transactionId,
         ]);
@@ -70,20 +70,54 @@ const handlePaypalWebhook = async (req, res) => {
       break;
     }
 
-    case "PAYMENT.CAPTURE.DENIED": {
+    case "PAYMENT.CAPTURE.FAILED": {
       const capture = event.resource;
       const orderId = capture.supplementary_data?.related_ids?.order_id;
+      const transactionId = capture.id;
 
       try {
-        // 1. Mark order as failed
-        await client.query(
-          `UPDATE orders SET payment_status = $1 WHERE order_id = $2`,
-          ["Failed", orderId]
+        // 1. Fetch order details
+        const { rows } = await client.query(
+          `SELECT * FROM orders WHERE order_id = $1`,
+          [orderId]
         );
+
+        if (rows.length === 0) {
+          return res.status(404).send("Order not found");
+        }
+
+        // 2. Update order status
+        await client.query(
+          `UPDATE orders SET payment_status = $1, order_status = $2 WHERE order_id = $3`,
+          ["Failed", "Failed", orderId]
+        );
+
+        // 3. Insert into payments table
+        const insertQuery = `
+      INSERT INTO payments (
+        order_id, user_id, amount, payment_type,
+        payment_status, payment_method, transaction_reference,
+        created_at, updated_at
+      ) VALUES (
+        $1, $2, $3, $4,
+        $5, $6, $7,
+        NOW(), NOW()
+      )
+    `;
+
+        await client.query(insertQuery, [
+          orderId,
+          rows[0].user_id,
+          rows[0].checkout_amount,
+          rows[0].payment_option || "Full",
+          "failed",
+          "PayPal",
+          transactionId,
+        ]);
 
         console.warn(`❌ Payment failed for order ${orderId}`);
       } catch (error) {
-        console.error("Error handling denied webhook:", error);
+        console.error("Error handling failed webhook:", error);
       }
 
       break;
@@ -145,7 +179,5 @@ const handleStripeWebhook = async (req, res) => {
     return res.status(200).send("Event received.");
   }
 };
-
-
 
 module.exports = { handlePaypalWebhook, handleStripeWebhook };
