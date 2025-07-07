@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const path = require("path")
+const path = require("path");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth");
 const ordersRoute = require("./routes/orders");
@@ -32,7 +32,10 @@ app.use(
 app.use(express.json());
 
 //CORS
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://pioneer-writers-8a531f1c7067.herokuapp.com/",
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
