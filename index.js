@@ -84,6 +84,10 @@ if (process.env.NODE_ENV === "production") {
 //Server start
 const PORT = process.env.PORT || 6100;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+// Start the server only if not in test environment
+if (process.env.NODE_ENV !== "test") {
+  const PORT = process.env.PORT || 6100;
+  app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+  });
+}
