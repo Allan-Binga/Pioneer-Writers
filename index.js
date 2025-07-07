@@ -22,11 +22,7 @@ dotenv.config();
 const app = express();
 
 // Stripe webhook raw-body middleware
-app.use(
-  "/pioneer-writers/v1/webhook",
-  express.raw({ type: "application/json" }),
-  webhookRoute
-);
+app.use("/pioneer-writers/v1/webhook", express.json(), webhookRoute);
 
 // All other routes use JSON
 app.use(express.json());

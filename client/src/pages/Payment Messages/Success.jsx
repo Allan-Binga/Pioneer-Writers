@@ -5,18 +5,22 @@ import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import { CheckCircle } from "lucide-react";
 import { endpoint } from "../../server";
+import { useSearchParams } from "react-router-dom";
 
 function Success() {
-  const [showSidebar, setShowSidebar] = useState(false)
+  const [showSidebar, setShowSidebar] = useState(false);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [searchParams] = useSearchParams();
 
   const toggleMobileSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
   useEffect(() => {
+    const token = searchParams.get("token");
+
     const fetchPayments = async () => {
       setLoading(true);
       try {
@@ -33,14 +37,32 @@ function Success() {
       }
     };
 
-    fetchPayments();
+    if (token) {
+      axios
+        .post(
+          `${endpoint}/payments/capture`,
+          { token },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          console.log("✅ PayPal order captured:", res.data);
+          notify.success("Payment captured successfully.");
+          fetchPayments(); // Refresh list after capture
+        })
+        .catch((error) => {
+          console.error("❌ Capture failed:", error);
+          notify.error("Failed to capture PayPal payment.");
+        });
+    } else {
+      fetchPayments(); // No token — just fetch payments
+    }
   }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
       <div className="flex">
-       <Sidebar/>
+        <Sidebar />
 
         <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
           <div className="max-w-6xl mx-auto space-y-8">
@@ -90,7 +112,8 @@ function Success() {
                           <td className="px-4 py-2">
                             <span
                               className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${
-                                payment.payment_status?.toLowerCase() === "completed"
+                                payment.payment_status?.toLowerCase() ===
+                                "completed"
                                   ? "bg-green-100 text-green-700"
                                   : "bg-orange-100 text-orange-700"
                               }`}
