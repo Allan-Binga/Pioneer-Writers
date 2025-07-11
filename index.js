@@ -29,7 +29,7 @@ app.use(express.json());
 
 //CORS
 const allowedOrigins = [
-  "http://localhost:5173",
+  "https://localhost:5173",
   "https://pioneer-writers-8a531f1c7067.herokuapp.com",
 ];
 

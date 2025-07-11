@@ -1,5 +1,4 @@
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
 import {
   CheckCircle,
   LoaderCircle,
@@ -11,7 +10,7 @@ import {
   DollarSign,
   Inbox,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 const dashboardItems = [
   {
@@ -71,44 +70,31 @@ const dashboardItems = [
 ];
 
 function Dashboard() {
-  const [showSidebar, setShowSidebar] = useState(false);
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
       <Navbar />
-      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
-      <main
-        className={`pt-20 px-8 transition-all duration-300 ${
-          showSidebar ? "lg:ml-[calc(18rem)] ml-0" : "lg:ml-[calc(18rem)] ml-0"
-        } md:ml-72`}
-      >
+      <main className="flex-1 pt-20 px-4 md:px-10 max-w-7xl mx-auto w-full">
         <h1 className="text-3xl font-semibold text-slate-800 mb-8">
           Dashboard
         </h1>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {dashboardItems.map((item) => {
-            const Icon = item.icon;
-            return (
-              <div
-                key={item.label}
-                className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-all border border-slate-100 flex items-center space-x-5 group"
-              >
-                <div
-                  className={`p-4 rounded-full ${item.color} transition-all duration-300`}
-                >
-                  <Icon className="w-8 h-8" />
-                </div>
-                <div>
-                  <p className="text-xl font-semibold text-slate-800 group-hover:text-slate-900">
-                    {item.label}
-                  </p>
-                  <p className="text-3xl font-bold text-slate-700">
-                    {item.count}
-                  </p>
-                </div>
+          {dashboardItems.map(({ label, icon: Icon, count, color }) => (
+            <div
+              key={label}
+              className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-all border border-slate-100 flex items-center space-x-5 group"
+            >
+              <div className={`p-4 rounded-full ${color}`}>
+                <Icon className="w-8 h-8" />
               </div>
-            );
-          })}
+              <div>
+                <p className="text-xl font-semibold text-slate-800 group-hover:text-slate-900">
+                  {label}
+                </p>
+                <p className="text-3xl font-bold text-slate-700">{count}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </main>
     </div>

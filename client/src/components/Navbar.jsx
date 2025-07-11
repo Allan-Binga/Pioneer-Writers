@@ -58,19 +58,6 @@ function Navbar() {
             />
           </Link>
 
-          {/* Center Nav (Desktop) */}
-          <div className="hidden md:flex items-center space-x-4 lg:space-x-6 absolute left-1/2 -translate-x-1/2">
-            {navItems.map((item) => (
-              <a
-                key={item}
-                href="#"
-                className="text-gray-600 hover:text-slate-900 transition-colors duration-200 text-sm lg:text-base font-medium"
-              >
-                {item}
-              </a>
-            ))}
-          </div>
-
           {/* Right Section */}
           <div className="flex items-center space-x-3 sm:space-x-4">
             {/* Notifications */}
@@ -142,52 +129,6 @@ function Navbar() {
             >
               <X size={24} />
             </button>
-          </div>
-
-          {/* Menu Items */}
-          <div className="flex flex-col space-y-3">
-            {navItems.map((item) => (
-              <a
-                key={item}
-                href="#"
-                onClick={toggleMenu}
-                className="text-gray-600 hover:text-slate-600 transition-colors duration-200 text-sm font-medium"
-              >
-                {item}
-              </a>
-            ))}
-
-            {isLoggedIn ? (
-              <Link
-                to="/profile"
-                className="flex items-center space-x-2 text-gray-600 hover:text-slate-600 transition-colors duration-200 text-sm font-medium py-2"
-                onClick={toggleMenu}
-              >
-                <img
-                  src={avatarUrl}
-                  alt="User Avatar"
-                  className="w-8 h-8 rounded-full object-cover border border-slate-200"
-                />
-                <span>{userName}</span>
-              </Link>
-            ) : showAuthButtons ? (
-              <>
-                <Link
-                  to="/sign-in"
-                  className="text-slate-600 hover:text-slate-700 text-sm font-medium py-2"
-                  onClick={toggleMenu}
-                >
-                  Log In
-                </Link>
-                <Link
-                  to="/sign-up"
-                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-6 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 shadow-md w-fit"
-                  onClick={toggleMenu}
-                >
-                  Sign Up
-                </Link>
-              </>
-            ) : null}
           </div>
         </div>
       )}

@@ -16,6 +16,7 @@ import FacebookIcon from "../../assets/facebook.png";
 import { endpoint } from "../../server";
 import { notify } from "../../utils/toast";
 import { useGoogleLogin } from "@react-oauth/google";
+import AuthImage from "../../assets/authImage.jpg";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -45,6 +46,55 @@ const SignUp = () => {
     { value: "+86", label: "+86 (China)" },
     { value: "+27", label: "+27 (South Africa)" },
   ];
+
+  useEffect(() => {
+    // Add fb-root if it doesn't exist (required by Facebook SDK)
+    if (!document.getElementById("fb-root")) {
+      const fbDiv = document.createElement("div");
+      fbDiv.id = "fb-root";
+      document.body.appendChild(fbDiv);
+    }
+
+    // Prevent duplicate SDK injection
+    if (document.getElementById("facebook-jssdk")) return;
+
+    // Set fbAsyncInit FIRST — before loading script
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: import.meta.env.VITE_FACEBOOK_APP_ID,
+        cookie: true,
+        xfbml: false,
+        version: "v16.0",
+      });
+      console.log("Facebook SDK initialized");
+    };
+
+    // Inject Facebook SDK
+    const script = document.createElement("script");
+    script.id = "facebook-jssdk";
+    script.async = true;
+    script.defer = true;
+    script.src = "https://connect.facebook.net/en_US/sdk.js";
+    script.onerror = () => console.error("Failed to load Facebook SDK");
+    document.body.appendChild(script);
+
+    // Optional: handle click outside logic
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      const existingScript = document.getElementById("facebook-jssdk");
+      if (existingScript) existingScript.remove();
+      delete window.fbAsyncInit;
+      delete window.FB;
+    };
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -131,42 +181,67 @@ const SignUp = () => {
     }
   };
 
+  const handleFacebookLogin = () => {
+    if (!window.FB) {
+      console.error("Facebook SDK not loaded");
+      notify.error("Facebook SDK is not ready. Please try again.");
+      return;
+    }
+
+    window.FB.login(
+      (response) => {
+        console.log("FB.login response:", response);
+        if (response.authResponse) {
+          const { accessToken } = response.authResponse;
+          handleFacebookAuthResponse(accessToken);
+        } else {
+          notify.error("Facebook login was cancelled or failed.");
+        }
+      },
+      { scope: "public_profile,email" }
+    );
+  };
+
+  const handleFacebookAuthResponse = async (accessToken) => {
+    try {
+      const res = await fetch(`${endpoint}/oauth2/sign-in/facebook`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: accessToken }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Facebook login failed");
+
+      localStorage.setItem("userRole", data.user.role);
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("isLoggedIn", "true");
+
+      notify.success("Facebook login successful");
+      setTimeout(() => navigate("/dashboard"), 1000);
+    } catch (err) {
+      notify.error(err.message || "Facebook login failed");
+    }
+  };
+
   const googleLogin = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => notify.error("Google sign-up failed"),
     flow: "implicit",
   });
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-slate-100 flex">
       {/* Left Column */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-dark-blue-700 to-slate-500">
-        <div className="mb-8 p-8 bg-white rounded-full shadow-lg">
-          <div className="w-64 h-64">
-            <img
-              src={Logo}
-              alt="Pioneer Writers Logo"
-              className="w-full h-full object-contain rounded-full"
-            />
-          </div>
-        </div>
-
-        <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">
-          Welcome to Pioneer Writers
-        </h2>
-        <p className="text-slate-700 text-center mb-12 max-w-md">
-          Your trusted academic writing partner, powered by expert human writers
-        </p>
+      <div className="lg:w-1/2 w-full h-[50vh] lg:h-screen bg-white flex items-center justify-center">
+        <img
+          src={AuthImage}
+          alt="Auth Background"
+          className="w-full h-full object-cover lg:object-contain"
+        />
       </div>
 
       {/* Right Column */}
@@ -374,7 +449,10 @@ const SignUp = () => {
             >
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
-            <button className="group border border-slate-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer">
+            <button
+              onClick={handleFacebookLogin}
+              className="group border border-slate-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer"
+            >
               <img
                 src={FacebookIcon}
                 alt="Facebook"
