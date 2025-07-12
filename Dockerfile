@@ -1,30 +1,38 @@
-#Base image
+# -------------------
+# Stage 1: Builder
+# -------------------
 FROM node:22-alpine AS builder
 
-# Working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
+# Install system tools needed by Prisma
+RUN apk add --no-cache openssl
+
+# Copy and install dependencies
 COPY package*.json ./
+RUN npm ci --production
 
-# Install dependencies
-RUN npm ci --production  
-
-# Copy source code
+# Copy full app source code (make sure prisma is included)
 COPY . .
 
-# Multi-stage build
+# Generate Prisma Client
+RUN npx prisma generate
+
+# -------------------
+# Stage 2: Final image
+# -------------------
 FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy only necessary files from builder
+RUN apk add --no-cache openssl
+
+# Copy only what's needed from builder
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
-COPY --from=builder /app .
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app ./
 
-# Expose port (optional, for documentation)
 EXPOSE 6100
 
-#Start command
 CMD ["npm", "start"]

@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prisma-migrate-job
+  namespace: pioneer-writers
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate
+          image: allanbinga/pioneer-writers-backend:v2.0.0
+          command: ["npx", "prisma", "migrate", "deploy"]
+          envFrom:
+            - secretRef:
+                name: db-secret
+      restartPolicy: Never
+  backoffLimit: 1
