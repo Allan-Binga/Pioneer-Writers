@@ -8,8 +8,8 @@ spec:
     spec:
       containers:
         - name: migrate
-          image: allanbinga/pioneer-writers-backend:v2.0.0
-          command: ["npx", "prisma", "migrate", "deploy"]
+          image: allanbinga/pioneer-writers-backend:v2.0.1
+          command: ["/bin/sh", "-c", "pwd; ls -la /app/prisma; npx prisma migrate deploy"]
           envFrom:
             - secretRef:
                 name: db-secret
