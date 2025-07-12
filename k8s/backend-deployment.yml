@@ -26,6 +26,12 @@ spec:
                 name: aws-secret
             - secretRef:
                 name: jwt-secret
+            - secretRef:
+                name: email-secret
+            - secretRef:
+                name: paypal-secret
+            - secretRef:
+                name: stripe-secret
           resources:
             requests:
               cpu: "100m"
