@@ -23,6 +23,8 @@ spec:
             - secretRef:
                 name: db-secret
             - secretRef:
+                name: db-ssl
+            - secretRef:
                 name: aws-secret
             - secretRef:
                 name: jwt-secret
