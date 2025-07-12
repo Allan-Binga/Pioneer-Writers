@@ -8,9 +8,7 @@ let client;
 if (process.env.NODE_ENV === "production") {
   client = new Client({
     connectionString: process.env.DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false, 
-    },
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
   });
 } else {
   client = new Client({
