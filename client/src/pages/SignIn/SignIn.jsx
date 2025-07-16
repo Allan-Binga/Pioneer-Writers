@@ -1,18 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, BookCopy, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, X } from "lucide-react";
 import GoogleIcon from "../../assets/google.png";
 import FacebookIcon from "../../assets/facebook.png";
-import Logo from "../../assets/logo.jpg";
 import { notify } from "../../utils/toast";
 import { endpoint } from "../../server";
 import { useGoogleLogin } from "@react-oauth/google";
+import AuthImage from "../../assets/signupImage.jpg";
+import LogoImage from "../../assets/logo.jpeg";
 
 function SignIn() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -23,6 +27,55 @@ function SignIn() {
     if (!formData.password) errors.password = "Password is required";
     return errors;
   };
+
+  useEffect(() => {
+    // Add fb-root if it doesn't exist (required by Facebook SDK)
+    if (!document.getElementById("fb-root")) {
+      const fbDiv = document.createElement("div");
+      fbDiv.id = "fb-root";
+      document.body.appendChild(fbDiv);
+    }
+
+    // Prevent duplicate SDK injection
+    if (document.getElementById("facebook-jssdk")) return;
+
+    // Set fbAsyncInit FIRST — before loading script
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: import.meta.env.VITE_FACEBOOK_APP_ID,
+        cookie: true,
+        xfbml: false,
+        version: "v16.0",
+      });
+      console.log("Facebook SDK initialized");
+    };
+
+    // Inject Facebook SDK
+    const script = document.createElement("script");
+    script.id = "facebook-jssdk";
+    script.async = true;
+    script.defer = true;
+    script.src = "https://connect.facebook.net/en_US/sdk.js";
+    script.onerror = () => console.error("Failed to load Facebook SDK");
+    document.body.appendChild(script);
+
+    // Optional: handle click outside logic
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      const existingScript = document.getElementById("facebook-jssdk");
+      if (existingScript) existingScript.remove();
+      delete window.fbAsyncInit;
+      delete window.FB;
+    };
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -80,7 +133,6 @@ function SignIn() {
   const handleGoogleSuccess = async (tokenResponse) => {
     try {
       const token = tokenResponse.access_token;
-      // console.log(token)
 
       if (!token) throw new Error("No token returned from Google");
 
@@ -109,6 +161,52 @@ function SignIn() {
     }
   };
 
+  const handleFacebookLogin = () => {
+    if (!window.FB) {
+      console.error("Facebook SDK not loaded");
+      notify.error("Facebook SDK is not ready. Please try again.");
+      return;
+    }
+
+    window.FB.login(
+      (response) => {
+        console.log("FB.login response:", response);
+        if (response.authResponse) {
+          const { accessToken } = response.authResponse;
+          handleFacebookAuthResponse(accessToken);
+        } else {
+          notify.error("Facebook login was cancelled or failed.");
+        }
+      },
+      { scope: "public_profile,email" }
+    );
+  };
+
+  const handleFacebookAuthResponse = async (accessToken) => {
+    try {
+      const res = await fetch(`${endpoint}/oauth2/sign-in/facebook`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token: accessToken }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Facebook login failed");
+
+      localStorage.setItem("userRole", data.user.role);
+      localStorage.setItem("userEmail", data.user.email);
+      localStorage.setItem("isLoggedIn", "true");
+
+      notify.success("Facebook login successful");
+      setTimeout(() => navigate("/dashboard"), 1000);
+    } catch (err) {
+      notify.error(err.message || "Facebook login failed");
+    }
+  };
+
   const googleLogin = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
     onError: () => notify.error("Google sign-in failed"),
@@ -116,39 +214,30 @@ function SignIn() {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex">
-      {/* Left Column */}
-      <div className="hidden lg:flex lg:w-1/2 flex-col justify-center items-center p-12 bg-gradient-to-br from-slate-200 to-slate-300">
-        <div className="mb-8 p-8 bg-white rounded-full shadow-lg">
-          <div className="w-64 h-64">
-            <img
-              src={Logo}
-              alt="Pioneer Writers Logo"
-              className="w-full h-full object-contain rounded-full"
-            />
-          </div>
+    <div className="min-h-screen flex bg-gradient-to-br from-white to-white">
+      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
+        <div className="mb-6 z-10">
+          <img
+            src={LogoImage}
+            alt="Logo"
+            className="w-[200px] h-auto object-contain"
+          />
         </div>
-        <h2 className="text-3xl font-bold text-slate-900 mb-2 text-center">
-          Pioneer Writers
-        </h2>
-        <p className="text-slate-700 text-center mb-12 max-w-md">
-          Your trusted writing partner with expert assistance
-        </p>
+        <div className="w-full h-full relative z-0">
+          <img
+            src={AuthImage}
+            alt="Auth Background"
+            className="w-full h-full object-cover object-center shadow-lg"
+          />
+        </div>
       </div>
 
-      {/* Right Column */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6 border border-slate-200">
           <div className="text-center pb-4">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-500 to-slate-700 bg-clip-text text-transparent">
               Welcome back!
             </h1>
-            <p className="text-slate-600 mt-2">
-              New to Pioneer Writers?{" "}
-              <Link to="/sign-up" className="text-slate-700 hover:underline">
-                Sign Up Now
-              </Link>
-            </p>
           </div>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -192,18 +281,19 @@ function SignIn() {
             </div>
 
             <div className="text-right">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-slate-700 hover:underline"
+              <button
+                type="button"
+                onClick={() => setShowForgotModal(true)}
+                className="text-sm text-slate-700 hover:underline cursor-pointer"
               >
                 Forgot password?
-              </Link>
+              </button>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-slate-500 to-slate-700 hover:from-slate-600 hover:to-slate-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center"
+              className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               {loading ? (
                 <svg
@@ -250,7 +340,10 @@ function SignIn() {
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
 
-            <button className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer">
+            <button
+              onClick={handleFacebookLogin}
+              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer"
+            >
               <img
                 src={FacebookIcon}
                 alt="Facebook"
@@ -258,8 +351,63 @@ function SignIn() {
               />
             </button>
           </div>
+          <p className="text-slate-600 mt-2 text-center text-sm">
+            New to Pioneer Writers?{" "}
+            <Link
+              to="/sign-up"
+              className="text-slate-700 hover:underline hover:font-semibold"
+            >
+              Sign Up
+            </Link>
+          </p>
         </div>
       </div>
+
+      {showForgotModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/10">
+          <div className="relative bg-white w-full max-w-md mx-auto rounded-2xl p-6 shadow-lg border border-slate-300">
+            <button
+              onClick={() => setShowForgotModal(false)}
+              className="absolute top-4 right-4 text-slate-500 hover:text-slate-700 cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold text-slate-700 mb-4">
+              Reset your password
+            </h2>
+
+            <div className="mb-4">
+              <label
+                className="block text-sm text-slate-600 mb-1"
+                htmlFor="forgotEmail"
+              >
+                Please enter your email
+              </label>
+              <input
+                id="forgotEmail"
+                type="email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-4 py-2 rounded-full border border-slate-300 focus:ring-1 focus:ring-slate-600 focus:outline-none"
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (!forgotEmail) return notify.error("Please enter an email");
+                notify.success("Password reset link sent!");
+                setShowForgotModal(false);
+              }}
+              className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white py-2.5 rounded-full shadow hover:shadow-md transition-all duration-200 cursor-pointer"
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

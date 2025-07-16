@@ -4,11 +4,11 @@ pipeline {
     tools {
         nodejs 'NodeJS 18'
     }
-    environment {
-        FRONTEND_IMAGE = 'allanbinga/pioneer-writers-frontend:v2.0.0'
-        BACKEND_IMAGE  = 'allanbinga/pioneer-writers-backend:v2.0.0'
-        DOCKER_CREDS = credentials('dockerhub') // stored securely in Jenkins
-    }
+    // environment {
+    //     FRONTEND_IMAGE = 'allanbinga/pioneer-writers-frontend:v2.0.0'
+    //     BACKEND_IMAGE  = 'allanbinga/pioneer-writers-backend:v2.0.0'
+    //     DOCKER_CREDS = credentials('dockerhub') // stored securely in Jenkins
+    // }
     stages {
         stage('Clone Repository') {
             steps {
@@ -36,19 +36,19 @@ pipeline {
         //     }
         // }
 
-        // stage('Push Docker Images') {
-        //     steps {
-        //         sh "docker push $FRONTEND_IMAGE"
-        //         sh "docker push $BACKEND_IMAGE"
-        //     }
-        // }
+    // stage('Push Docker Images') {
+    //     steps {
+    //         sh "docker push $FRONTEND_IMAGE"
+    //         sh "docker push $BACKEND_IMAGE"
+    //     }
+    // }
     }
     post {
         success {
             slackSend(
                 channel: '#pioneer-writers',
                 color: 'good',
-                message: "Docker images built and pushed:\n- $FRONTEND_IMAGE\n- $BACKEND_IMAGE"
+                message: 'Dependencies installed, waiting next step.'
             )
         }
         failure {

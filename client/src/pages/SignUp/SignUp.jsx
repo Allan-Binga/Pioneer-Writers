@@ -9,14 +9,14 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
-import Logo from "../../assets/logo.jpg";
 import { useNavigate } from "react-router-dom";
 import GoogleIcon from "../../assets/google.png";
 import FacebookIcon from "../../assets/facebook.png";
 import { endpoint } from "../../server";
 import { notify } from "../../utils/toast";
 import { useGoogleLogin } from "@react-oauth/google";
-import AuthImage from "../../assets/authImage.jpg";
+import AuthImage from "../../assets/signupImage.jpg";
+import LogoImage from "../../assets/logo.jpeg";
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -234,31 +234,44 @@ const SignUp = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-slate-100 flex">
+    <div className="min-h-screen flex bg-gradient-to-br from-white to-zinc-100">
       {/* Left Column */}
-      <div className="lg:w-1/2 w-full h-[50vh] lg:h-screen bg-white flex items-center justify-center">
-        <img
-          src={AuthImage}
-          alt="Auth Background"
-          className="w-full h-full object-cover lg:object-contain"
-        />
+      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
+        {/* Logo */}
+        <div className="mb-6 z-10">
+          <img
+            src={LogoImage}
+            alt="Logo"
+            className="w-[200px] h-auto object-contain"
+          />
+        </div>
+
+        {/* Auth Background Image */}
+        <div className="w-full h-full relative z-0">
+          <img
+            src={AuthImage}
+            alt="Auth Background"
+            className="w-full h-full object-cover object-center shadow-lg"
+          />
+        </div>
       </div>
 
       {/* Right Column */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6 border border-slate-200">
-          <div className="text-center pb-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-900 bg-clip-text text-transparent">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
+        <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-stone-200">
+          <div className="text-center mb-6">
+            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-stone-800 to-zinc-800 bg-clip-text text-transparent">
               Join us!
             </h1>
-            <p className="text-slate-600 mt-2">
+            <p className="text-stone-600 mt-2 text-sm">
               Create your account to get started
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Username */}
             <div className="relative">
-              <User className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+              <User className="absolute left-4 top-3.5 h-5 w-5 text-zinc-400" />
               <input
                 id="userName"
                 name="userName"
@@ -267,55 +280,53 @@ const SignUp = () => {
                 value={formData.userName}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-300"
+                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-400"
               />
               {validationErrors.userName && (
-                <p className="text-red-500 text-sm mt-1 ml-2 focus:ring-red-700">
+                <p className="text-amber-600 text-xs mt-1 ml-2">
                   {validationErrors.userName}
                 </p>
               )}
             </div>
 
+            {/* Email */}
             <div className="relative">
-              <Mail className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+              <Mail className="absolute left-4 top-3.5 h-5 w-5 text-zinc-400" />
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="E-mail"
+                placeholder="Email"
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-300"
+                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-400"
               />
               {validationErrors.email && (
-                <p className="text-red-500 text-sm mt-1 ml-2 focus:ring-red-700">
+                <p className="text-amber-600 text-xs mt-1 ml-2">
                   {validationErrors.email}
                 </p>
               )}
             </div>
 
+            {/* Phone */}
             <div className="flex space-x-2">
-              <div className="relative" ref={dropdownRef}>
+              {/* Country Code Dropdown */}
+              <div className="relative w-24" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="w-20 px-3 py-3 border border-slate-300 rounded-full bg-white text-slate-600 flex items-center justify-between focus:outline-none focus:ring-1 focus:ring-slate-300"
+                  className="w-full py-3 px-4 border border-stone-300 rounded-full bg-white text-zinc-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-zinc-400"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <span>{formData.countryCode}</span>
-                  <ChevronDown className="w-4 h-4 text-slate-400" />
+                  <ChevronDown className="w-4 h-4 text-zinc-400" />
                 </button>
-                {validationErrors.phoneNumber && (
-                  <p className="text-red-500 text-sm mt-1 ml-2 focus:ring-red-700">
-                    {validationErrors.phoneNumber}
-                  </p>
-                )}
                 {isDropdownOpen && (
-                  <ul className="absolute z-10 mt-1 w-28 bg-white border border-slate-300 rounded-lg shadow-lg max-h-40 overflow-auto">
+                  <ul className="absolute z-10 mt-1 w-full bg-white border border-stone-300 rounded-lg shadow-md max-h-48 overflow-auto">
                     {countryCodes.map((code) => (
                       <li
                         key={code.value}
-                        className="px-3 py-2 text-slate-600 hover:bg-slate-50 cursor-pointer"
+                        className="px-3 py-2 text-zinc-600 hover:bg-zinc-100 cursor-pointer"
                         onClick={() => handleCountryCodeSelect(code.value)}
                       >
                         {code.label}
@@ -324,8 +335,10 @@ const SignUp = () => {
                   </ul>
                 )}
               </div>
+
+              {/* Phone Number */}
               <div className="relative flex-1">
-                <Phone className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+                <Phone className="absolute left-4 top-3.5 h-5 w-5 text-zinc-400" />
                 <input
                   id="phoneNumber"
                   name="phoneNumber"
@@ -334,13 +347,14 @@ const SignUp = () => {
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
                   required
-                  className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-300"
+                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-400"
                 />
               </div>
             </div>
 
+            {/* Password */}
             <div className="relative">
-              <Lock className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+              <Lock className="absolute left-4 top-3.5 h-5 w-5 text-zinc-400" />
               <input
                 id="password"
                 name="password"
@@ -349,16 +363,11 @@ const SignUp = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-10 pr-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-300"
+                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-400"
               />
-              {validationErrors.password && (
-                <p className="text-red-500 text-sm mt-1 ml-2 focus:ring-red-700">
-                  {validationErrors.password}
-                </p>
-              )}
               <button
                 type="button"
-                className="absolute right-4 top-4 text-slate-400"
+                className="absolute right-4 top-3.5 text-zinc-400"
                 onClick={() => setShowPassword((prev) => !prev)}
               >
                 {showPassword ? (
@@ -367,8 +376,14 @@ const SignUp = () => {
                   <Eye className="w-5 h-5" />
                 )}
               </button>
+              {validationErrors.password && (
+                <p className="text-amber-600 text-xs mt-1 ml-2">
+                  {validationErrors.password}
+                </p>
+              )}
             </div>
 
+            {/* Terms Checkbox */}
             <div className="flex items-start space-x-2">
               <input
                 type="checkbox"
@@ -380,30 +395,31 @@ const SignUp = () => {
                     agreeTerms: e.target.checked,
                   }))
                 }
-                className="mt-1 rounded border-slate-300 text-slate-500"
+                className="mt-1 rounded border-stone-300 text-zinc-500"
               />
-              <label htmlFor="terms" className="text-sm text-dark-blue-700">
-                I agree with the{" "}
+              <label htmlFor="terms" className="text-sm text-stone-700">
+                I agree to the{" "}
                 <Link
                   to="/sign-up"
-                  className="text-slate-500 hover:underline font-semibold"
+                  className="text-zinc-600 underline font-semibold"
                 >
                   Terms & Conditions
                 </Link>{" "}
                 and{" "}
                 <Link
                   to="/sign-up"
-                  className="text-slate-500 hover:underline font-semibold"
+                  className="text-zinc-600 underline font-semibold"
                 >
                   Fair Use Policy
                 </Link>
               </label>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-slate-500 to-slate-700 hover:from-slate-600 hover:to-slate-800 text-white py-2.5 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer flex items-center justify-center"
               disabled={!formData.agreeTerms || isLoading}
+              className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white py-3 rounded-full shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 flex items-center justify-center cursor-pointer"
             >
               {isLoading ? (
                 <svg
@@ -419,12 +435,12 @@ const SignUp = () => {
                     r="10"
                     stroke="currentColor"
                     strokeWidth="4"
-                  ></circle>
+                  />
                   <path
                     className="opacity-75"
                     fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
               ) : (
                 "Sign Up"
@@ -432,40 +448,39 @@ const SignUp = () => {
             </button>
           </form>
 
+          {/* Social Divider */}
           <div className="my-6 relative">
             <div className="flex items-center justify-center">
-              <div className="flex-grow border-t border-slate-300"></div>
-              <span className="mx-4 text-sm text-dark-blue-700 bg-white px-2">
-                Or sign up with your social accounts
+              <div className="flex-grow border-t border-stone-300"></div>
+              <span className="mx-4 text-sm text-stone-500 bg-white px-2">
+                Or sign up with
               </span>
-              <div className="flex-grow border-t border-slate-300"></div>
+              <div className="flex-grow border-t border-stone-300"></div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          {/* Social Logins */}
+          <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => googleLogin()}
-              className="group border border-slate-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer flex items-center justify-center"
+              onClick={googleLogin}
+              className="border border-stone-300 p-3 rounded-full bg-white hover:border-zinc-500 flex items-center justify-center transition-colors duration-200 cursor-pointer"
             >
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
             <button
               onClick={handleFacebookLogin}
-              className="group border border-slate-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer"
+              className="border border-stone-300 p-3 rounded-full bg-white hover:border-zinc-500 flex items-center justify-center transition-colors duration-200 cursor-pointer"
             >
-              <img
-                src={FacebookIcon}
-                alt="Facebook"
-                className="w-6 h-6 mx-auto"
-              />
+              <img src={FacebookIcon} alt="Facebook" className="w-6 h-6" />
             </button>
           </div>
 
-          <p className="text-center text-sm text-dark-blue-700 mt-6">
+          {/* Footer */}
+          <p className="text-center text-sm text-stone-700 mt-6">
             Already have an account?{" "}
             <Link
               to="/sign-in"
-              className="text-slate-500 hover:text-slate-700 font-medium"
+              className="text-slate-700 hover:font-semibold hover:underline"
             >
               Sign In
             </Link>
