@@ -4,7 +4,6 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import Layout from "./layouts/Layout";
 import { Toaster } from "sonner";
 import NewOrder from "./pages/NewOrder/NewOrder";
 import Landing from "./pages/LandingPage/Landing";
@@ -12,10 +11,10 @@ import SignUp from "./pages/SignUp/SignUp";
 import SignIn from "./pages/SignIn/SignIn";
 import OrderConfirmation from "./pages/OrderConfirmation/OrderConfirmation";
 import MyOrders from "./pages/Orders/MyOrders";
-import Dashboard from "./pages/Dashboard/Dashboard";
 import Wallet from "./pages/Wallet/Wallet";
 import Inbox from "./pages/Inbox/Inbox";
 import Writers from "./pages/Writers/Writers";
+import TopWriters from "./pages/Writers/TopWriters";
 import Settings from "./pages/Profile/Settings";
 import Profile from "./pages/Profile/Profile";
 import News from "./pages/News/News";
@@ -25,6 +24,9 @@ import Failure from "./pages/Payment Messages/Failure";
 import Terms from "./pages/TermsOfUse/Terms";
 import PrivacyPolicy from "./pages/TermsOfUse/PrivacyPolicy";
 import DataDeletion from "./pages/TermsOfUse/DataDeletion";
+import Drafts from "./pages/Orders/Drafts";
+import Home from "./pages/Home/Home";
+import OrderDetails from "./pages/Orders/OrderDetails";
 
 function App() {
   return (
@@ -32,20 +34,23 @@ function App() {
       <Toaster richColors position="top-right" />
       <Routes>
         <Route path="/" element={<Navigate to="/sign-in" />} />
-        <Route path="/home" element={<Landing />} />
-        <Route path="/new-order" element={<Layout><NewOrder /></Layout>} />
+        <Route path="/landing" element={<Landing />} />
+        <Route path="/new-order" element={<NewOrder />} />
         <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/order-details/:orderId" element={<OrderDetails />} />
+        <Route path="/drafts" element={<Drafts />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
-        <Route path="/order-confirmation" element={<Layout><OrderConfirmation/></Layout>} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/order-confirmation" element={<OrderConfirmation />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/writers" element={<Writers />} />
+        <Route path="/top-writers" element={<TopWriters />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/news" element={<News />} />
-        <Route path="/order-checkout" element={<Layout><OrderCheckout/></Layout>} />
+        <Route path="/order-checkout" element={<OrderCheckout />} />
         <Route path="/payment/successful" element={<Success />} />
         <Route path="/payment/failed" element={<Failure />} />
         <Route path="/terms" element={<Terms />} />

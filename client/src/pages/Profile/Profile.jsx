@@ -1,5 +1,5 @@
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+import Footer from "../../components/Footer";
 import { User, Mail, Phone, Save, ImagePlus, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { fetchProfile } from "../../utils/profile";
@@ -8,7 +8,6 @@ import { notify } from "../../utils/toast";
 import { endpoint } from "../../server";
 
 function Profile() {
-  const [showSidebar, setShowSidebar] = useState(false);
   const [smsEnabled, setSmsEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
@@ -74,13 +73,12 @@ function Profile() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
-      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       <div className="flex">
-        <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
+        <main className="flex-1 transition-all duration-300 pt-20 px-4">
           <div className="max-w-6xl mx-auto space-y-10">
-            <h1 className="text-3xl font-bold text-slate-800 mb-4">
+            <h1 className="text-3xl font-bold text-slate-800 mb-8 mt-8">
               My Profile
             </h1>
 
@@ -109,12 +107,6 @@ function Profile() {
                     Enable SMS notifications for order updates
                   </span>
                 </div>
-                {/* <div>
-                  <h3 className="text-md font-medium text-gray-700 mb-1">
-                    Bio
-                  </h3>
-                  <p className="text-md text-gray-600">{userData.bio}</p>
-                </div> */}
               </div>
             </div>
 
@@ -199,6 +191,7 @@ function Profile() {
           </div>
         </main>
       </div>
+      <Footer />
     </div>
   );
 }

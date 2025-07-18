@@ -114,14 +114,14 @@ function SignIn() {
       notify.success("Login successful.");
       setTimeout(() => {
         navigate(
-          data.user.role === "Admin" ? "/admin/dashboard" : "/dashboard"
+          data.user.role === "Admin" ? "/home" : "/home"
         );
       }, 1500);
     } catch (error) {
       const msg = error.message?.toLowerCase?.();
       if (msg?.includes("already logged in")) {
         notify.info("Already logged in");
-        navigate("/dashboard");
+        navigate("/home");
       } else {
         notify.error(error.message || "Something went wrong");
       }
@@ -133,7 +133,6 @@ function SignIn() {
   const handleGoogleSuccess = async (tokenResponse) => {
     try {
       const token = tokenResponse.access_token;
-
       if (!token) throw new Error("No token returned from Google");
 
       const response = await fetch(`${endpoint}/oauth2/sign-in/google`, {
@@ -154,10 +153,16 @@ function SignIn() {
 
       notify.success("Logged in with Google");
       setTimeout(() => {
-        navigate(data.user.role === "User" ? "/dashboard" : "/dashboard");
+        navigate(data.user.role === "User" ? "/home" : "/home");
       }, 1000);
     } catch (err) {
-      notify.error(err.message || "Google login failed");
+      const msg = err.message?.toLowerCase?.();
+      if (msg?.includes("already logged in")) {
+        notify.info("Already logged in");
+        navigate("/home");
+      } else {
+        notify.error(err.message || "Google login failed");
+      }
     }
   };
 
@@ -201,9 +206,15 @@ function SignIn() {
       localStorage.setItem("isLoggedIn", "true");
 
       notify.success("Facebook login successful");
-      setTimeout(() => navigate("/dashboard"), 1000);
+      setTimeout(() => navigate("/home"), 1000);
     } catch (err) {
-      notify.error(err.message || "Facebook login failed");
+      const msg = err.message?.toLowerCase?.();
+      if (msg?.includes("already logged in")) {
+        notify.info("Already logged in");
+        navigate("/home");
+      } else {
+        notify.error(err.message || "Facebook login failed");
+      }
     }
   };
 
@@ -216,13 +227,6 @@ function SignIn() {
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-white to-white">
       <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
-        <div className="mb-6 z-10">
-          <img
-            src={LogoImage}
-            alt="Logo"
-            className="w-[200px] h-auto object-contain"
-          />
-        </div>
         <div className="w-full h-full relative z-0">
           <img
             src={AuthImage}
@@ -233,14 +237,21 @@ function SignIn() {
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md bg-white rounded-lg shadow-xl p-6 border border-slate-200">
+        <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
           <div className="text-center pb-4">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-500 to-slate-700 bg-clip-text text-transparent">
-              Welcome back!
+            <div className="mb-6">
+              <img
+                src={LogoImage}
+                alt="Logo"
+                className="mx-auto w-[220px] h-auto object-contain"
+              />
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
+              Welcome back
             </h1>
           </div>
 
-          <form className="space-y-4" onSubmit={handleSubmit}>
+          <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
             <div className="relative">
               <Mail className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
               <input
@@ -284,7 +295,7 @@ function SignIn() {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(true)}
-                className="text-sm text-slate-700 hover:underline cursor-pointer"
+                className="text-sm text-slate-700 hover:underline"
               >
                 Forgot password?
               </button>
@@ -322,36 +333,36 @@ function SignIn() {
             </button>
           </form>
 
-          <div className="my-6 relative">
+          {/* Divider */}
+          <div className="my-8 relative">
             <div className="flex items-center justify-center">
               <div className="flex-grow border-t border-slate-300"></div>
-              <span className="mx-4 text-sm text-slate-600 bg-white px-2">
-                Or sign in with your social accounts
+              <span className="mx-4 text-sm text-slate-600 bg-white px-3">
+                Or sign in with
               </span>
               <div className="flex-grow border-t border-slate-300"></div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          {/* Social Logins */}
+          <div className="grid grid-cols-2 gap-4">
             <button
               onClick={() => googleLogin()}
-              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer flex items-center justify-center"
+              className="group border border-gray-300 p-4 rounded-full bg-white hover:border-gray-400 transition duration-200 flex items-center justify-center cursor-pointer"
             >
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
 
             <button
               onClick={handleFacebookLogin}
-              className="group border border-gray-300 p-4 rounded-full bg-white transition-colors duration-200 hover:border-slate-700 cursor-pointer"
+              className="group border border-gray-300 p-4 rounded-full bg-white hover:border-gray-400 transition duration-200 flex items-center justify-center cursor-pointer"
             >
-              <img
-                src={FacebookIcon}
-                alt="Facebook"
-                className="w-6 h-6 mx-auto"
-              />
+              <img src={FacebookIcon} alt="Facebook" className="w-6 h-6" />
             </button>
           </div>
-          <p className="text-slate-600 mt-2 text-center text-sm">
+
+          {/* Footer */}
+          <p className="text-slate-600 mt-6 text-center text-sm">
             New to Pioneer Writers?{" "}
             <Link
               to="/sign-up"

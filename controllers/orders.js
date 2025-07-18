@@ -1,8 +1,7 @@
 const client = require("../config/dbConfig");
 const Joi = require("joi");
-const jwt = require("jsonwebtoken");
 
-// Post or update an order
+// Post/Update an order
 const postOrder = async (req, res) => {
   const userId = req.userId; // From middleware
   try {
@@ -10,7 +9,7 @@ const postOrder = async (req, res) => {
       order_id: Joi.string()
         .guid({ version: ["uuidv4"] }) // Validate as UUID v4
         .optional(), // Add order_id to schema
-      topic_field: Joi.string().required(),
+      subject: Joi.string().required(),
       type_of_service: Joi.string().required(),
       document_type: Joi.string().required(),
       writer_level: Joi.string().required(),
@@ -22,12 +21,16 @@ const postOrder = async (req, res) => {
       number_of_sources: Joi.number().integer().min(0),
       topic: Joi.string().required(),
       instructions: Joi.string().allow(""),
-      writer_type: Joi.string().required(),
+      writer_category: Joi.string().required(),
       deadline: Joi.date().iso().required(),
       total_price: Joi.number().min(0).required(),
       checkout_amount: Joi.number().min(0).required(),
       writer_tip: Joi.number().min(0).allow(null),
       plagiarism_report: Joi.boolean(),
+      order_status: Joi.string()
+        .valid("draft", "pending", "paid", "cancelled")
+        .optional(),
+
       payment_option: Joi.string().allow(""),
       coupon_code: Joi.string().allow(""),
     });
@@ -57,34 +60,26 @@ const postOrder = async (req, res) => {
 
       // Update existing order
       query = `
-        UPDATE orders SET
-          topic_field = $1,
-          type_of_service = $2,
-          document_type = $3,
-          writer_level = $4,
-          paper_format = $5,
-          english_type = $6,
-          pages = $7,
-          spacing = $8,
-          number_of_words = $9,
-          number_of_sources = $10,
-          topic = $11,
-          instructions = $12,
-          uploaded_file = $13,
-          writer_type = $14,
-          deadline = $15,
-          total_price = $16,
-          checkout_amount = $17,
-          writer_tip = $18,
-          plagiarism_report = $19,
-          payment_option = $20,
-          coupon_code = $21,
-          updated_at = NOW()
-        WHERE order_id = $22 AND user_id = $23
-        RETURNING *;
-      `;
+  INSERT INTO orders (
+    subject, type_of_service, document_type, writer_level,
+    paper_format, english_type, pages, spacing, number_of_words,
+    number_of_sources, topic, instructions, uploaded_file,
+    writer_category, deadline, total_price, checkout_amount,
+    writer_tip, plagiarism_report, payment_option, coupon_code,
+    user_id, order_status
+  )
+  VALUES (
+    $1, $2, $3, $4, $5,
+    $6, $7, $8, $9, $10,
+    $11, $12, $13, $14,
+    $15, $16, $17, $18, $19, $20,
+    $21, $22, $23
+  )
+  RETURNING *;
+`;
+
       values = [
-        value.topic_field,
+        value.subject,
         value.type_of_service,
         value.document_type,
         value.writer_level,
@@ -97,7 +92,7 @@ const postOrder = async (req, res) => {
         value.topic,
         value.instructions,
         uploadedFile,
-        value.writer_type,
+        value.writer_category,
         value.deadline,
         value.total_price,
         value.checkout_amount,
@@ -105,17 +100,17 @@ const postOrder = async (req, res) => {
         value.plagiarism_report ?? false,
         value.payment_option || "",
         value.coupon_code || "",
-        value.order_id,
         userId,
+        value.order_status || "pending", // This is the key line
       ];
     } else {
       // Insert new order
       query = `
         INSERT INTO orders (
-          topic_field, type_of_service, document_type, writer_level,
+          subject, type_of_service, document_type, writer_level,
           paper_format, english_type, pages, spacing, number_of_words,
           number_of_sources, topic, instructions, uploaded_file,
-          writer_type, deadline, total_price, checkout_amount,
+          writer_category, deadline, total_price, checkout_amount,
           writer_tip, plagiarism_report, payment_option, coupon_code,
           user_id
         )
@@ -129,7 +124,7 @@ const postOrder = async (req, res) => {
         RETURNING *;
       `;
       values = [
-        value.topic_field,
+        value.subject,
         value.type_of_service,
         value.document_type,
         value.writer_level,
@@ -142,7 +137,7 @@ const postOrder = async (req, res) => {
         value.topic,
         value.instructions,
         uploadedFile,
-        value.writer_type,
+        value.writer_category,
         value.deadline,
         value.total_price,
         value.checkout_amount,
@@ -182,6 +177,30 @@ const getOrders = async (req, res) => {
   }
 };
 
+//Fetch single order
+const getSingleOrder = async (req, res) => {
+  const userId = req.userId; // from authUser middleware
+  const { orderId } = req.params;
+
+  try {
+    const { rows } = await client.query(
+      "SELECT * FROM orders WHERE order_id = $1 AND user_id = $2",
+      [orderId, userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    const order = rows[0];
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 // Fetch my orders
 const getUsersOrders = async (req, res) => {
   const userId = req.userId;
@@ -218,7 +237,7 @@ const updateOrder = async (req, res) => {
       number_of_sources: Joi.number().integer().min(0),
       topic: Joi.string(),
       instructions: Joi.string().allow(""),
-      writer_type: Joi.string(),
+      writer_category: Joi.string(),
       deadline: Joi.date().iso(),
       writer_tip: Joi.number().min(0),
       plagiarism_report: Joi.boolean(),
@@ -289,10 +308,12 @@ const deleteOrder = async (req, res) => {
 
     const order = checkResult.rows[0];
 
-    // If you want to restrict deletion to the owner only
-    // if (order.user_id !== userId) {
-    //   return res.status(403).json({ error: "Unauthorized to delete this order." });
-    // }
+    // Restrict deletion to owner
+    if (order.user_id !== userId) {
+      return res
+        .status(403)
+        .json({ error: "Unauthorized to delete this order." });
+    }
 
     // Proceed with deletion
     const deleteQuery = `DELETE FROM orders WHERE order_id = $1 RETURNING *`;
@@ -314,4 +335,5 @@ module.exports = {
   getUsersOrders,
   updateOrder,
   deleteOrder,
+  getSingleOrder,
 };

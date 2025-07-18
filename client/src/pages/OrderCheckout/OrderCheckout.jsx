@@ -12,7 +12,6 @@ import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import Visa from "../../assets/visa.png";
 import PayPal from "../../assets/paypal.png";
-import Googlepay from "../../assets/googlepay.png";
 import StripeLogo from "../../assets/stripe.png";
 import { endpoint } from "../../server";
 import axios from "axios";
@@ -105,6 +104,7 @@ function OrderPayment() {
           break;
 
         case "stripe":
+        case "visa": // Reuse same logic for visa
           response = await axios.post(
             `${endpoint}/checkout/stripe`,
             {},
@@ -114,28 +114,39 @@ function OrderPayment() {
           if (!redirectUrl) throw new Error("No session URL received");
           break;
 
-        case "visa":
-          response = await axios.post(
-            `${endpoint}/checkout/stripe`,
-            {},
-            { withCredentials: true }
-          );
-          redirectUrl = response.data.sessionUrl;
-          if (!redirectUrl) throw new Error("No session URL received");
-          break;
         default:
           throw new Error("Please select a payment method");
       }
 
-      // ✅ Clear localStorage on success
+      // ✅ Clear all related storage on success
       localStorage.removeItem("step1Data");
       localStorage.removeItem("step2Data");
       localStorage.removeItem("checkoutAmount");
+      localStorage.removeItem("order_id");
+      localStorage.removeItem("orderData");
 
-      // Redirect after clearing
+      // 🔁 Redirect to payment gateway
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("Payment error:", error);
+
+      // ✅ Combine step1 and step2 data for recovery
+      try {
+        const step1 = JSON.parse(localStorage.getItem("step1Data") || "{}");
+        const step2 = JSON.parse(localStorage.getItem("step2Data") || "{}");
+
+        const orderData = {
+          ...step1,
+          ...step2,
+          selectedMethod,
+          timestamp: new Date().toISOString(), // Optional: for tracking
+        };
+
+        localStorage.setItem("orderData", JSON.stringify(orderData));
+      } catch (storageErr) {
+        console.warn("Failed to save orderData to localStorage", storageErr);
+      }
+
       notify.error(`Failed to initiate ${selectedMethod} payment`);
     } finally {
       setIsSubmitting(false);
@@ -205,51 +216,37 @@ function OrderPayment() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
-      <main className="pt-16 ml-0 lg:ml-64">
+      <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
           {/* Progress Tracker */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8">
+          <div className="p-6 mb-8">
             <div className="flex items-center justify-between relative">
-              <div className="absolute top-6 left-0 w-full h-0.5 bg-gray-200 z-0">
-                <div
-                  className="h-full bg-gradient-to-r from-slate-500 to-slate-800 transition-all duration-500"
-                  style={{
-                    width: `${
-                      (steps.findIndex((s) => s.current) / (steps.length - 1)) *
-                      100
-                    }%`,
-                  }}
-                />
-              </div>
+              {/* Steps */}
               {steps.map((step) => (
                 <div
                   key={step.number}
-                  className="flex flex-col items-center relative z-10"
+                  className="relative z-10 flex items-center"
                 >
                   <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
+                    className={`flex items-center px-8 py-4 rounded-full border text-sm font-medium transition-all duration-300 ${
                       step.completed
-                        ? "bg-gradient-to-r from-slate-600 to-slate-950 border-slate-500 text-white"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-800 border-slate-700 text-white"
                         : step.current
-                        ? "bg-gradient-to-r from-slate-600 to-slate-950 border-slate-500 text-white shadow-lg"
-                        : "bg-white border-gray-300 text-gray-400"
+                        ? "bg-gradient-to-r from-slate-600 to-slate-800 border-slate-700 text-white shadow-md"
+                        : "bg-white border-slate-300 text-slate-400"
                     }`}
                   >
-                    {step.completed ? (
-                      <Check size={16} />
-                    ) : (
-                      <span className="text-md font-semibold">
-                        {step.number}
-                      </span>
-                    )}
-                  </div>
-                  <span
-                    className={`mt-2 text-md font-medium text-center ${
-                      step.current ? "text-slate-600" : "text-gray-600"
-                    }`}
-                  >
+                    <span
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2 ${
+                        step.completed || step.current
+                          ? "bg-white text-slate-700"
+                          : "bg-slate-200 text-slate-600"
+                      }`}
+                    >
+                      {step.completed ? <Check size={12} /> : step.number}
+                    </span>
                     {step.title}
-                  </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -259,7 +256,7 @@ function OrderPayment() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left: Order Summary */}
             <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-6 transition-all duration-300 hover:shadow-lg relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-slate-500 to-indigo-500" />
+              <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-slate-500 to-slate-500" />
               <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
                 <FileText size={20} className="text-slate-500" />
                 Order Summary
@@ -402,7 +399,7 @@ function OrderPayment() {
                     disabled={!selectedMethod || isSubmitting}
                     className={`w-1/2 py-3 rounded-xl text-white font-semibold transition-all duration-300 cursor-pointer ${
                       selectedMethod && !isSubmitting
-                        ? "bg-gradient-to-r from-slate-500 to-indigo-500 hover:from-slate-600 hover:to-indigo-600 hover:shadow-lg"
+                        ? "bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 hover:shadow-lg"
                         : "bg-gray-300 cursor-not-allowed"
                     } flex items-center justify-center`}
                   >

@@ -1,5 +1,5 @@
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+import Footer from "../../components/Footer";
 import {
   Mail,
   Phone,
@@ -18,7 +18,6 @@ import { notify } from "../../utils/toast";
 import moment from "moment";
 
 function Writers() {
-  const [showSidebar, setShowSidebar] = useState(false);
   const [writers, setWriters] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -29,8 +28,8 @@ function Writers() {
         const response = await axios.get(`${endpoint}/writers/all`);
         setWriters(response.data);
       } catch (error) {
-        notify.info("Failed to fetch orders");
-        console.error("Failed to fetch orders.");
+        notify.info("Failed to fetch writers.");
+        console.error("Failed to fetch writers.");
       } finally {
         setLoading(false);
       }
@@ -38,14 +37,13 @@ function Writers() {
     fetchWriters();
   }, []);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
-      <Sidebar showSidebar={showSidebar} setShowSidebar={setShowSidebar} />
       <div className="flex">
         {/* Main Content Area */}
-        <main className="flex-1 transition-all duration-300 md:ml-64 pt-20 px-4">
+        <main className="flex-1 transition-all duration-300 pt-20 px-4">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold text-slate-800 mb-4">Writers</h1>
+            <h1 className="text-3xl font-bold text-slate-800 mb-4 mt-8">Writers</h1>
 
             {loading ? (
               <div className="flex justify-center items-center h-64">
@@ -143,6 +141,7 @@ function Writers() {
           </div>
         </main>
       </div>
+      <Footer/>
     </div>
   );
 }

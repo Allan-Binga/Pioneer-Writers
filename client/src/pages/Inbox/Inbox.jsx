@@ -12,7 +12,7 @@ import {
   Paperclip,
 } from "lucide-react";
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+import Footer from "../../components/Footer";
 import { endpoint } from "../../server";
 import { notify } from "../../utils/toast";
 
@@ -274,12 +274,11 @@ function ComposeModal({ onClose }) {
 function Inbox() {
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   const [isComposeModalOpen, setIsComposeModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [filter, setFilter] = useState("inbox"); // Track selected filter
 
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
   const openComposeModal = () => setIsComposeModalOpen(true);
   const closeComposeModal = () => setIsComposeModalOpen(false);
 
@@ -313,16 +312,13 @@ function Inbox() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
-      <Navbar toggleMobileSidebar={toggleSidebar} />
-      <Sidebar isOpen={isSidebarOpen} />
-
-      <main
-        className={`transition-all duration-300 pt-16 px-6 ${
-          isSidebarOpen ? "ml-64" : "ml-0 md:ml-72"
-        }`}
-      >
-        <div className="max-w-screen-4xl mx-auto py-10">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-indigo-50">
+      <Navbar />
+      <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl font-bold text-slate-800 mb-8 mt-10">
+            Manage your messages
+          </h1>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
             <div className="flex flex-col lg:flex-row">
               {/* Sidebar */}
@@ -505,6 +501,7 @@ function Inbox() {
 
         {isComposeModalOpen && <ComposeModal onClose={closeComposeModal} />}
       </main>
+      <Footer/>
     </div>
   );
 }

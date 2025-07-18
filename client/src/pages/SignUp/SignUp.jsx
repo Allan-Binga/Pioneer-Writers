@@ -237,15 +237,6 @@ const SignUp = () => {
     <div className="min-h-screen flex bg-gradient-to-br from-white to-zinc-100">
       {/* Left Column */}
       <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
-        {/* Logo */}
-        <div className="mb-6 z-10">
-          <img
-            src={LogoImage}
-            alt="Logo"
-            className="w-[200px] h-auto object-contain"
-          />
-        </div>
-
         {/* Auth Background Image */}
         <div className="w-full h-full relative z-0">
           <img
@@ -257,10 +248,16 @@ const SignUp = () => {
       </div>
 
       {/* Right Column */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-white/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-stone-200">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl p-8 border border-slate-200">
+          {/* Logo Image */}
           <div className="text-center mb-6">
-            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-stone-800 to-zinc-800 bg-clip-text text-transparent">
+            <img
+              src={LogoImage}
+              alt="Logo"
+              className="w-[200px] h-auto object-contain mx-auto mb-4"
+            />
+            <h1 className="text-4xl font-extrabold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
               Join us!
             </h1>
             <p className="text-stone-600 mt-2 text-sm">
@@ -311,7 +308,6 @@ const SignUp = () => {
 
             {/* Phone */}
             <div className="flex space-x-2">
-              {/* Country Code Dropdown */}
               <div className="relative w-24" ref={dropdownRef}>
                 <button
                   type="button"
@@ -336,7 +332,6 @@ const SignUp = () => {
                 )}
               </div>
 
-              {/* Phone Number */}
               <div className="relative flex-1">
                 <Phone className="absolute left-4 top-3.5 h-5 w-5 text-zinc-400" />
                 <input
@@ -383,7 +378,7 @@ const SignUp = () => {
               )}
             </div>
 
-            {/* Terms Checkbox */}
+            {/* Terms */}
             <div className="flex items-start space-x-2">
               <input
                 type="checkbox"
@@ -415,7 +410,7 @@ const SignUp = () => {
               </label>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <button
               type="submit"
               disabled={!formData.agreeTerms || isLoading}
@@ -448,14 +443,14 @@ const SignUp = () => {
             </button>
           </form>
 
-          {/* Social Divider */}
+          {/* Divider */}
           <div className="my-6 relative">
             <div className="flex items-center justify-center">
-              <div className="flex-grow border-t border-stone-300"></div>
-              <span className="mx-4 text-sm text-stone-500 bg-white px-2">
+              <div className="flex-grow border-t border-slate-300"></div>
+              <span className="mx-4 text-sm text-slate-500 bg-white px-2">
                 Or sign up with
               </span>
-              <div className="flex-grow border-t border-stone-300"></div>
+              <div className="flex-grow border-t border-slate-300"></div>
             </div>
           </div>
 
@@ -463,13 +458,13 @@ const SignUp = () => {
           <div className="grid grid-cols-2 gap-4">
             <button
               onClick={googleLogin}
-              className="border border-stone-300 p-3 rounded-full bg-white hover:border-zinc-500 flex items-center justify-center transition-colors duration-200 cursor-pointer"
+              className="border border-slate-300 p-3 rounded-full bg-white hover:border-zinc-500 flex items-center justify-center transition-colors duration-200 cursor-pointer"
             >
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
             <button
               onClick={handleFacebookLogin}
-              className="border border-stone-300 p-3 rounded-full bg-white hover:border-zinc-500 flex items-center justify-center transition-colors duration-200 cursor-pointer"
+              className="border border-slate-300 p-3 rounded-full bg-white hover:border-zinc-500 flex items-center justify-center transition-colors duration-200 cursor-pointer"
             >
               <img src={FacebookIcon} alt="Facebook" className="w-6 h-6" />
             </button>

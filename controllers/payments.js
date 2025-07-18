@@ -4,14 +4,14 @@ const client = require("../config/dbConfig");
 
 dotenv.config();
 
-// 🟢 PayPal SDK Configuration
+//  PayPal SDK Configuration
 const environment = new paypal.core.SandboxEnvironment(
   process.env.PAYPAL_CLIENT_ID,
   process.env.PAYPAL_CLIENT_SECRET
 );
 const paypalClient = new paypal.core.PayPalHttpClient(environment);
 
-// 📥 Get Payments for Logged-in User
+//  Get Payments for Logged-in User
 const getMyPayments = async (req, res) => {
   const userId = req.userId;
 
@@ -23,12 +23,12 @@ const getMyPayments = async (req, res) => {
 
     res.status(200).json(result.rows);
   } catch (error) {
-    console.error("❌ Error fetching payments:", error);
+    console.error("Error fetching payments:", error);
     res.status(500).json({ message: "Failed to fetch payments." });
   }
 };
 
-// 💰 Capture PayPal Payment
+// Capture PayPal Payment
 const capturePayment = async (req, res) => {
   const { token } = req.body;
 
@@ -38,18 +38,18 @@ const capturePayment = async (req, res) => {
 
   try {
     const request = new paypal.orders.OrdersCaptureRequest(token);
-    request.requestBody({}); 
+    request.requestBody({});
 
     const capture = await paypalClient.execute(request);
     const captureData = capture.result;
 
-    console.log("✅ PayPal capture successful:", captureData);
+    console.log("PayPal capture successful:", captureData);
 
     // Optional: Save captureData to DB here if needed
 
     res.status(200).json({ success: true, capture: captureData });
   } catch (error) {
-    console.error("❌ PayPal capture failed:", error.message || error);
+    console.error("PayPal capture failed:", error.message || error);
     res.status(500).json({ error: "Capture failed." });
   }
 };
