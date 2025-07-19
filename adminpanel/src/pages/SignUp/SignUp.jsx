@@ -115,6 +115,7 @@ function AdminSignUp() {
     try {
       const response = await fetch(`${endpoint}/auth/administrator/sign-up`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: formData.email,
@@ -139,12 +140,15 @@ function AdminSignUp() {
     try {
       const token = tokenResponse.access_token;
       if (!token) throw new Error("No token returned from Google");
-      const response = await fetch(`${endpoint}/oauth2/administrator/sign-in/google`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
+      const response = await fetch(
+        `${endpoint}/oauth2/administrator/sign-in/google`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+        }
+      );
       const data = await response.json();
       if (!response.ok)
         throw new Error(data.message || "Google sign-in failed");
@@ -180,12 +184,15 @@ function AdminSignUp() {
 
   const handleFacebookAuthResponse = async (accessToken) => {
     try {
-      const res = await fetch(`${endpoint}/oauth2/administrator/sign-in/facebook`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: accessToken }),
-      });
+      const res = await fetch(
+        `${endpoint}/oauth2/administrator/sign-in/facebook`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: accessToken }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Facebook login failed");
