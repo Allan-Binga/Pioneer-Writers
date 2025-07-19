@@ -58,4 +58,5 @@ jobs:
         run: |
           git config --global user.email "$HEROKU_EMAIL"
           git config --global user.name "GitHub Actions"
-          git push heroku HEAD:master --force
+          git push https://heroku:$HEROKU_API_KEY@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git HEAD:master --force
+
