@@ -23,6 +23,25 @@ const signUpSchema = Joi.object({
     }),
 });
 
+// Joi schema for login
+const signInSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
+
+//Admin Signup Schema
+const adminSignUpSchema = Joi.object({
+  email: Joi.string().email().required(),
+  phoneNumber: Joi.string().min(7).required(),
+  password: Joi.string().min(6).required(),
+});
+
+//Admin Sign In Schema
+const adminSignInSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+});
+
 //Sign Up Users
 const signUp = async (req, res) => {
   const { error, value } = signUpSchema.validate(req.body);
@@ -68,12 +87,6 @@ const signUp = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
-
-// Joi schema for login
-const signInSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().required(),
-});
 
 //Sign In Users
 const signIn = async (req, res) => {
@@ -152,4 +165,126 @@ const signOut = async (req, res) => {
   }
 };
 
-module.exports = { signUp, signIn, signOut };
+//SignUp Administrator
+const signUpAdmin = async (req, res) => {
+  const { error, value } = adminSignUpSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const { email, phoneNumber, password } = value;
+
+  try {
+    const existingAdmin = await client.query(
+      `SELECT * FROM administrators WHERE email = $1`,
+      [email]
+    );
+
+    if (existingAdmin.rows.length > 0) {
+      return res
+        .status(409)
+        .json({ message: "Admin already registered with this email." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const result = await client.query(
+      `
+      INSERT INTO administrators (email, phone_number, password_hash)
+      VALUES ($1, $2, $3)
+      RETURNING admin_id, email, phone_number
+      `,
+      [email, phoneNumber, hashedPassword]
+    );
+
+    res.status(201).json({
+      message: "Admin registered successfully.",
+      admin: result.rows[0],
+    });
+  } catch (err) {
+    console.error("Admin signup error:", err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+//Sign In Admin
+const signInAdmin = async (req, res) => {
+  if (req.cookies?.pioneerAdminSession) {
+    return res.status(400).json({ message: "Already logged in as admin." });
+  }
+
+  const { error, value } = adminSignInSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({ message: error.details[0].message });
+  }
+
+  const { email, password } = value;
+
+  try {
+    const result = await client.query(
+      `SELECT * FROM administrators WHERE email = $1`,
+      [email]
+    );
+
+    const admin = result.rows[0];
+    if (!admin) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
+    const isValid = await bcrypt.compare(password, admin.password_hash);
+    if (!isValid) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
+    const token = jwt.sign(
+      {
+        adminId: admin.admin_id,
+        role: "Admin",
+        email: admin.email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "12h" }
+    );
+
+    res.cookie("pioneerAdminSession", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 12 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Admin login successful",
+      admin: { email: admin.email, role: "Administrator" },
+    });
+  } catch (err) {
+    console.error("Admin login error:", err);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+//Sign Out Adminstrator
+const signOutAdmin = async (req, res) => {
+  try {
+    if (!req.cookies?.pioneerAdminSession) {
+      return res
+        .status(400)
+        .json({ message: "You are not logged in as admin." });
+    }
+
+    res.clearCookie("");
+    res.status(200).json({ message: "Admin logout successful." });
+  } catch (error) {
+    console.error("Admin logout error:", error);
+    res.status(500).json({ message: "Error occurred during logout." });
+  }
+};
+
+module.exports = {
+  signUp,
+  signIn,
+  signOut,
+  signUpAdmin,
+  signInAdmin,
+  signOutAdmin,
+};

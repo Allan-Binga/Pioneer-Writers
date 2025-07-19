@@ -28,3 +28,23 @@ jobs:
             --build-arg VITE_GOOGLE_CLIENT_ID=204800037322-e6g2gk84rl3tc1rj899sijsto7r3l9vl.apps.googleusercontent.com \
             -t allanbinga/pioneer-writers-frontend:v2.0.0 ./client
           docker push allanbinga/pioneer-writers-frontend:v2.0.0
+
+      - name: Install Heroku CLI
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+
+      - name: Log in to Heroku Container Registry
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          echo "$HEROKU_API_KEY" | heroku auth:token
+          echo "$HEROKU_API_KEY" | docker login --username=_ --password-stdin registry.heroku.com
+
+      - name: Push backend image to Heroku
+        run: |
+          docker tag allanbinga/pioneer-writers-backend:v2.0.0 registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+          docker push registry.heroku.com/${{ secrets.HEROKU_APP_NAME }}/web
+      
+      - name: Release image on Heroku
+        run: |
+          heroku container:release web --app ${{ secrets.HEROKU_APP_NAME }}

@@ -8,7 +8,6 @@ import {
   Plus,
   List,
   Edit,
-  Search,
   Star,
   ChevronDown,
   GraduationCap,
@@ -103,8 +102,10 @@ function Navbar() {
     }
   }, [isLoggedIn]);
 
-  const avatarUrl = profile?.avatar_url || "https://via.placeholder.com/40";
+  const avatarUrl = profile?.avatar_url?.trim() || "https://via.placeholder.com/40";
+
   const userName = profile?.username || "User";
+  // console.log(avatarUrl)
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const toggleDropdown = (name) => {

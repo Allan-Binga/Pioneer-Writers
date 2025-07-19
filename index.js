@@ -30,6 +30,8 @@ app.use(express.json());
 //CORS
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
+  "https://pioneer-administrator.vercel.app",
   "https://pioneer-writers-8a531f1c7067.herokuapp.com",
 ];
 
