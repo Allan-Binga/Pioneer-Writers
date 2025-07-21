@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
-import Select, { components } from "react-select";
+import Select from "react-select";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useState, useEffect, useCallback } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { Check, Calendar } from "lucide-react";
 import { notify } from "../../utils/toast";
 
 function NewOrder() {
@@ -20,35 +20,10 @@ function NewOrder() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [steps, setSteps] = useState([
-    {
-      number: 1,
-      title: "Assignment Instructions",
-      current: true,
-      completed: false,
-    },
-    {
-      number: 2,
-      title: "Order Confirmation",
-      current: false,
-      completed: false,
-    },
+    { number: 1, title: "Assignment Instructions", current: true, completed: false },
+    { number: 2, title: "Order Confirmation", current: false, completed: false },
     { number: 3, title: "Order Payment", current: false, completed: false },
   ]);
-
-  // Custom Dropdown Indicator
-  const DropdownIndicator = (props) => (
-    <components.DropdownIndicator {...props}>
-      <svg
-        className="w-4 h-4 text-slate-500"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={2}
-        viewBox="0 0 24 24"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-      </svg>
-    </components.DropdownIndicator>
-  );
 
   // Load saved data from localStorage
   useEffect(() => {
@@ -70,14 +45,10 @@ function NewOrder() {
   // Calculate price
   useEffect(() => {
     const calculatePrice = () => {
-      let basePrice = 20; // Default: Writing, Essay, University, 1 page
+      let basePrice = 20;
       if (formData.type_of_service === "editing") basePrice -= 9;
-      else if (formData.type_of_service === "calculations") basePrice -= 6;
-      if (
-        ["article_review", "thesis", "dissertation"].includes(
-          formData.document_type
-        )
-      )
+      else if (formData.type_of_service === "powerpoint") basePrice -= 6;
+      if (["article_review", "thesis", "dissertation"].includes(formData.document_type))
         basePrice += 5;
       else if (formData.document_type === "math-problems") basePrice += 10;
       if (formData.writer_level === "college") basePrice -= 2;
@@ -86,25 +57,18 @@ function NewOrder() {
       const pages = parseInt(formData.pages) || 1;
       let totalPrice = basePrice * pages;
       if (formData.deadline) {
-        const hoursUntilDeadline =
-          (new Date(formData.deadline) - new Date()) / (1000 * 60 * 60);
+        const hoursUntilDeadline = (new Date(formData.deadline) - new Date()) / (1000 * 60 * 60);
         if (hoursUntilDeadline > 7 * 24) totalPrice = 19.08;
       }
       setFormData((prev) => ({ ...prev, total_price: totalPrice }));
     };
     calculatePrice();
-  }, [
-    formData.type_of_service,
-    formData.writer_level,
-    formData.document_type,
-    formData.pages,
-    formData.deadline,
-  ]);
+  }, [formData.type_of_service, formData.writer_level, formData.document_type, formData.pages, formData.deadline]);
 
   // Handle input changes
   const handleInputChange = useCallback((name, value) => {
     if (name === "pages") {
-      const pages = parseInt(value, 10);
+      const pages = parseInt(value, 10) || 1;
       setFormData((prevData) => ({
         ...prevData,
         pages: value,
@@ -122,19 +86,10 @@ function NewOrder() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const requiredFields = [
-      "type_of_service",
-      "writer_level",
-      "document_type",
-      "pages",
-      "deadline",
-      "english_type",
-    ];
+    const requiredFields = ["type_of_service", "writer_level", "document_type", "pages", "deadline", "english_type"];
     const missingFields = requiredFields.filter((field) => !formData[field]);
     if (missingFields.length > 0) {
-      notify.error(
-        `Please fill all required fields: ${missingFields.join(", ")}`
-      );
+      notify.error(`Please fill all required fields: ${missingFields.join(", ")}`);
       setIsSubmitting(false);
       return;
     }
@@ -159,95 +114,20 @@ function NewOrder() {
           : step
       )
     );
-    navigate("/order-confirmation", {
-      state: { order: orderData, total_price: formData.total_price },
-    });
+    navigate("/order-confirmation", { state: { order: orderData, total_price: formData.total_price } });
     setIsSubmitting(false);
   };
 
-  // Reusable FormField component
-  const FormField = ({
-    label,
-    name,
-    type,
-    value,
-    onChange,
-    options,
-    required = false,
-  }) => {
-    // Refined select styles
-    const selectStyles = {
-      control: (provided, state) => ({
-        ...provided,
-        border: `1.8px solid ${state.isFocused ? "#475569" : "#CBD5E1"}`,
-        borderRadius: "0.75rem",
-        padding: "0.35rem 0.5rem",
-        backgroundColor: "#fff",
-        transition: "border-color 0.2s ease-in-out, box-shadow 0.2s",
-        boxShadow: state.isFocused
-          ? "0 0 0 3px rgba(100, 116, 139, 0.2)"
-          : "none",
-        "&:hover": {
-          borderColor: "#475569",
-        },
-      }),
-      menu: (provided) => ({
-        ...provided,
-        borderRadius: "0.75rem",
-        border: "1px solid #CBD5E1",
-        padding: "0.3rem 0",
-        zIndex: 30,
-      }),
-      option: (provided, state) => ({
-        ...provided,
-        backgroundColor: state.isSelected
-          ? "#334155"
-          : state.isFocused
-          ? "#F8FAFC"
-          : "#fff",
-        color: state.isSelected ? "#fff" : "#0F172A",
-        padding: "0.5rem 1rem",
-        fontSize: "0.925rem",
-        cursor: "pointer",
-      }),
-      singleValue: (provided) => ({
-        ...provided,
-        color: "#0F172A",
-        fontWeight: 500,
-      }),
-      placeholder: (provided) => ({
-        ...provided,
-        color: "#94A3B8",
-      }),
-      indicatorSeparator: () => ({ display: "none" }),
-    };
-
+  const OptionCard = ({ value, label, selected, onClick }) => {
     return (
-      <div>
-        <label className="block text-sm font-semibold text-slate-700 mb-2">
-          {label} {required && <span className="text-red-500">*</span>}
-        </label>
-        {type === "select" ? (
-          <Select
-            value={options.find((option) => option.value === value) || null}
-            onChange={(selected) =>
-              onChange(name, selected ? selected.value : "")
-            }
-            options={options}
-            styles={selectStyles}
-            isSearchable={true}
-            components={{ DropdownIndicator }}
-          />
-        ) : (
-          <input
-            id={name}
-            name={name}
-            type={type}
-            value={value}
-            onChange={(e) => onChange(name, e.target.value)}
-            className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500"
-          />
-        )}
+      <div
+        onClick={onClick}
+        className={`relative cursor-pointer p-4 transition duration-200 bg-gradient-to-br from-slate-50 to-slate-100 hover:from-slate-100 hover:to-slate-200 rounded-lg shadow-sm border ${
+          selected ? "border-teal-500 bg-teal-50" : "border-slate-200"
+        }`}
+      >
+        <div className="text-sm font-medium text-slate-700">{label}</div>
+        {selected && <Check className="absolute top-3 right-3 text-teal-500 w-5 h-5" />}
       </div>
     );
   };
@@ -255,43 +135,76 @@ function NewOrder() {
   // Format deadline for display
   const formatDeadline = (dateString) =>
     dateString
-      ? new Date(dateString).toLocaleString("en-US", {
-          dateStyle: "medium",
-          timeStyle: "short",
-        })
+      ? new Date(dateString).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
       : "Not set";
 
+  // react-select custom styles
+  const selectStyles = {
+    control: (provided) => ({
+      ...provided,
+      border: "1px solid #e2e8f0",
+      borderRadius: "0.5rem",
+      padding: "0.5rem",
+      boxShadow: "none",
+      "&:hover": { borderColor: "#2dd4bf" },
+      "&:focus-within": { borderColor: "#2dd4bf", boxShadow: "0 0 0 2px rgba(45, 212, 191, 0.2)" },
+    }),
+    option: (provided, state) => ({
+      ...provided,
+      backgroundColor: state.isSelected ? "#2dd4bf" : state.isFocused ? "#f1f5f9" : "white",
+      color: state.isSelected ? "white" : "#1e293b",
+      padding: "0.75rem 1rem",
+    }),
+    menu: (provided) => ({
+      ...provided,
+      borderRadius: "0.5rem",
+      border: "1px solid #e2e8f0",
+      boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+    }),
+  };
+
+  // Options for document type and pages
+  const documentTypeOptions = [
+    { value: "essay", label: "Essay (Any Type)" },
+    { value: "coursework", label: "Coursework" },
+    { value: "business-plan", label: "Business Plan" },
+    { value: "article_review", label: "Article Review" },
+    { value: "dissertation", label: "Dissertation" },
+    { value: "thesis", label: "Thesis" },
+    { value: "math-problems", label: "Mathematics Problems" },
+  ];
+
+  const pageOptions = Array.from({ length: 100 }, (_, i) => ({
+    value: String(i + 1),
+    label: `${i + 1} page${i + 1 > 1 ? "s" : ""}`,
+  }));
+
+  const englishTypeOptions = [
+    { value: "usa", label: "USA" },
+    { value: "uk", label: "UK" },
+  ];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
-          {/* <h1 className="text-2xl font-semibold text-slate-800 mb-6 mt-6">
-            Place Order
-          </h1> */}
-          {/*Progress Tracker*/}
           <div className="p-6 mb-8">
             <div className="flex items-center justify-between relative">
-              {/* Steps */}
               {steps.map((step) => (
-                <div
-                  key={step.number}
-                  className="relative z-10 flex items-center"
-                >
+                <div key={step.number} className="relative z-10 flex items-center">
                   <div
                     className={`flex items-center px-8 py-4 rounded-full border text-sm font-medium transition-all duration-300 ${
                       step.completed
-                        ? "bg-gradient-to-r from-slate-600 to-slate-800 border-slate-700 text-white"
+                        ? "bg-gradient-to-r from-teal-500 to-teal-700 border-teal-600 text-white"
                         : step.current
-                        ? "bg-gradient-to-r from-slate-600 to-slate-800 border-slate-700 text-white shadow-md"
-                        : "bg-white border-slate-300 text-slate-400"
+                        ? "bg-gradient-to-r from-teal-500 to-teal-700 border-teal-600 text-white shadow-md"
+                        : "bg-white border-slate-200 text-slate-400"
                     }`}
                   >
                     <span
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2 ${
-                        step.completed || step.current
-                          ? "bg-white text-slate-700"
-                          : "bg-slate-200 text-slate-600"
+                        step.completed || step.current ? "bg-white text-teal-700" : "bg-slate-200 text-slate-600"
                       }`}
                     >
                       {step.completed ? <Check size={12} /> : step.number}
@@ -305,140 +218,163 @@ function NewOrder() {
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                  Step 1: Assignment Instructions
-                </h2>
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">Step 1: Assignment Instructions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    label="Type of Service"
-                    name="type_of_service"
-                    type="select"
-                    value={formData.type_of_service}
-                    onChange={handleInputChange}
-                    options={[
-                      { value: "writing", label: "Writing from scratch" },
-                      { value: "editing", label: "Editing & Proofreading" },
-                      {
-                        value: "calculations",
-                        label: "PowerPoint Presentation",
-                      },
-                    ]}
-                    required
-                  />
-                  <FormField
-                    label="Writer Level"
-                    name="writer_level"
-                    type="select"
-                    value={formData.writer_level}
-                    onChange={handleInputChange}
-                    options={[
-                      { value: "university", label: "University" },
-                      { value: "college", label: "College" },
-                      { value: "masters", label: "Masters" },
-                      { value: "phd", label: "Doctorate" },
-                    ]}
-                    required
-                  />
-                  <FormField
-                    label="Document Type"
-                    name="document_type"
-                    type="select"
-                    value={formData.document_type}
-                    onChange={handleInputChange}
-                    options={[
-                      { value: "essay", label: "Essay (Any Type)" },
-                      { value: "coursework", label: "Coursework" },
-                      { value: "business-plan", label: "Business Plan" },
-                      { value: "article_review", label: "Article Review" },
-                      { value: "dissertation", label: "Dissertation" },
-                      { value: "thesis", label: "Thesis" },
-                      { value: "math-problems", label: "Mathematics Problems" },
-                    ]}
-                    required
-                  />
-                  <FormField
-                    label="Pages"
-                    name="pages"
-                    type="select"
-                    value={formData.pages}
-                    onChange={handleInputChange}
-                    options={Array.from({ length: 100 }, (_, i) => ({
-                      value: `${i + 1}`,
-                      label: `${i + 1}`,
-                    }))}
-                    required
-                  />
-                  <FormField
-                    label="Number of Words"
-                    name="number_of_words"
-                    type="number"
-                    value={formData.number_of_words}
-                    onChange={handleInputChange}
-                    suffix="Words"
-                  />
-                  <FormField
-                    label="Deadline"
-                    name="deadline"
-                    type="datetime-local"
-                    value={formData.deadline}
-                    onChange={handleInputChange}
-                    required
-                  />
-                  <FormField
-                    label="Select English Type"
-                    name="english_type"
-                    type="select"
-                    value={formData.english_type}
-                    onChange={handleInputChange}
-                    options={[
-                      { value: "usa", label: "USA" },
-                      { value: "uk", label: "UK" },
-                    ]}
-                    required
-                  />
+                  {/* Type of Service */}
+                  <div className="col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Type of Service <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {[
+                        { value: "writing", label: "Writing from scratch" },
+                        { value: "editing", label: "Editing & Proofreading" },
+                        { value: "powerpoint", label: "PowerPoint Presentation" },
+                      ].map((option) => (
+                        <OptionCard
+                          key={option.value}
+                          value={option.value}
+                          label={option.label}
+                          selected={formData.type_of_service === option.value}
+                          onClick={() => handleInputChange("type_of_service", option.value)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Writer Level */}
+                  <div className="col-span-2">
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Writer Level <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                      {[
+                        { value: "university", label: "University" },
+                        { value: "college", label: "College" },
+                        { value: "masters", label: "Masters" },
+                        { value: "phd", label: "Doctorate" },
+                      ].map((option) => (
+                        <OptionCard
+                          key={option.value}
+                          value={option.value}
+                          label={option.label}
+                          selected={formData.writer_level === option.value}
+                          onClick={() => handleInputChange("writer_level", option.value)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Document Type */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Document Type <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                      name="document_type"
+                      value={documentTypeOptions.find((opt) => opt.value === formData.document_type)}
+                      onChange={(option) => handleInputChange("document_type", option.value)}
+                      options={documentTypeOptions}
+                      styles={selectStyles}
+                      placeholder="Select document type"
+                    />
+                  </div>
+
+                  {/* Pages */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Pages <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                      name="pages"
+                      value={pageOptions.find((opt) => opt.value === formData.pages)}
+                      onChange={(option) => handleInputChange("pages", option.value)}
+                      options={pageOptions}
+                      styles={selectStyles}
+                      placeholder="Select pages"
+                    />
+                  </div>
+
+                  {/* Number of Words */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Number of Words
+                    </label>
+                    <input
+                      type="number"
+                      name="number_of_words"
+                      value={formData.number_of_words}
+                      onChange={(e) => handleInputChange("number_of_words", e.target.value)}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Deadline */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Deadline <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="datetime-local"
+                        name="deadline"
+                        value={formData.deadline}
+                        onChange={(e) => handleInputChange("deadline", e.target.value)}
+                        className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent pr-10"
+                      />
+                      <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                    </div>
+                  </div>
+
+                  {/* English Type */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                      Select English Type <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                      name="english_type"
+                      value={englishTypeOptions.find((opt) => opt.value === formData.english_type)}
+                      onChange={(option) => handleInputChange("english_type", option.value)}
+                      options={englishTypeOptions}
+                      styles={selectStyles}
+                      placeholder="Select English type"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
             {/* Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-6">
-                <h3 className="text-xl font-bold text-gray-800 mb-6">
-                  Summary
-                </h3>
+                <h3 className="text-xl font-bold text-slate-800 mb-6">Summary</h3>
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Document Type</span>
+                    <span className="text-slate-600">Document Type</span>
                     <span className="font-semibold">
                       {formData.document_type
-                        ? formData.document_type.charAt(0).toUpperCase() +
-                          formData.document_type.slice(1)
+                        ? formData.document_type.charAt(0).toUpperCase() + formData.document_type.slice(1)
                         : "Essay"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Quantity</span>
-                    <span className="font-semibold">
-                      {formData.pages || 1} page(s)
-                    </span>
+                    <span className="text-slate-600">Quantity</span>
+                    <span className="font-semibold">{formData.pages || 1} page(s)</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Academic Level</span>
+                    <span className="text-slate-600">Academic Level</span>
                     <span className="font-semibold">
                       {formData.writer_level
-                        ? formData.writer_level.charAt(0).toUpperCase() +
-                          formData.writer_level.slice(1)
+                        ? formData.writer_level.charAt(0).toUpperCase() + formData.writer_level.slice(1)
                         : "University"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Deadline</span>
-                    <span className="font-semibold text-sm">
-                      {formatDeadline(formData.deadline)}
-                    </span>
+                    <span className="text-slate-600">Deadline</span>
+                    <span className="font-semibold text-sm">{formatDeadline(formData.deadline)}</span>
                   </div>
                 </div>
-                <div className="border-t border-gray-200 pt-4 mb-6">
+                <div className="border-t border-slate-200 pt-4 mb-6">
                   <div className="flex justify-between items-center text-lg font-bold">
                     <span>Total</span>
                     <span>${formData.total_price.toFixed(2)}</span>
@@ -448,10 +384,8 @@ function NewOrder() {
                   onClick={handleSubmit}
                   disabled={isSubmitting}
                   className={`w-full flex items-center justify-center cursor-pointer bg-gradient-to-r ${
-                    isSubmitting
-                      ? "from-slate-500 to-slate-700"
-                      : "from-slate-800 to-slate-900"
-                  } text-white py-4 rounded-xl font-semibold hover:from-slate-900 hover:to-slate-950 ${
+                    isSubmitting ? "from-slate-400 to-slate-600" : "from-teal-500 to-teal-700"
+                  } text-white py-4 rounded-xl font-semibold hover:from-teal-600 hover:to-teal-800 ${
                     isSubmitting ? "opacity-80 cursor-not-allowed" : ""
                   }`}
                 >
@@ -462,14 +396,7 @@ function NewOrder() {
                       fill="none"
                       viewBox="0 0 24 24"
                     >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path
                         className="opacity-75"
                         fill="currentColor"
@@ -485,7 +412,7 @@ function NewOrder() {
           </div>
         </div>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }
