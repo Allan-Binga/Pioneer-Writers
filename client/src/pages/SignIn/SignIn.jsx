@@ -6,7 +6,7 @@ import FacebookIcon from "../../assets/facebook.png";
 import { notify } from "../../utils/toast";
 import { endpoint } from "../../server";
 import { useGoogleLogin } from "@react-oauth/google";
-import AuthImage from "../../assets/signupImage.jpg";
+import AuthImage from "../../assets/signupImage.webp";
 import LogoImage from "../../assets/logo.jpeg";
 
 function SignIn() {
@@ -237,17 +237,17 @@ function SignIn() {
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
           <div className="text-center pb-4">
-            <div className="mb-6">
+            <div className="mb-4">
               <img
                 src={LogoImage}
                 alt="Logo"
-                className="mx-auto w-[220px] h-auto object-contain"
+                className="mx-auto w-[180px] h-auto object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
-              Welcome back
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
+              Welcome back !
             </h1>
           </div>
 
@@ -260,7 +260,7 @@ function SignIn() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
-                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-500"
+                className="w-full pl-10 py-2.5 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-amber-100"
               />
               {fieldErrors.email && (
                 <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
@@ -275,7 +275,7 @@ function SignIn() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
-                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-500"
+                className="w-full pl-10 py-2.5 border border-stone-300 rounded-full focus:outline-none focus:ring-1 focus:ring-amber-100"
               />
               <button
                 type="button"

@@ -35,7 +35,7 @@ function Navbar() {
   );
 
   const navItems = [
-    { name: "Home", color: "hover:text-blue-500" },
+    { name: "Home", path: "/home", color: "hover:text-blue-500" },
     {
       name: "Orders",
       subItems: [
@@ -58,6 +58,11 @@ function Navbar() {
       color: "hover:text-green-500",
     },
     {
+      name: "Transactions",
+      path: "/payment/success",
+      color: "hover:text-amber-500",
+    },
+    {
       name: "Writers",
       subItems: [
         {
@@ -73,8 +78,8 @@ function Navbar() {
       ],
       color: "hover:text-orange-500",
     },
-    { name: "Inbox", color: "hover:text-purple-500" },
-    { name: "News", color: "hover:text-green-500" },
+    { name: "Inbox", path: "/inbox", color: "hover:text-purple-500" },
+    { name: "News", path: "/news", color: "hover:text-green-500" },
   ];
 
   const profileItems = [
@@ -102,18 +107,15 @@ function Navbar() {
     }
   }, [isLoggedIn]);
 
-  const avatarUrl = profile?.avatar_url?.trim() || "https://via.placeholder.com/40";
+  const avatarUrl =
+    profile?.avatar_url?.trim() || "https://via.placeholder.com/40";
 
   const userName = profile?.username || "User";
-  // console.log(avatarUrl)
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const toggleDropdown = (name) => {
     setActiveDropdown(activeDropdown === name ? null : name);
   };
-
-  const isNavigable = (itemName) =>
-    ["Home", "Inbox", "News"].includes(itemName);
 
   const handleLogout = async () => {
     try {
@@ -141,7 +143,7 @@ function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center ml-4">
+          <Link to="/" className="flex items-center ml-4 cursor-pointer">
             <img
               src={Logo}
               alt="Pioneer-Writers"
@@ -154,17 +156,17 @@ function Navbar() {
             <div className="flex space-x-8">
               {navItems.map((item) => (
                 <div key={item.name} className="relative" ref={dropdownRef}>
-                  {isNavigable(item.name) ? (
+                  {item.path ? (
                     <Link
-                      to={`/${item.name.toLowerCase()}`}
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center`}
+                      to={item.path}
+                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center cursor-pointer`}
                     >
                       {item.name}
                     </Link>
                   ) : (
                     <button
                       type="button"
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center`}
+                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center cursor-pointer`}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleDropdown(item.name);
@@ -187,7 +189,7 @@ function Navbar() {
                         <Link
                           key={subItem.name}
                           to={subItem.path}
-                          className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900"
+                          className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 cursor-pointer"
                           onClick={() => setActiveDropdown(null)}
                         >
                           {subItem.icon}
@@ -205,7 +207,7 @@ function Navbar() {
           <div className="flex items-center space-x-4 sm:space-x-6 mr-2">
             <Link
               to="/news"
-              className="relative text-gray-600 hover:text-purple-500 transition-colors duration-200"
+              className="relative text-gray-600 hover:text-purple-500 transition-colors duration-200 cursor-pointer"
               title="News Notifications"
             >
               <Bell className="w-7 h-7" />
@@ -255,7 +257,7 @@ function Navbar() {
                         <Link
                           key={item.name}
                           to={item.path}
-                          className={`flex items-center px-4 py-3 text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
+                          className={`flex items-center px-4 py-3 text-base text-gray-600 ${hoverBg} hover:text-gray-900 cursor-pointer`}
                           onClick={() => setActiveDropdown(null)}
                         >
                           {item.icon}
@@ -270,13 +272,13 @@ function Navbar() {
               <div className="hidden md:flex items-center space-x-3">
                 <Link
                   to="/sign-in"
-                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-base font-medium"
+                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-base font-medium cursor-pointer"
                 >
                   Log In
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-6 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-base"
+                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-6 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-base cursor-pointer"
                 >
                   Sign Up
                 </Link>
@@ -307,10 +309,10 @@ function Navbar() {
           <div className="flex flex-col space-y-4">
             {navItems.map((item) => (
               <div key={item.name}>
-                {isNavigable(item.name) ? (
+                {item.path ? (
                   <Link
-                    to={`/${item.name.toLowerCase()}`}
-                    className={`text-gray-600 ${item.color} text-base font-medium`}
+                    to={item.path}
+                    className={`text-gray-600 ${item.color} text-base font-medium cursor-pointer`}
                     onClick={toggleMenu}
                   >
                     {item.name}
@@ -341,7 +343,7 @@ function Navbar() {
                       <Link
                         key={subItem.name}
                         to={subItem.path}
-                        className="flex items-center text-base text-gray-600 hover:text-gray-900"
+                        className="flex items-center text-base text-gray-600 hover:text-gray-900 cursor-pointer"
                         onClick={toggleMenu}
                       >
                         {subItem.icon}
@@ -377,7 +379,7 @@ function Navbar() {
                       <Link
                         key={item.name}
                         to={item.path}
-                        className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900"
+                        className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 cursor-pointer"
                         onClick={() => {
                           setActiveDropdown(null);
                           toggleMenu();

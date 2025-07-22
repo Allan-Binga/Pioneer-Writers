@@ -21,7 +21,7 @@ import News from "./pages/News/News";
 import OrderCheckout from "./pages/OrderCheckout/OrderCheckout";
 import Success from "./pages/Payment Messages/Success";
 import Failure from "./pages/Payment Messages/Failure";
-import Terms from "./pages/TermsOfUse/Terms";
+import TermsAndConditions from "./pages/TermsOfUse/TermsAndConditions";
 import PrivacyPolicy from "./pages/TermsOfUse/PrivacyPolicy";
 import DataDeletion from "./pages/TermsOfUse/DataDeletion";
 import Drafts from "./pages/Orders/Drafts";
@@ -33,7 +33,7 @@ function App() {
     <Router>
       <Toaster richColors position="top-right" />
       <Routes>
-        <Route path="/" element={<Navigate to="/sign-in" />} />
+        <Route path="/" element={<Navigate to="/sign-up" />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/new-order" element={<NewOrder />} />
         <Route path="/my-orders" element={<MyOrders />} />
@@ -51,9 +51,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/news" element={<News />} />
         <Route path="/order-checkout" element={<OrderCheckout />} />
-        <Route path="/payment/successful" element={<Success />} />
+        <Route path="/payment/success" element={<Success />} />
         <Route path="/payment/failed" element={<Failure />} />
-        <Route path="/terms" element={<Terms />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/data-deletion" element={<DataDeletion />} />
       </Routes>

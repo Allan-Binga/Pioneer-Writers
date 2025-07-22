@@ -1,21 +1,21 @@
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import Spinner from "../../components/Spinner";
 import {
   CheckCircle,
-  LoaderCircle,
+  Loader,
   FileText,
   Ban,
-  AlertTriangle,
+  Scale,
   FileClock,
   FileEdit,
-  DollarSign,
-  Inbox,
+  BanknoteArrowUp,
+  FileCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { notify } from "../../utils/toast";
-import moment from "moment";
 import { endpoint } from "../../server";
 
 function Home() {
@@ -48,7 +48,8 @@ function Home() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 space-y-4">
+        <Spinner size="medium" />
         <div className="text-lg text-slate-500">Loading your dashboard...</div>
       </div>
     );
@@ -64,7 +65,7 @@ function Home() {
     {
       key: "inProgress",
       label: "Orders In Progress",
-      icon: LoaderCircle,
+      icon: Loader,
       color: "bg-blue-100 text-blue-600",
     },
     {
@@ -76,7 +77,7 @@ function Home() {
     {
       key: "disputed",
       label: "Disputed Orders",
-      icon: AlertTriangle,
+      icon: Scale,
       color: "bg-red-100 text-red-600",
     },
     {
@@ -94,7 +95,7 @@ function Home() {
     {
       key: "paid",
       label: "Paid Orders",
-      icon: DollarSign,
+      icon: BanknoteArrowUp,
       color: "bg-green-100 text-green-600",
     },
     {
@@ -106,7 +107,7 @@ function Home() {
     {
       key: "submitted",
       label: "Submitted Orders",
-      icon: Inbox,
+      icon: FileCheck,
       color: "bg-sky-100 text-sky-600",
     },
   ];
@@ -163,10 +164,10 @@ function Home() {
           <h2 className="text-2xl font-semibold text-slate-800 mb-6">
             Recent Orders
           </h2>
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             {dashboard.recentOrders.length > 0 ? (
               <table className="w-full table-auto text-left">
-                <thead className="bg-slate-50 border-b">
+                <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
                     <th className="px-6 py-4 text-sm font-medium text-slate-500">
                       Order ID
@@ -185,7 +186,7 @@ function Home() {
                 <tbody>
                   {dashboard.recentOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-slate-50 transition">
-                      <td className="px-6 py-4 font-mono text-sm text-blue-600 hover:underline">
+                      <td className="px-6 py-4 font-mono text-sm text-slate-600 hover:underline">
                         <Link to={`/order-details/${order.id}`}>
                           {order.id}
                         </Link>

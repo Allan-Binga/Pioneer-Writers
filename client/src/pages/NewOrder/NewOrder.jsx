@@ -20,8 +20,18 @@ function NewOrder() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [steps, setSteps] = useState([
-    { number: 1, title: "Assignment Instructions", current: true, completed: false },
-    { number: 2, title: "Order Confirmation", current: false, completed: false },
+    {
+      number: 1,
+      title: "Assignment Instructions",
+      current: true,
+      completed: false,
+    },
+    {
+      number: 2,
+      title: "Order Confirmation",
+      current: false,
+      completed: false,
+    },
     { number: 3, title: "Order Payment", current: false, completed: false },
   ]);
 
@@ -39,6 +49,7 @@ function NewOrder() {
         ? new Date(storedOrder.deadline).toISOString().slice(0, 16)
         : "",
       total_price: storedOrder.total_price || 20,
+      english_type: storedOrder.english_type || "usa",
     }));
   }, []);
 
@@ -48,7 +59,11 @@ function NewOrder() {
       let basePrice = 20;
       if (formData.type_of_service === "editing") basePrice -= 9;
       else if (formData.type_of_service === "powerpoint") basePrice -= 6;
-      if (["article_review", "thesis", "dissertation"].includes(formData.document_type))
+      if (
+        ["article_review", "thesis", "dissertation"].includes(
+          formData.document_type
+        )
+      )
         basePrice += 5;
       else if (formData.document_type === "math-problems") basePrice += 10;
       if (formData.writer_level === "college") basePrice -= 2;
@@ -57,13 +72,20 @@ function NewOrder() {
       const pages = parseInt(formData.pages) || 1;
       let totalPrice = basePrice * pages;
       if (formData.deadline) {
-        const hoursUntilDeadline = (new Date(formData.deadline) - new Date()) / (1000 * 60 * 60);
+        const hoursUntilDeadline =
+          (new Date(formData.deadline) - new Date()) / (1000 * 60 * 60);
         if (hoursUntilDeadline > 7 * 24) totalPrice = 19.08;
       }
       setFormData((prev) => ({ ...prev, total_price: totalPrice }));
     };
     calculatePrice();
-  }, [formData.type_of_service, formData.writer_level, formData.document_type, formData.pages, formData.deadline]);
+  }, [
+    formData.type_of_service,
+    formData.writer_level,
+    formData.document_type,
+    formData.pages,
+    formData.deadline,
+  ]);
 
   // Handle input changes
   const handleInputChange = useCallback((name, value) => {
@@ -86,10 +108,19 @@ function NewOrder() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    const requiredFields = ["type_of_service", "writer_level", "document_type", "pages", "deadline", "english_type"];
+    const requiredFields = [
+      "type_of_service",
+      "writer_level",
+      "document_type",
+      "pages",
+      "deadline",
+      "english_type",
+    ];
     const missingFields = requiredFields.filter((field) => !formData[field]);
     if (missingFields.length > 0) {
-      notify.error(`Please fill all required fields: ${missingFields.join(", ")}`);
+      notify.error(
+        `Please fill all required fields: ${missingFields.join(", ")}`
+      );
       setIsSubmitting(false);
       return;
     }
@@ -114,7 +145,9 @@ function NewOrder() {
           : step
       )
     );
-    navigate("/order-confirmation", { state: { order: orderData, total_price: formData.total_price } });
+    navigate("/order-confirmation", {
+      state: { order: orderData, total_price: formData.total_price },
+    });
     setIsSubmitting(false);
   };
 
@@ -127,7 +160,9 @@ function NewOrder() {
         }`}
       >
         <div className="text-sm font-medium text-slate-700">{label}</div>
-        {selected && <Check className="absolute top-3 right-3 text-teal-500 w-5 h-5" />}
+        {selected && (
+          <Check className="absolute top-3 right-3 text-teal-500 w-5 h-5" />
+        )}
       </div>
     );
   };
@@ -135,7 +170,10 @@ function NewOrder() {
   // Format deadline for display
   const formatDeadline = (dateString) =>
     dateString
-      ? new Date(dateString).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })
+      ? new Date(dateString).toLocaleString("en-US", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
       : "Not set";
 
   // react-select custom styles
@@ -147,11 +185,18 @@ function NewOrder() {
       padding: "0.5rem",
       boxShadow: "none",
       "&:hover": { borderColor: "#2dd4bf" },
-      "&:focus-within": { borderColor: "#2dd4bf", boxShadow: "0 0 0 2px rgba(45, 212, 191, 0.2)" },
+      "&:focus-within": {
+        borderColor: "#2dd4bf",
+        boxShadow: "0 0 0 2px rgba(45, 212, 191, 0.2)",
+      },
     }),
     option: (provided, state) => ({
       ...provided,
-      backgroundColor: state.isSelected ? "#2dd4bf" : state.isFocused ? "#f1f5f9" : "white",
+      backgroundColor: state.isSelected
+        ? "#2dd4bf"
+        : state.isFocused
+        ? "#f1f5f9"
+        : "white",
       color: state.isSelected ? "white" : "#1e293b",
       padding: "0.75rem 1rem",
     }),
@@ -189,10 +234,13 @@ function NewOrder() {
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="p-6 mb-8">
+          <div className="p-6 mb-4 mt-4">
             <div className="flex items-center justify-between relative">
               {steps.map((step) => (
-                <div key={step.number} className="relative z-10 flex items-center">
+                <div
+                  key={step.number}
+                  className="relative z-10 flex items-center"
+                >
                   <div
                     className={`flex items-center px-8 py-4 rounded-full border text-sm font-medium transition-all duration-300 ${
                       step.completed
@@ -204,7 +252,9 @@ function NewOrder() {
                   >
                     <span
                       className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-2 ${
-                        step.completed || step.current ? "bg-white text-teal-700" : "bg-slate-200 text-slate-600"
+                        step.completed || step.current
+                          ? "bg-white text-teal-700"
+                          : "bg-slate-200 text-slate-600"
                       }`}
                     >
                       {step.completed ? <Check size={12} /> : step.number}
@@ -219,7 +269,9 @@ function NewOrder() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-                <h2 className="text-2xl font-bold text-slate-800 mb-6">Step 1: Assignment Instructions</h2>
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                  Basic Paper Instructions
+                </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Type of Service */}
                   <div className="col-span-2">
@@ -230,14 +282,19 @@ function NewOrder() {
                       {[
                         { value: "writing", label: "Writing from scratch" },
                         { value: "editing", label: "Editing & Proofreading" },
-                        { value: "powerpoint", label: "PowerPoint Presentation" },
+                        {
+                          value: "powerpoint",
+                          label: "PowerPoint Presentation",
+                        },
                       ].map((option) => (
                         <OptionCard
                           key={option.value}
                           value={option.value}
                           label={option.label}
                           selected={formData.type_of_service === option.value}
-                          onClick={() => handleInputChange("type_of_service", option.value)}
+                          onClick={() =>
+                            handleInputChange("type_of_service", option.value)
+                          }
                         />
                       ))}
                     </div>
@@ -260,7 +317,9 @@ function NewOrder() {
                           value={option.value}
                           label={option.label}
                           selected={formData.writer_level === option.value}
-                          onClick={() => handleInputChange("writer_level", option.value)}
+                          onClick={() =>
+                            handleInputChange("writer_level", option.value)
+                          }
                         />
                       ))}
                     </div>
@@ -273,8 +332,12 @@ function NewOrder() {
                     </label>
                     <Select
                       name="document_type"
-                      value={documentTypeOptions.find((opt) => opt.value === formData.document_type)}
-                      onChange={(option) => handleInputChange("document_type", option.value)}
+                      value={documentTypeOptions.find(
+                        (opt) => opt.value === formData.document_type
+                      )}
+                      onChange={(option) =>
+                        handleInputChange("document_type", option.value)
+                      }
                       options={documentTypeOptions}
                       styles={selectStyles}
                       placeholder="Select document type"
@@ -288,8 +351,12 @@ function NewOrder() {
                     </label>
                     <Select
                       name="pages"
-                      value={pageOptions.find((opt) => opt.value === formData.pages)}
-                      onChange={(option) => handleInputChange("pages", option.value)}
+                      value={pageOptions.find(
+                        (opt) => opt.value === formData.pages
+                      )}
+                      onChange={(option) =>
+                        handleInputChange("pages", option.value)
+                      }
                       options={pageOptions}
                       styles={selectStyles}
                       placeholder="Select pages"
@@ -305,7 +372,9 @@ function NewOrder() {
                       type="number"
                       name="number_of_words"
                       value={formData.number_of_words}
-                      onChange={(e) => handleInputChange("number_of_words", e.target.value)}
+                      onChange={(e) =>
+                        handleInputChange("number_of_words", e.target.value)
+                      }
                       className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                     />
                   </div>
@@ -320,7 +389,9 @@ function NewOrder() {
                         type="datetime-local"
                         name="deadline"
                         value={formData.deadline}
-                        onChange={(e) => handleInputChange("deadline", e.target.value)}
+                        onChange={(e) =>
+                          handleInputChange("deadline", e.target.value)
+                        }
                         className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent pr-10"
                       />
                       <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
@@ -330,12 +401,17 @@ function NewOrder() {
                   {/* English Type */}
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
-                      Select English Type <span className="text-red-500">*</span>
+                      Select English Type{" "}
+                      <span className="text-red-500">*</span>
                     </label>
                     <Select
                       name="english_type"
-                      value={englishTypeOptions.find((opt) => opt.value === formData.english_type)}
-                      onChange={(option) => handleInputChange("english_type", option.value)}
+                      value={englishTypeOptions.find(
+                        (opt) => opt.value === formData.english_type
+                      )}
+                      onChange={(option) =>
+                        handleInputChange("english_type", option.value)
+                      }
                       options={englishTypeOptions}
                       styles={selectStyles}
                       placeholder="Select English type"
@@ -347,31 +423,39 @@ function NewOrder() {
             {/* Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-6">
-                <h3 className="text-xl font-bold text-slate-800 mb-6">Summary</h3>
+                <h3 className="text-xl font-bold text-slate-800 mb-6">
+                  Summary
+                </h3>
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Document Type</span>
                     <span className="font-semibold">
                       {formData.document_type
-                        ? formData.document_type.charAt(0).toUpperCase() + formData.document_type.slice(1)
+                        ? formData.document_type.charAt(0).toUpperCase() +
+                          formData.document_type.slice(1)
                         : "Essay"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Quantity</span>
-                    <span className="font-semibold">{formData.pages || 1} page(s)</span>
+                    <span className="font-semibold">
+                      {formData.pages || 1} page(s)
+                    </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Academic Level</span>
                     <span className="font-semibold">
                       {formData.writer_level
-                        ? formData.writer_level.charAt(0).toUpperCase() + formData.writer_level.slice(1)
+                        ? formData.writer_level.charAt(0).toUpperCase() +
+                          formData.writer_level.slice(1)
                         : "University"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Deadline</span>
-                    <span className="font-semibold text-sm">{formatDeadline(formData.deadline)}</span>
+                    <span className="font-semibold text-sm">
+                      {formatDeadline(formData.deadline)}
+                    </span>
                   </div>
                 </div>
                 <div className="border-t border-slate-200 pt-4 mb-6">
@@ -384,7 +468,9 @@ function NewOrder() {
                   onClick={handleSubmit}
                   disabled={isSubmitting}
                   className={`w-full flex items-center justify-center cursor-pointer bg-gradient-to-r ${
-                    isSubmitting ? "from-slate-400 to-slate-600" : "from-teal-500 to-teal-700"
+                    isSubmitting
+                      ? "from-slate-400 to-slate-600"
+                      : "from-teal-500 to-teal-700"
                   } text-white py-4 rounded-xl font-semibold hover:from-teal-600 hover:to-teal-800 ${
                     isSubmitting ? "opacity-80 cursor-not-allowed" : ""
                   }`}
@@ -396,7 +482,14 @@ function NewOrder() {
                       fill="none"
                       viewBox="0 0 24 24"
                     >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
                       <path
                         className="opacity-75"
                         fill="currentColor"

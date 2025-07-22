@@ -10,10 +10,13 @@ const checkoutRoute = require("./routes/orderCheckout");
 const oauth2Route = require("./routes/oauth2");
 const usersRoute = require("./routes/users");
 const draftRoute = require("./routes/drafts");
-const webhookRoute = require("./routes/webhook");
 const inboxRoute = require("./routes/inbox");
 const writersRoute = require("./routes/writers");
 const profileRoute = require("./routes/profile");
+const {
+  handlePaypalWebhook,
+  handleStripeWebhook,
+} = require("./controllers/webhook");
 
 //Import DB connection
 require("./config/dbConfig");
@@ -22,7 +25,18 @@ dotenv.config();
 const app = express();
 
 // Stripe webhook raw-body middleware
-app.use("/pioneer-writers/v1/webhook", express.json(), webhookRoute);
+app.post(
+  "/pioneer-writers/v1/webhook/stripe",
+  express.raw({ type: "application/json" }),
+  handleStripeWebhook
+);
+
+//Paypal Webhook json middleware
+app.post(
+  "/pioneer-writers/v1/webhook/paypal",
+  express.json(),
+  handlePaypalWebhook
+);
 
 // All other routes use JSON
 app.use(express.json());
