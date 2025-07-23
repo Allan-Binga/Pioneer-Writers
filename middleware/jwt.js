@@ -41,4 +41,33 @@ const authAdmin = (req, res, next) => {
   }
 };
 
-module.exports = { authUser , authAdmin};
+// Allow either user or admin
+const authUserOrAdmin = (req, res, next) => {
+  const userToken = req.cookies.userPioneerSession;
+  const adminToken = req.cookies.pioneerAdminSession;
+
+  if (userToken) {
+    try {
+      const decoded = jwt.verify(userToken, process.env.JWT_SECRET);
+      req.userId = decoded.userId;
+      return next();
+    } catch (err) {
+      console.error("JWT error (user):", err);
+    }
+  }
+
+  if (adminToken) {
+    try {
+      const decoded = jwt.verify(adminToken, process.env.JWT_SECRET);
+      req.adminId = decoded.adminId;
+      console.log("Authenticated as admin");
+      return next();
+    } catch (err) {
+      console.error("JWT error (admin):", err);
+    }
+  }
+
+  return res.status(401).json({ message: "Unauthorized access" });
+};
+
+module.exports = { authUser, authAdmin , authUserOrAdmin};

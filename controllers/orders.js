@@ -201,6 +201,28 @@ const getSingleOrder = async (req, res) => {
   }
 };
 
+// Fetch Single Admin Order
+const getAdminSingleOrder = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    const { rows } = await client.query(
+      "SELECT * FROM orders WHERE order_id = $1",
+      [orderId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    const order = rows[0];
+    res.status(200).json(order);
+  } catch (error) {
+    console.error("Error fetching admin single order:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 // Fetch my orders
 const getUsersOrders = async (req, res) => {
   const userId = req.userId;
@@ -336,4 +358,5 @@ module.exports = {
   updateOrder,
   deleteOrder,
   getSingleOrder,
+  getAdminSingleOrder,
 };

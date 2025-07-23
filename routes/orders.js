@@ -1,15 +1,16 @@
 const express = require("express")
-const { postOrder, getOrders, getUsersOrders, updateOrder, deleteOrder, getSingleOrder} = require("../controllers/orders")
+const { postOrder, getOrders, getUsersOrders, updateOrder, deleteOrder, getSingleOrder, getAdminSingleOrder} = require("../controllers/orders")
 const { getDashboard } = require("../controllers/dashboard")
-const {authUser} = require("../middleware/jwt")
+const {authUser, authAdmin} = require("../middleware/jwt")
 const {uploadedFile} = require("../middleware/upload")
 
 const router = express.Router()
 
 router.post("/post-order",authUser,uploadedFile.array('uploadedFiles', 20),postOrder);
-router.get("/all/orders", getOrders)
+router.get("/all/orders", authAdmin, getOrders)
 router.get("/dashboard-details",authUser, getDashboard )
 router.get("/order/:orderId", authUser, getSingleOrder)
+router.get("/administrator/order/:orderId", authAdmin, getAdminSingleOrder)
 router.get("/my-orders", authUser,getUsersOrders)
 router.patch("/update-order/:orderId", authUser, uploadedFile.array(), updateOrder)
 router.delete("/delete-order/:orderId", authUser, deleteOrder)

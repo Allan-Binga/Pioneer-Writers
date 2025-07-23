@@ -6,7 +6,7 @@ import FacebookIcon from "../../assets/facebook.png";
 import { notify } from "../../utils/toast";
 import { endpoint } from "../../server";
 import { useGoogleLogin } from "@react-oauth/google";
-import SignupImage from "../../assets/background.jpg";
+import SignupImage from "../../assets/signupImage.webp";
 import LogoImage from "../../assets/logo.jpeg";
 
 function SignIn() {
@@ -114,7 +114,9 @@ function SignIn() {
 
       notify.success("Login successful.");
       setTimeout(() => {
-        navigate(data.admin.role === "Administrator" ? "/dashboard" : "/dashboard");
+        navigate(
+          data.admin.role === "Administrator" ? "/dashboard" : "/dashboard"
+        );
       }, 1500);
     } catch (error) {
       const msg = error.message?.toLowerCase?.();
@@ -134,12 +136,15 @@ function SignIn() {
       const token = tokenResponse.access_token;
       if (!token) throw new Error("No token returned from Google");
 
-      const response = await fetch(`${endpoint}/oauth2/administrator/sign-in/google`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      });
+      const response = await fetch(
+        `${endpoint}/oauth2/administrator/sign-in/google`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token }),
+        }
+      );
 
       const data = await response.json();
 
@@ -152,7 +157,9 @@ function SignIn() {
 
       notify.success("Logged in with Google");
       setTimeout(() => {
-        navigate(data.admin.role === "Administrator" ? "/dashboard" : "/dashboard");
+        navigate(
+          data.admin.role === "Administrator" ? "/dashboard" : "/dashboard"
+        );
       }, 1000);
     } catch (err) {
       const msg = err.message?.toLowerCase?.();
@@ -188,14 +195,17 @@ function SignIn() {
 
   const handleFacebookAuthResponse = async (accessToken) => {
     try {
-      const res = await fetch(`${endpoint}/oauth2/administrator/sign-in/facebook`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ token: accessToken }),
-      });
+      const res = await fetch(
+        `${endpoint}/oauth2/administrator/sign-in/facebook`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ token: accessToken }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Facebook login failed");
@@ -225,28 +235,18 @@ function SignIn() {
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-white to-white">
-      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
-        <div className="w-full h-full relative z-0">
-          <img
-            src={SignupImage}
-            alt="Auth Background"
-            className="w-full h-full object-cover object-center shadow-lg"
-          />
-        </div>
-      </div>
-
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-xl bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
+        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
           <div className="text-center pb-4">
-            <div className="mb-6">
+            <div className="mb-4">
               <img
                 src={LogoImage}
                 alt="Logo"
-                className="mx-auto w-[220px] h-auto object-contain"
+                className="mx-auto w-[180px] h-auto object-contain"
               />
             </div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
-              Welcome back
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
+              Administrator Access
             </h1>
           </div>
 
@@ -259,7 +259,7 @@ function SignIn() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
-                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-500"
+                className="w-full pl-10 py-2.5 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-amber-100"
               />
               {fieldErrors.email && (
                 <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
@@ -274,7 +274,7 @@ function SignIn() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
-                className="w-full pl-10 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-slate-500"
+                className="w-full pl-10 py-2.5 border border-stone-300 rounded-full focus:outline-none focus:ring-1 focus:ring-amber-100"
               />
               <button
                 type="button"
@@ -359,17 +359,16 @@ function SignIn() {
               <img src={FacebookIcon} alt="Facebook" className="w-6 h-6" />
             </button>
           </div>
+        </div>
+      </div>
 
-          {/* Footer */}
-          <p className="text-slate-600 mt-6 text-center text-sm">
-            New to Pioneer Writers?{" "}
-            <Link
-              to="/sign-up"
-              className="text-slate-700 hover:underline hover:font-semibold"
-            >
-              Sign Up
-            </Link>
-          </p>
+      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
+        <div className="w-full h-full relative z-0">
+          <img
+            src={SignupImage}
+            alt="Auth Background"
+            className="w-full h-full object-cover object-center shadow-lg"
+          />
         </div>
       </div>
 

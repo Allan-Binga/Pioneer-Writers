@@ -5,10 +5,8 @@ import {
   Bell,
   User,
   LogOut,
-  Plus,
-  List,
-  Edit,
-  Star,
+  ShieldUser,
+  Inbox,
   ChevronDown,
   GraduationCap,
 } from "lucide-react";
@@ -30,66 +28,42 @@ function Navbar() {
   const notificationCount = 3;
   const dropdownRef = useRef(null);
 
-  //   const showAuthButtons = ["/new-order", "/order-payment"].includes(
-  //     location.pathname
-  //   );
-
   const navItems = [
     { name: "Dashboard", color: "hover:text-amber-600" },
-    {
-      name: "Orders",
-      subItems: [
-        {
-          name: "All Orders",
-          path: "/admin/orders",
-          icon: <List className="w-4 h-4 mr-2" />,
-        },
-        {
-          name: "Completed Orders",
-          path: "/admin/orders/completed",
-          icon: <Star className="w-4 h-4 mr-2" />,
-        },
-        {
-          name: "Pending Orders",
-          path: "/admin/orders/pending",
-          icon: <Edit className="w-4 h-4 mr-2" />,
-        },
-      ],
-      color: "hover:text-amber-600",
-    },
+    { name: "Orders", color: "hover:text-amber-600" },
     {
       name: "Users",
       subItems: [
         {
-          name: "Users",
-          path: "/admin/users",
+          name: "Clients",
+          path: "/clients",
           icon: <User className="w-4 h-4 mr-2" />,
         },
         {
           name: "Writers",
-          path: "/admin/writers",
+          path: "/writers",
           icon: <GraduationCap className="w-4 h-4 mr-2" />,
         },
         {
           name: "Administrators",
-          path: "/admin/administrators",
-          icon: <User className="w-4 h-4 mr-2" />,
+          path: "/administrators",
+          icon: <ShieldUser className="w-4 h-4 mr-2" />,
         },
       ],
       color: "hover:text-amber-600",
     },
     {
-      name: "Content",
+      name: "Platform Services",
       subItems: [
         {
-          name: "Announcements",
-          path: "/admin/news",
+          name: "News Center",
+          path: "/news",
           icon: <Bell className="w-4 h-4 mr-2" />,
         },
         {
-          name: "Reviews",
-          path: "/admin/reviews",
-          icon: <Star className="w-4 h-4 mr-2" />,
+          name: "Message Center",
+          path: "/message-center",
+          icon: <Inbox className="w-4 h-4 mr-2" />,
         },
       ],
       color: "hover:text-amber-600",
@@ -99,7 +73,7 @@ function Navbar() {
       subItems: [
         {
           name: "Platform Settings",
-          path: "/admin/settings",
+          path: "/settings",
           icon: <ChevronDown className="w-4 h-4 mr-2" />,
         },
       ],
@@ -133,7 +107,7 @@ function Navbar() {
   }, [isLoggedIn]);
 
   const avatarUrl = profile?.avatar_url || "https://via.placeholder.com/40";
-  const userName = profile?.username || "User";
+  const userName = profile?.full_name || "User";
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const toggleDropdown = (name) => {
@@ -141,7 +115,7 @@ function Navbar() {
   };
 
   const isNavigable = (itemName) =>
-    ["Home", "Inbox", "News"].includes(itemName);
+    ["Dashboard", "Orders", "Inbox", "News"].includes(itemName);
 
   const handleLogout = async () => {
     try {

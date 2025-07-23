@@ -173,7 +173,7 @@ const SignUp = () => {
       localStorage.setItem("isLoggedIn", "true");
       notify.success("Sign-up successful");
       setTimeout(
-        () => navigate(data.user.role === "User" ? "/dashboard" : "/dashboard"),
+        () => navigate(data.user.role === "User" ? "/home" : "/home"),
         1000
       );
     } catch (err) {

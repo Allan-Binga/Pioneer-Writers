@@ -22,6 +22,29 @@ const getProfile = async (req, res) => {
   }
 };
 
+//Get Admin Profile
+const getAdminProfile = async (req, res) => {
+  const adminId = req.adminId;
+
+  try {
+    const result = await client.query(
+      `SELECT admin_id, full_name, email, phone_number, avatar_url FROM administrators WHERE admin_id = $1`,
+      [adminId]
+    );
+
+    const admin = result.rows[0];
+
+    if (!admin) {
+      return res.status(404).json({ error: "Administrator not found." });
+    }
+
+    return res.status(200).json(admin);
+  } catch (err) {
+    console.error("Error fetching profile:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 //Update Profile
 const updateProfile = async (req, res) => {
   const userId = req.userId;
@@ -79,4 +102,4 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile };
+module.exports = { getProfile, updateProfile, getAdminProfile };

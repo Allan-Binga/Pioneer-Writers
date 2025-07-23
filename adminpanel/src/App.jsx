@@ -9,10 +9,15 @@ import SignUp from "./pages/SignUp/SignUp";
 import SignIn from "./pages/SignIn/SignIn";
 import Orders from "./pages/Orders/Orders";
 import MessageCenter from "./pages/MessageCenter/MessageCenter";
-import Writers from "./pages/Writers/Writers";
 import News from "./pages/News/News";
 import Profile from "./pages/Profile/Profile";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import Clients from "./pages/Users/Clients";
+import Writers from "./pages/Users/Writers";
+import Administrators from "./pages/Users/Admins";
+import Settings from "./pages/Settings/Settings";
+import OrderDetails from "./pages/Orders/OrderDetails";
+import Disputes from "./pages/Disputes/Disputes";
 
 function App() {
   return (
@@ -22,12 +27,17 @@ function App() {
         <Route path="/" element={<Navigate to="/sign-in" />} />I
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/sign-up" element={<SignUp />} />
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/order-details/:orderId" element={<OrderDetails />} />
         <Route path="/message-center" element={<MessageCenter />} />
-        <Route path="/writers" element={<Writers />} />
         <Route path="/news" element={<News />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/writers" element={<Writers />} />
+        <Route path="/clients" element={<Clients />} />
+        <Route path="/administrators" element={<Administrators />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/disputes" element={<Orders />} />
       </Routes>
     </Router>
   );
