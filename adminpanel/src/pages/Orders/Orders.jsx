@@ -1,6 +1,6 @@
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
-import { CalendarClock, Hourglass, LoaderCircle, FileText } from "lucide-react";
+import { LoaderCircle, FileText } from "lucide-react";
 import { endpoint } from "../../server";
 import axios from "axios";
 import { useState, useEffect } from "react";
@@ -11,12 +11,13 @@ import { Link } from "react-router-dom";
 function Orders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("all");
 
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${endpoint}/all/orders`, {
+        const response = await axios.get(`${endpoint}/orders/all/orders`, {
           withCredentials: true,
         });
         setOrders(response.data);
@@ -36,7 +37,7 @@ function Orders() {
     const hoursLeft = due.diff(now, "hours");
 
     if (hoursLeft < 6) return "text-red-500";
-    if (hoursLeft < 24) return "text-amber-500";
+    if (hoursLeft < 24) return "text-yellow-500";
     return "text-green-600";
   };
 
@@ -48,65 +49,125 @@ function Orders() {
     return `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m`;
   };
 
+  const formatStatus = (status) => {
+    const baseClass =
+      "inline-block px-2 py-1 rounded-full text-xs font-medium capitalize";
+    switch (status) {
+      case "Pending":
+        return `${baseClass} bg-blue-100 text-blue-800`;
+      case "Paid":
+        return `${baseClass} bg-green-100 text-green-800`;
+      case "draft":
+        return `${baseClass} bg-amber-100 text-amber-800`;
+      case "in_progress":
+        return `${baseClass} bg-blue-100 text-blue-800`;
+      case "completed":
+        return `${baseClass} bg-green-100 text-green-800`;
+      default:
+        return `${baseClass} bg-slate-100 text-slate-600`;
+    }
+  };
+
+  const filteredOrders =
+    activeTab === "all"
+      ? orders
+      : orders.filter(
+          (order) => order.order_status.toLowerCase() === activeTab
+        );
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       <Navbar />
-      <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-slate-900 mb-6">Orders</h1>
+          <h1 className="text-3xl font-semibold text-slate-900 mb-6 mt-8">
+            Orders
+          </h1>
+
+          {/* Filter Tabs */}
+          <div className="mb-6 flex flex-wrap gap-3">
+            {["all", "pending", "paid", "draft", "completed", "cancelled"].map(
+              (status) => (
+                <button
+                  key={status}
+                  onClick={() => setActiveTab(status)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium capitalize ${
+                    activeTab === status
+                      ? "bg-slate-800 text-white"
+                      : "bg-white text-slate-700 border border-slate-300"
+                  }`}
+                >
+                  {status.replace("_", " ")}
+                </button>
+              )
+            )}
+          </div>
 
           {loading ? (
-            <div className="flex justify-center mt-10">
-              <LoaderCircle className="animate-spin w-6 h-6 text-slate-500" />
+            <div className="flex justify-center items-center h-60">
+              <LoaderCircle className="animate-spin w-8 h-8 text-blue-500" />
             </div>
           ) : orders.length === 0 ? (
-            <p className="text-slate-600">No orders found.</p>
+            <div className="text-center py-20 bg-white rounded-xl border border-slate-200 shadow-sm">
+              <FileText className="mx-auto h-12 w-12 text-slate-400" />
+              <p className="mt-4 text-slate-600 text-sm">
+                No orders to display at the moment.
+              </p>
+            </div>
           ) : (
-            <div className="overflow-x-auto rounded-lg shadow-sm bg-white border border-slate-200">
+            <div className="overflow-x-auto rounded-xl shadow-sm bg-white border border-slate-200">
               <table className="min-w-full divide-y divide-slate-200 text-sm">
                 <thead className="bg-slate-100">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700">
+                    <th className="px-6 py-3 text-left font-semibold text-slate-600">
                       Order ID
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700">
+                    <th className="px-6 py-3 text-left font-semibold text-slate-600">
                       Title
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700">
+                    <th className="px-6 py-3 text-left font-semibold text-slate-600">
                       Deadline
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700">
+                    <th className="px-6 py-3 text-left font-semibold text-slate-600">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left font-medium text-slate-700">
+                    <th className="px-6 py-3 text-left font-semibold text-slate-600">
                       Actions
+                    </th>
+                    <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                      User
+                    </th>
+                    <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                      Writer
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-slate-100">
-                  {orders.map((order) => (
-                    <tr key={order.order_id}>
-                      <td className="px-4 py-3 text-slate-700">
+                  {filteredOrders.map((order) => (
+                    <tr key={order.order_id} className="hover:bg-slate-50">
+                      <td className="px-6 py-4 text-slate-700">
                         <code className="text-xs">
                           {order.order_id.slice(0, 8)}...
                         </code>
                       </td>
-                      <td className="px-4 py-3 text-slate-800">
-                        {order.title}
+                      <td className="px-6 py-4 text-slate-800 font-medium">
+                        {order.topic}
                       </td>
                       <td
-                        className={`px-4 py-3 font-medium ${getCountdownColor(
+                        className={`px-6 py-4 font-medium ${getCountdownColor(
                           order.deadline
                         )}`}
                       >
                         {formatCountdown(order.deadline)}
                       </td>
-                      <td className="px-4 py-3 capitalize text-slate-700">
-                        {order.status}
+                      <td className="px-6 py-4">
+                        <span className={formatStatus(order.order_status)}>
+                          {order.order_status.replace("_", " ")}
+                        </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-6 py-4">
                         <Link
-                          to={`/admin/orders/${order.order_id}`}
+                          to={`/order-details/${order.order_id}`}
                           className="text-blue-600 hover:underline text-sm"
                         >
                           View

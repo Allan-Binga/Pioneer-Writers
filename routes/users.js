@@ -1,7 +1,12 @@
-const express = require("express")
-const {getUsers} = require("../controllers/users")
+const express = require("express");
+const { getUsers, getWriters, getAdmins, getSingleUser } = require("../controllers/users");
+const { authAdmin } = require("../middleware/jwt");
 
-const router = express.Router()
-router.get("/clients", getUsers)
+const router = express.Router();
 
-module.exports = router
+router.get("/clients", authAdmin, getUsers);
+router.get("/clients/:userId", authAdmin, getSingleUser)
+router.get("/writers", authAdmin, getWriters);
+router.get("/administrators", authAdmin, getAdmins);
+
+module.exports = router;

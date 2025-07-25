@@ -30,7 +30,7 @@ function OrderDetails() {
   const [showActions, setShowActions] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState([]);
 
-  console.log(endpoint);
+  // console.log(endpoint);
 
   useEffect(() => {
     const fetchOrder = async () => {

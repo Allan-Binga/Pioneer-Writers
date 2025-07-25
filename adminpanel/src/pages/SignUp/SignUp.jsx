@@ -7,7 +7,7 @@ import FacebookIcon from "../../assets/facebook.png";
 import { endpoint } from "../../server";
 import { notify } from "../../utils/toast";
 import { useGoogleLogin } from "@react-oauth/google";
-import SignupImage from "../../assets/background.jpg";
+import SignupImage from "../../assets/background.webp";
 import LogoImage from "../../assets/logo.jpeg";
 
 function AdminSignUp() {
@@ -217,17 +217,6 @@ function AdminSignUp() {
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-white to-zinc-100">
       {/* Left Column */}
-      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
-        <div className="w-full h-full relative z-0">
-          <img
-            src={SignupImage}
-            alt="Signup Image"
-            className="w-full h-full object-cover object-center shadow-lg"
-          />
-        </div>
-      </div>
-
-      {/* Right Column */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl p-8 border border-slate-200">
           {/* Logo Image */}
@@ -257,7 +246,7 @@ function AdminSignUp() {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-200"
               />
               {validationErrors.email && (
                 <p className="text-amber-600 text-xs mt-1 ml-2">
@@ -271,7 +260,7 @@ function AdminSignUp() {
               <div className="relative w-24" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="w-full py-3 px-4 border border-stone-300 rounded-full bg-white text-zinc-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                  className="w-full py-3 px-4 border border-stone-300 rounded-full bg-white text-zinc-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-100"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <span>{formData.countryCode}</span>
@@ -301,7 +290,7 @@ function AdminSignUp() {
                   placeholder="(000) 000 - 0000"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
                 />
               </div>
             </div>
@@ -316,7 +305,7 @@ function AdminSignUp() {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-400"
+                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
               />
               <button
                 type="button"
@@ -406,6 +395,17 @@ function AdminSignUp() {
               Sign In
             </Link>
           </p>
+        </div>
+      </div>
+
+      {/* Right Column */}
+      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
+        <div className="w-full h-full relative z-0">
+          <img
+            src={SignupImage}
+            alt="Signup Image"
+            className="w-full h-full object-cover object-center shadow-lg"
+          />
         </div>
       </div>
     </div>

@@ -6,7 +6,7 @@ import FacebookIcon from "../../assets/facebook.png";
 import { notify } from "../../utils/toast";
 import { endpoint } from "../../server";
 import { useGoogleLogin } from "@react-oauth/google";
-import SignupImage from "../../assets/signupImage.webp";
+import SignupImage from "../../assets/background.webp";
 import LogoImage from "../../assets/logo.jpeg";
 
 function SignIn() {
@@ -47,7 +47,7 @@ function SignIn() {
         xfbml: false,
         version: "v16.0",
       });
-      console.log("Facebook SDK initialized");
+      // console.log("Facebook SDK initialized");
     };
 
     // Inject Facebook SDK
@@ -358,6 +358,30 @@ function SignIn() {
             >
               <img src={FacebookIcon} alt="Facebook" className="w-6 h-6" />
             </button>
+          </div>
+
+          <div className="text-center mt-6">
+            <p className="text-sm text-stone-700">Don’t have an account?</p>
+            <Link
+              to="/sign-up"
+              className="inline-flex items-center justify-center mt-2 px-4 py-2 text-sm font-semibold text-amber-600 hover:text-white border border-amber-600 hover:bg-amber-600 rounded-full transition-all duration-200"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-4 h-4 mr-2"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Create Account
+            </Link>
           </div>
         </div>
       </div>

@@ -62,7 +62,7 @@ function Navbar() {
         },
         {
           name: "Message Center",
-          path: "/message-center",
+          path: "/email-center",
           icon: <Inbox className="w-4 h-4 mr-2" />,
         },
       ],
