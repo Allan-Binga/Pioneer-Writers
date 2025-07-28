@@ -6,9 +6,9 @@ import {
   User,
   LogOut,
   ShieldUser,
-  Inbox,
   ChevronDown,
   GraduationCap,
+  Mails,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.jpeg";
@@ -28,6 +28,9 @@ function Navbar() {
   const notificationCount = 3;
   const dropdownRef = useRef(null);
 
+  // Assuming showAuthButtons is based on whether user is not logged in
+  const showAuthButtons = !isLoggedIn;
+
   const navItems = [
     { name: "Dashboard", color: "hover:text-amber-600" },
     { name: "Orders", color: "hover:text-amber-600" },
@@ -37,17 +40,17 @@ function Navbar() {
         {
           name: "Clients",
           path: "/clients",
-          icon: <User className="w-4 h-4 mr-2" />,
+          icon: <User className="w-5 h-5 mr-2" />,
         },
         {
           name: "Writers",
           path: "/writers",
-          icon: <GraduationCap className="w-4 h-4 mr-2" />,
+          icon: <GraduationCap className="w-5 h-5 mr-2" />,
         },
         {
           name: "Administrators",
           path: "/administrators",
-          icon: <ShieldUser className="w-4 h-4 mr-2" />,
+          icon: <ShieldUser className="w-5 h-5 mr-2" />,
         },
       ],
       color: "hover:text-amber-600",
@@ -56,40 +59,30 @@ function Navbar() {
       name: "Platform Services",
       subItems: [
         {
-          name: "News Center",
-          path: "/news",
-          icon: <Bell className="w-4 h-4 mr-2" />,
-        },
-        {
           name: "Message Center",
           path: "/email-center",
-          icon: <Inbox className="w-4 h-4 mr-2" />,
+          icon: <Mails className="w-5 h-5 mr-2" />,
         },
-      ],
-      color: "hover:text-amber-600",
-    },
-    {
-      name: "Settings",
-      subItems: [
         {
-          name: "Platform Settings",
-          path: "/settings",
-          icon: <ChevronDown className="w-4 h-4 mr-2" />,
+          name: "News Center",
+          path: "/news",
+          icon: <Bell className="w-5 h-5 mr-2" />,
         },
       ],
       color: "hover:text-amber-600",
     },
+    { name: "Payments", color: "hover:text-amber-600" },
   ];
 
   const profileItems = [
     {
       name: "Profile",
       path: "/profile",
-      icon: <User className="w-4 h-4 mr-2" />,
+      icon: <User className="w-5 h-5 mr-2" />,
     },
     {
       name: "Logout",
-      icon: <LogOut className="w-4 h-4 mr-2" />,
+      icon: <LogOut className="w-5 h-5 mr-2" />,
     },
   ];
 
@@ -115,7 +108,7 @@ function Navbar() {
   };
 
   const isNavigable = (itemName) =>
-    ["Dashboard", "Orders", "Inbox", "News"].includes(itemName);
+    ["Dashboard", "Orders", "Inbox", "News", "Payments"].includes(itemName);
 
   const handleLogout = async () => {
     try {
@@ -141,32 +134,32 @@ function Navbar() {
   return (
     <nav className="bg-white border-b border-slate-100 fixed top-0 left-0 w-full z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-16 sm:h-20 lg:h-24">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center ml-4">
+          <Link to="/" className="flex items-center ml-2 sm:ml-4">
             <img
               src={Logo}
               alt="Pioneer-Writers"
-              className="h-10 w-auto sm:h-12 lg:h-14 object-contain"
+              className="h-8 w-auto sm:h-10 lg:h-12 object-contain"
             />
           </Link>
 
           {/* Navigation Items */}
           <div className="hidden md:flex items-center justify-center flex-1">
-            <div className="flex space-x-8">
+            <div className="flex space-x-4 lg:space-x-8">
               {navItems.map((item) => (
                 <div key={item.name} className="relative" ref={dropdownRef}>
                   {isNavigable(item.name) ? (
                     <Link
                       to={`/${item.name.toLowerCase()}`}
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center`}
+                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-sm lg:text-base font-medium flex items-center`}
                     >
                       {item.name}
                     </Link>
                   ) : (
                     <button
                       type="button"
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center`}
+                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-sm lg:text-base font-medium flex items-center`}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleDropdown(item.name);
@@ -175,7 +168,7 @@ function Navbar() {
                       {item.name}
                       {item.subItems && (
                         <ChevronDown
-                          className={`ml-1 w-4 h-4 transition-transform duration-200 ${
+                          className={`ml-1 w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 ${
                             activeDropdown === item.name ? "rotate-180" : ""
                           }`}
                         />
@@ -184,12 +177,12 @@ function Navbar() {
                   )}
 
                   {item.subItems && activeDropdown === item.name && (
-                    <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50 py-2">
+                    <div className="absolute left-0 mt-2 w-48 sm:w-56 bg-white rounded-md shadow-lg z-50 py-2">
                       {item.subItems.map((subItem) => (
                         <Link
                           key={subItem.name}
                           to={subItem.path}
-                          className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900"
+                          className="flex items-center px-4 py-2 text-sm lg:text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900"
                           onClick={() => setActiveDropdown(null)}
                         >
                           {subItem.icon}
@@ -204,37 +197,35 @@ function Navbar() {
           </div>
 
           {/* Right Section */}
-          <div className="flex items-center space-x-4 sm:space-x-6 mr-2">
+          <div className="flex items-center space-x-2 sm:space-x-4 lg:space-x-6 mr-2 sm:mr-4">
             <Link
               to="/news"
               className="relative text-gray-600 hover:text-purple-500 transition-colors duration-200"
               title="News Notifications"
             >
-              <Bell className="w-7 h-7" />
+              <Bell className="w-6 h-6 sm:w-7 sm:h-7" />
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-yellow-400 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                  {notificationCount}
-                </span>
+                <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 sm:w-4 sm:h-4"></span>
               )}
             </Link>
 
             {isLoggedIn ? (
               <div className="relative" ref={dropdownRef}>
                 <div
-                  className="flex items-center space-x-2 hover:bg-slate-100 rounded-full p-2 transition-all duration-200 cursor-pointer"
+                  className="flex items-center space-x-1 sm:space-x-2 hover:bg-slate-100 rounded-full p-1 sm:p-2 transition-all duration-200 cursor-pointer"
                   onClick={() => toggleDropdown("profile")}
                 >
                   <img
                     src={avatarUrl}
                     alt="User Avatar"
-                    className="w-10 h-10 rounded-full object-cover border border-slate-200"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-slate-200"
                   />
-                  <span className="hidden lg:inline text-gray-600 text-base font-medium">
+                  <span className="hidden lg:inline text-gray-600 text-sm lg:text-base font-medium">
                     {userName}
                   </span>
                 </div>
                 {activeDropdown === "profile" && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50 py-2">
+                  <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-md shadow-lg z-50 py-2">
                     {profileItems.map((item) => {
                       const hoverBg =
                         item.name === "Logout"
@@ -248,7 +239,7 @@ function Navbar() {
                             setActiveDropdown(null);
                             handleLogout();
                           }}
-                          className={`flex items-center w-full px-4 py-3 text-left cursor-pointer text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
+                          className={`flex items-center w-full px-4 py-2 text-left cursor-pointer text-sm lg:text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
                         >
                           {item.icon}
                           {item.name}
@@ -257,7 +248,7 @@ function Navbar() {
                         <Link
                           key={item.name}
                           to={item.path}
-                          className={`flex items-center px-4 py-3 text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
+                          className={`flex items-center px-4 py-2 text-sm lg:text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
                           onClick={() => setActiveDropdown(null)}
                         >
                           {item.icon}
@@ -269,16 +260,16 @@ function Navbar() {
                 )}
               </div>
             ) : showAuthButtons ? (
-              <div className="hidden md:flex items-center space-x-3">
+              <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
                 <Link
                   to="/sign-in"
-                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-base font-medium"
+                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-sm lg:text-base font-medium"
                 >
                   Log In
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-6 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-base"
+                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-4 lg:px-6 py-1.5 lg:py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-sm lg:text-base"
                 >
                   Sign Up
                 </Link>
@@ -289,7 +280,7 @@ function Navbar() {
               onClick={toggleMenu}
               className="md:hidden text-gray-600 hover:text-gray-600 transition-colors"
             >
-              <Menu size={24} />
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
         </div>
@@ -297,16 +288,8 @@ function Navbar() {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="absolute top-20 left-0 w-full bg-white backdrop-blur-md bg-opacity-90 border-t border-slate-100 z-50 py-4 px-4 md:hidden">
-          <div className="flex justify-end mb-4">
-            <button
-              onClick={toggleMenu}
-              className="text-gray-600 hover:text-gray-600"
-            >
-              <X size={24} />
-            </button>
-          </div>
-          <div className="flex flex-col space-y-4">
+        <div className="absolute top-16 sm:top-20 left-0 w-full bg-white backdrop-blur-md bg-opacity-95 border-t border-slate-100 z-50 py-4 px-4 md:hidden transition-all duration-300 ease-in-out">
+          <div className="flex flex-col space-y-3">
             {navItems.map((item) => (
               <div key={item.name}>
                 {isNavigable(item.name) ? (
@@ -329,7 +312,7 @@ function Navbar() {
                     {item.name}
                     {item.subItems && (
                       <ChevronDown
-                        className={`ml-1 w-4 h-4 transition-transform duration-200 ${
+                        className={`ml-1 w-5 h-5 transition-transform duration-200 ${
                           activeDropdown === item.name ? "rotate-180" : ""
                         }`}
                       />
@@ -343,7 +326,7 @@ function Navbar() {
                       <Link
                         key={subItem.name}
                         to={subItem.path}
-                        className="flex items-center text-base text-gray-600 hover:text-gray-900"
+                        className="flex items-center text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 px-3 py-2 rounded-md"
                         onClick={toggleMenu}
                       >
                         {subItem.icon}
@@ -370,7 +353,7 @@ function Navbar() {
                           handleLogout();
                           toggleMenu();
                         }}
-                        className="flex items-center w-full px-4 py-3 text-left text-base text-gray-600 hover:bg-red-200 hover:text-gray-900"
+                        className="flex items-center w-full px-3 py-2 text-left text-base text-gray-600 hover:bg-red-200 hover:text-gray-900 rounded-md"
                       >
                         {item.icon}
                         {item.name}
@@ -379,7 +362,7 @@ function Navbar() {
                       <Link
                         key={item.name}
                         to={item.path}
-                        className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900"
+                        className="flex items-center px-3 py-2 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 rounded-md"
                         onClick={() => {
                           setActiveDropdown(null);
                           toggleMenu();
@@ -391,6 +374,25 @@ function Navbar() {
                     )
                   )}
                 </div>
+              </div>
+            )}
+
+            {!isLoggedIn && showAuthButtons && (
+              <div className="flex flex-col space-y-2">
+                <Link
+                  to="/sign-in"
+                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-base font-medium"
+                  onClick={toggleMenu}
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/sign-up"
+                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-4 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 text-base"
+                  onClick={toggleMenu}
+                >
+                  Sign Up
+                </Link>
               </div>
             )}
           </div>

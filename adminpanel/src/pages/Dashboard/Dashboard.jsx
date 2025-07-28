@@ -2,15 +2,13 @@ import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import {
   Users,
-  UserCog,
-  DollarSign,
-  AlertCircle,
   FileText,
   ShieldCheck,
   Inbox,
   User,
-  PenTool,
   Scale,
+  GraduationCap,
+  Banknote,
 } from "lucide-react"; // Added User, PenTool, Scale for Admin Tools
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -33,7 +31,19 @@ function AdminDashboard() {
           `${endpoint}/dashboard/administrator/dashboard`,
           { withCredentials: true }
         );
-        setDashboard(response.data);
+
+        // FIX: map response keys properly
+        setDashboard({
+          stats: {
+            users: response.data.dashboardStats.userCount,
+            totalWriters: response.data.dashboardStats.writerCount,
+            platformRevenue: response.data.dashboardStats.totalRevenue,
+            activeDisputes: response.data.dashboardStats.orderStats.disputed,
+            totalOrders: response.data.dashboardStats.orderStats.all,
+            submittedOrders: response.data.dashboardStats.orderStats.submitted,
+          },
+          recentOrders: response.data.recentOrders,
+        });
       } catch (error) {
         notify.info("Failed to fetch admin dashboard");
         console.error("Error:", error);
@@ -63,19 +73,19 @@ function AdminDashboard() {
     {
       key: "totalWriters",
       label: "Total Writers",
-      icon: UserCog,
+      icon: GraduationCap,
       color: "bg-indigo-100 text-indigo-700",
     },
     {
       key: "platformRevenue",
       label: "Revenue (USD)",
-      icon: DollarSign,
+      icon: Banknote,
       color: "bg-green-100 text-green-700",
     },
     {
       key: "activeDisputes",
       label: "Active Disputes",
-      icon: AlertCircle,
+      icon: Scale,
       color: "bg-red-100 text-red-700",
     },
     {
@@ -142,7 +152,7 @@ function AdminDashboard() {
             to="/writers"
             className="bg-indigo-600 text-white px-6 py-3 rounded-full font-medium hover:bg-indigo-700 transition flex items-center space-x-2"
           >
-            <PenTool className="w-5 h-5" />
+            <GraduationCap className="w-5 h-5" />
             <span>Manage Writers</span>
           </Link>
           <Link
@@ -162,7 +172,7 @@ function AdminDashboard() {
           <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
             {dashboard.recentOrders.length > 0 ? (
               <table className="w-full table-auto text-left">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-slate-100 border-b border-slate-200">
                   <tr>
                     <th className="px-6 py-4 text-sm font-medium text-slate-500">
                       Order ID
@@ -170,7 +180,9 @@ function AdminDashboard() {
                     <th className="px-6 py-4 text-sm font-medium text-slate-500">
                       Title
                     </th>
-                   
+                    <th className="px-6 py-4 text-sm font-medium text-slate-500">
+                      Client
+                    </th>
                     <th className="px-6 py-4 text-sm font-medium text-slate-500">
                       Writer
                     </th>
@@ -186,11 +198,13 @@ function AdminDashboard() {
                   {dashboard.recentOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-slate-50 transition">
                       <td className="px-6 py-4 font-mono text-sm text-slate-600 hover:underline">
-                        <Link to={`/order-details/${order.id}`}>{order.id}</Link>
+                        <Link to={`/order-details/${order.id}`}>
+                          {order.id}
+                        </Link>
                       </td>
                       <td className="px-6 py-4">{order.title}</td>
-                      <td className="px-6 py-4">{order.clientName}</td>
-                      <td className="px-6 py-4">{order.writerName ?? "—"}</td>
+                      <td className="px-6 py-4">{order.clientName ?? "-"}</td>
+                      <td className="px-6 py-4">{order.writerName ?? "-"}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-medium ${

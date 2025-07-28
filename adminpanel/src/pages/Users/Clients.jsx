@@ -83,9 +83,13 @@ function Clients() {
                     >
                       <td className="px-6 py-4">
                         <img
-                          src={user.avatar_url || UserImage}
+                          src={user.avatar_url}
                           alt="avatar"
                           className="h-10 w-10 rounded-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = UserImage;
+                          }}
                         />
                       </td>
                       <td className="px-6 py-4 font-medium text-slate-800">

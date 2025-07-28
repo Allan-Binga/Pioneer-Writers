@@ -246,7 +246,7 @@ function AdminSignUp() {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-200"
+                className="w-full pl-12 py-3 rounded-full border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
               />
               {validationErrors.email && (
                 <p className="text-amber-600 text-xs mt-1 ml-2">
@@ -260,7 +260,7 @@ function AdminSignUp() {
               <div className="relative w-24" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="w-full py-3 px-4 border border-stone-300 rounded-full bg-white text-zinc-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-100"
+                  className="w-full py-3 px-4 border border-amber-300 rounded-full bg-white text-zinc-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-100"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <span>{formData.countryCode}</span>
@@ -290,7 +290,7 @@ function AdminSignUp() {
                   placeholder="(000) 000 - 0000"
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
-                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
+                  className="w-full pl-12 py-3 rounded-full border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
                 />
               </div>
             </div>
@@ -305,7 +305,7 @@ function AdminSignUp() {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange}
-                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
+                className="w-full pl-12 pr-10 py-3 rounded-full border border-amber-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
               />
               <button
                 type="button"
@@ -385,16 +385,17 @@ function AdminSignUp() {
             </button>
           </div>
 
-          {/* Footer */}
-          <p className="text-center text-sm text-stone-700 mt-6">
-            Already have an account?{" "}
-            <Link
-              to="/sign-in"
-              className="text-slate-700 hover:font-semibold hover:underline"
-            >
-              Sign In
-            </Link>
-          </p>
+          <div className="mt-8 border-t border-slate-200 pt-6 text-center">
+            <p className="text-sm text-stone-600">
+              Already have an account?{" "}
+              <Link
+                to="/sign-in"
+                className="text-amber-600 font-semibold hover:underline transition duration-200"
+              >
+                Sign In
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
 

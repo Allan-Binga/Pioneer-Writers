@@ -83,9 +83,13 @@ function Writers() {
                     >
                       <td className="px-6 py-4">
                         <img
-                          src={writer.profile_picture_url || UserImage}
+                          src={writer.profile_picture_url}
                           alt="avatar"
                           className="h-10 w-10 rounded-full object-cover"
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src = UserImage;
+                          }}
                         />
                       </td>
                       <td className="px-6 py-4 font-medium text-slate-800">
@@ -94,7 +98,9 @@ function Writers() {
                       <td className="px-6 py-4 font-medium text-slate-800">
                         {writer.phone_number || "-"}
                       </td>
-                      <td className="px-6 py-4 text-slate-600">{writer.email}</td>
+                      <td className="px-6 py-4 text-slate-600">
+                        {writer.email}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

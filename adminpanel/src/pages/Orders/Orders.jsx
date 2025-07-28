@@ -129,7 +129,7 @@ function Orders() {
                       Deadline
                     </th>
                     <th className="px-6 py-3 text-left font-semibold text-slate-600">
-                      Status
+                      Payment Status
                     </th>
                     <th className="px-6 py-3 text-left font-semibold text-slate-600">
                       Actions
@@ -173,6 +173,8 @@ function Orders() {
                           View
                         </Link>
                       </td>
+                      <td className="px-6 py-4">{order.user_id}</td>
+                      <td className="px-6 py-4">{order.writer_id || "N/A"}</td>
                     </tr>
                   ))}
                 </tbody>

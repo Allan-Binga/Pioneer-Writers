@@ -54,7 +54,18 @@ const capturePayment = async (req, res) => {
   }
 };
 
+//Get All Payments
+const getAllPayments = async (req, res) => {
+  try {
+    const payments = await client.query("SELECT * FROM payments");
+    res.status(200).json(payments.rows);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch payments." });
+  }
+};
+
 module.exports = {
   getMyPayments,
   capturePayment,
+  getAllPayments,
 };

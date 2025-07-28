@@ -35,6 +35,20 @@ function UserDetails() {
     fetchUser();
   }, [clientId]);
 
+  const handleSuspendClient = async (id) => {
+    try {
+      await axios.post(
+        `${endpoint}/users/${id}/suspend`,
+        {},
+        { withCredentials: true }
+      );
+      notify.success("Client suspended successfully");
+    } catch (error) {
+      console.error(error);
+      notify.error("Failed to suspend client");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -63,29 +77,54 @@ function UserDetails() {
               className="w-20 h-20 rounded-full object-cover"
             />
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">{user.username}</h1>
+              <h1 className="text-2xl font-bold text-slate-900">
+                {user.username}
+              </h1>
               <p className="text-slate-600">{user.email}</p>
-              <p className="text-slate-500">{user.phone_number || "No phone provided"}</p>
+              <p className="text-slate-500">
+                {user.phone_number || "No phone provided"}
+              </p>
             </div>
           </div>
 
+          <div className="mt-6 flex gap-4">
+            <button
+              onClick={() => handleSuspendClient(user.id)}
+              className="bg-red-100 text-red-700 px-5 py-2 rounded-lg font-medium hover:bg-red-200 transition cursor-pointer"
+            >
+              Suspend Client
+            </button>
+          </div>
+
           <div className="mt-10">
-            <h2 className="text-xl font-semibold text-slate-800 mb-4">Orders</h2>
+            <h2 className="text-2xl font-semibold text-slate-800 mb-4">
+              Client Orders
+            </h2>
 
             {orders.length === 0 ? (
               <div className="text-center py-12">
                 <FileText className="mx-auto h-10 w-10 text-slate-400" />
-                <p className="text-sm text-slate-500 mt-2">This user has no orders yet.</p>
+                <p className="text-sm text-slate-500 mt-2">
+                  This user has no orders yet.
+                </p>
               </div>
             ) : (
               <div className="overflow-x-auto rounded-xl shadow-sm bg-white border border-slate-200">
                 <table className="min-w-full divide-y divide-slate-200 text-sm">
                   <thead className="bg-slate-100">
                     <tr>
-                      <th className="px-6 py-3 text-left font-semibold text-slate-600">Order ID</th>
-                      <th className="px-6 py-3 text-left font-semibold text-slate-600">Title</th>
-                      <th className="px-6 py-3 text-left font-semibold text-slate-600">Status</th>
-                      <th className="px-6 py-3 text-left font-semibold text-slate-600">Created At</th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        Order ID
+                      </th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        Title
+                      </th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left font-semibold text-slate-600">
+                        Created At
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-slate-100">
@@ -93,11 +132,15 @@ function UserDetails() {
                       <tr key={order.order_id}>
                         <td className="px-6 py-4">{order.order_id}</td>
                         <td className="px-6 py-4">{order.topic}</td>
-                        <td className="px-6 py-4 capitalize text-slate-700">{order.order_status}</td>
+                        <td className="px-6 py-4 capitalize text-slate-700">
+                          {order.order_status}
+                        </td>
                         <td className="px-6 py-4 text-slate-500">
                           {new Date(order.created_at).toLocaleDateString()}
                         </td>
-                          <td className="px-6 py-4 capitalize text-slate-700">{order.writer_id}</td>
+                        <td className="px-6 py-4 capitalize text-slate-700">
+                          {order.writer_id}
+                        </td>
                       </tr>
                     ))}
                   </tbody>

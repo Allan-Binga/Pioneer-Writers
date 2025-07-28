@@ -18,6 +18,7 @@ import Writers from "./pages/Users/Writers";
 import Administrators from "./pages/Users/Admins";
 import Settings from "./pages/Settings/Settings";
 import OrderDetails from "./pages/Orders/OrderDetails";
+import Payments from "./pages/Payments/Payment";
 import Disputes from "./pages/Disputes/Disputes";
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/payments" element={<Payments />} />
         <Route path="/order-details/:orderId" element={<OrderDetails />} />
         <Route path="/email-center" element={<EmailCenter />} />
         <Route path="/news" element={<News />} />
