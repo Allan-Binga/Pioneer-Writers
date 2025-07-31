@@ -28,6 +28,7 @@ import Drafts from "./pages/Orders/Drafts";
 import Home from "./pages/Home/Home";
 import OrderDetails from "./pages/Orders/OrderDetails";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
+import Payments from "./pages/Payments/Payments";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
         <Route path="/wallet" element={<Wallet />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/writers" element={<Writers />} />
+        <Route path="/payment-history" element={<Payments />} />
         <Route path="/top-writers" element={<TopWriters />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/profile" element={<Profile />} />

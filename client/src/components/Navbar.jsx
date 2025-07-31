@@ -58,8 +58,8 @@ function Navbar() {
       color: "hover:text-green-500",
     },
     {
-      name: "Transactions",
-      path: "/payment/success",
+      name: "Payment History",
+      path: "/payment-history",
       color: "hover:text-amber-500",
     },
     {
@@ -213,7 +213,7 @@ function Navbar() {
             >
               <Bell className="w-7 h-7" />
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-yellow-400 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                   {notificationCount}
                 </span>
               )}
