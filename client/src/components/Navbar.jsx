@@ -46,7 +46,7 @@ function Navbar() {
         },
         {
           name: "All Orders",
-          path: "/my-orders",
+          path: "/my-orders/all",
           icon: <List className="w-4 h-4 mr-2" />,
         },
         {
