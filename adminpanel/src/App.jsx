@@ -10,7 +10,6 @@ import SignIn from "./pages/SignIn/SignIn";
 import Orders from "./pages/Orders/Orders";
 import EmailCenter from "./pages/EmailCenter/EmailCenter";
 import News from "./pages/News/News";
-import Profile from "./pages/Profile/Profile";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Clients from "./pages/Users/Clients";
 import UserDetails from "./pages/Users/UserDetails";
@@ -35,13 +34,12 @@ function App() {
         <Route path="/order-details/:orderId" element={<OrderDetails />} />
         <Route path="/email-center" element={<EmailCenter />} />
         <Route path="/news" element={<News />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/writers" element={<Writers />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/clients/:clientId" element={<UserDetails />} />
         <Route path="/administrators" element={<Administrators />} />
         <Route path="/settings" element={<Settings />} />
-        <Route path="/disputes" element={<Orders />} />
+        <Route path="/disputes" element={<Disputes />} />
       </Routes>
     </Router>
   );

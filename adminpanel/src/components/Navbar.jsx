@@ -9,6 +9,7 @@ import {
   ChevronDown,
   GraduationCap,
   Mails,
+  LogOutIcon,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.jpeg";
@@ -100,7 +101,7 @@ function Navbar() {
   }, [isLoggedIn]);
 
   const avatarUrl = profile?.avatar_url || "https://via.placeholder.com/40";
-  const userName = profile?.full_name || "User";
+  const userName = profile?.full_name || "Administrator";
 
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
   const toggleDropdown = (name) => {
@@ -226,36 +227,18 @@ function Navbar() {
                 </div>
                 {activeDropdown === "profile" && (
                   <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-md shadow-lg z-50 py-2">
-                    {profileItems.map((item) => {
-                      const hoverBg =
-                        item.name === "Logout"
-                          ? "hover:bg-red-400"
-                          : "hover:bg-amber-100";
-
-                      return item.name === "Logout" ? (
-                        <button
-                          key={item.name}
-                          onClick={() => {
-                            setActiveDropdown(null);
-                            handleLogout();
-                          }}
-                          className={`flex items-center w-full px-4 py-2 text-left cursor-pointer text-sm lg:text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
-                        >
-                          {item.icon}
-                          {item.name}
-                        </button>
-                      ) : (
-                        <Link
-                          key={item.name}
-                          to={item.path}
-                          className={`flex items-center px-4 py-2 text-sm lg:text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
-                          onClick={() => setActiveDropdown(null)}
-                        >
-                          {item.icon}
-                          {item.name}
-                        </Link>
-                      );
-                    })}
+                    <button
+                      onClick={() => {
+                        setActiveDropdown(null);
+                        handleLogout();
+                      }}
+                      className="flex items-center w-full px-4 py-2 text-left cursor-pointer text-sm lg:text-base text-gray-600 hover:bg-red-400 hover:text-gray-900"
+                    >
+                      <span className="mr-2">
+                        <LogOutIcon />
+                      </span>
+                      Logout
+                    </button>
                   </div>
                 )}
               </div>

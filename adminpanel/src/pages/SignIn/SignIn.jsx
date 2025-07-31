@@ -109,7 +109,6 @@ function SignIn() {
 
       localStorage.setItem("userRole", data.admin.role);
       localStorage.setItem("adminEmail", data.admin.email);
-
       localStorage.setItem("isLoggedIn", "true");
 
       notify.success("Login successful.");
