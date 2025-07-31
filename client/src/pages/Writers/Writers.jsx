@@ -43,17 +43,19 @@ function Writers() {
         {/* Main Content Area */}
         <main className="flex-1 transition-all duration-300 pt-20 px-4">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl font-bold text-slate-800 mb-4 mt-8">Writers</h1>
+            <h1 className="text-2xl font-bold text-slate-800 mb-4 mt-8">
+              Writers
+            </h1>
 
             {loading ? (
               <div className="flex justify-center items-center h-64">
-                <span className="text-lg text-gray-500">
+                <span className="text-base text-gray-500">
                   Loading writers...
                 </span>
               </div>
             ) : writers.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-64 bg-white rounded-xl shadow-sm border border-gray-200">
-                <p className="text-lg text-gray-500">No writers found.</p>
+                <p className="text-base text-gray-500">No writers found.</p>
               </div>
             ) : (
               <div className="space-y-8">
@@ -72,19 +74,19 @@ function Writers() {
                     {/* Details */}
                     <div className="flex-1">
                       <div className="flex justify-between flex-wrap">
-                        <h2 className="text-xl font-semibold text-gray-800">
+                        <h2 className="text-lg font-semibold text-gray-800">
                           {writer.full_name}
                         </h2>
-                        <span className="text-sm text-gray-400">
+                        <span className="text-xs text-gray-400">
                           ID: {writer.writer_id}
                         </span>
                       </div>
 
-                      <p className="text-sm italic text-gray-600 mt-1">
+                      <p className="text-xs italic text-gray-600 mt-1">
                         {writer.bio}
                       </p>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-md text-gray-700">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 mt-4 text-sm text-gray-700">
                         <WriterDetail icon={Mail} label={writer.email} />
                         <WriterDetail
                           icon={Phone}
@@ -128,7 +130,7 @@ function Writers() {
                               : "text-red-500"
                           }
                         />
-                        <p className="text-gray-500 col-span-full mt-2">
+                        <p className="text-gray-500 col-span-full mt-2 text-xs">
                           Joined:{" "}
                           {moment(writer.joined_at).format("MMM Do, YYYY")}
                         </p>
@@ -141,7 +143,7 @@ function Writers() {
           </div>
         </main>
       </div>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

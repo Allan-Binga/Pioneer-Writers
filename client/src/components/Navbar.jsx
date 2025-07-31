@@ -144,7 +144,7 @@ function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-24">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center ml-4 cursor-pointer">
+          <Link to="/home" className="flex items-center ml-0 cursor-pointer">
             <img
               src={Logo}
               alt="Pioneer-Writers"
@@ -154,20 +154,21 @@ function Navbar() {
 
           {/* Navigation Items */}
           <div className="hidden md:flex items-center justify-center flex-1">
-            <div className="flex space-x-8">
+            <div className="flex space-x-4 lg:space-x-8">
               {navItems.map((item) => (
                 <div key={item.name} className="relative" ref={dropdownRef}>
                   {item.path ? (
                     <Link
                       to={item.path}
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center cursor-pointer`}
+                      title={item.name}
+                      className={`text-gray-700 ${item.color} transition-colors duration-200 text-sm font-medium flex items-center cursor-pointer`}
                     >
                       {item.name}
                     </Link>
                   ) : (
                     <button
                       type="button"
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-base font-medium flex items-center cursor-pointer`}
+                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-sm font-medium flex items-center cursor-pointer`}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleDropdown(item.name);
@@ -185,12 +186,12 @@ function Navbar() {
                   )}
 
                   {item.subItems && activeDropdown === item.name && (
-                    <div className="absolute left-0 mt-2 w-56 bg-white rounded-md shadow-lg z-50 py-2">
+                    <div className="absolute left-0 mt-2 w-48 sm:w-56 bg-white rounded-md shadow-lg z-50 py-2">
                       {item.subItems.map((subItem) => (
                         <Link
                           key={subItem.name}
                           to={subItem.path}
-                          className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 cursor-pointer"
+                          className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-amber-100 hover:text-gray-900 cursor-pointer"
                           onClick={() => setActiveDropdown(null)}
                         >
                           {subItem.icon}
@@ -208,12 +209,12 @@ function Navbar() {
           <div className="flex items-center space-x-4 sm:space-x-6 mr-2">
             <Link
               to="/news"
-              className="relative text-gray-600 hover:text-purple-500 transition-colors duration-200 cursor-pointer"
+              className="relative text-gray-600 hover:text-amber-500 transition-colors duration-200 cursor-pointer"
               title="News Notifications"
             >
               <Bell className="w-7 h-7" />
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
                   {notificationCount}
                 </span>
               )}
@@ -222,6 +223,7 @@ function Navbar() {
             {isLoggedIn ? (
               <div className="relative" ref={dropdownRef}>
                 <div
+                  title="Account"
                   className="flex items-center space-x-2 hover:bg-slate-100 rounded-full p-2 transition-all duration-200 cursor-pointer"
                   onClick={() => toggleDropdown("profile")}
                 >
@@ -230,7 +232,7 @@ function Navbar() {
                     alt="User Avatar"
                     className="w-10 h-10 rounded-full object-cover border border-slate-200"
                   />
-                  <span className="hidden lg:inline text-gray-600 text-base font-medium">
+                  <span className="hidden lg:inline text-gray-600 text-sm font-medium">
                     {userName}
                   </span>
                 </div>
@@ -249,7 +251,7 @@ function Navbar() {
                             setActiveDropdown(null);
                             handleLogout();
                           }}
-                          className={`flex items-center w-full px-4 py-3 text-left cursor-pointer text-base text-gray-600 ${hoverBg} hover:text-gray-900`}
+                          className={`flex items-center w-full px-4 py-3 text-left cursor-pointer text-sm text-gray-600 ${hoverBg} hover:text-gray-900`}
                         >
                           {item.icon}
                           {item.name}
@@ -258,7 +260,7 @@ function Navbar() {
                         <Link
                           key={item.name}
                           to={item.path}
-                          className={`flex items-center px-4 py-3 text-base text-gray-600 ${hoverBg} hover:text-gray-900 cursor-pointer`}
+                          className={`flex items-center px-4 py-3 text-sm text-gray-600 ${hoverBg} hover:text-gray-900 cursor-pointer`}
                           onClick={() => setActiveDropdown(null)}
                         >
                           {item.icon}
@@ -273,13 +275,13 @@ function Navbar() {
               <div className="hidden md:flex items-center space-x-3">
                 <Link
                   to="/sign-in"
-                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-base font-medium cursor-pointer"
+                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-sm font-medium cursor-pointer"
                 >
                   Log In
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-6 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-base cursor-pointer"
+                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-6 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-sm cursor-pointer"
                 >
                   Sign Up
                 </Link>
@@ -313,14 +315,14 @@ function Navbar() {
                 {item.path ? (
                   <Link
                     to={item.path}
-                    className={`text-gray-600 ${item.color} text-base font-medium cursor-pointer`}
+                    className={`text-gray-600 ${item.color} text-sm font-medium cursor-pointer`}
                     onClick={toggleMenu}
                   >
                     {item.name}
                   </Link>
                 ) : (
                   <div
-                    className={`text-gray-600 ${item.color} text-base font-medium cursor-pointer flex items-center`}
+                    className={`text-gray-600 ${item.color} text-sm font-medium cursor-pointer flex items-center`}
                     onClick={() =>
                       toggleDropdown(
                         activeDropdown === item.name ? null : item.name
@@ -344,7 +346,7 @@ function Navbar() {
                       <Link
                         key={subItem.name}
                         to={subItem.path}
-                        className="flex items-center text-base text-gray-600 hover:text-gray-900 cursor-pointer"
+                        className="flex items-center text-sm text-gray-600 hover:text-gray-900 cursor-pointer"
                         onClick={toggleMenu}
                       >
                         {subItem.icon}
@@ -358,7 +360,7 @@ function Navbar() {
 
             {isLoggedIn && (
               <div>
-                <span className="text-gray-600 text-base font-medium">
+                <span className="text-gray-600 text-sm font-medium">
                   {userName}
                 </span>
                 <div className="ml-4 mt-2 space-y-2">
@@ -371,7 +373,7 @@ function Navbar() {
                           handleLogout();
                           toggleMenu();
                         }}
-                        className="flex items-center w-full px-4 py-3 text-left text-base text-gray-600 hover:bg-red-200 hover:text-gray-900"
+                        className="flex items-center w-full px-4 py-3 text-left text-sm text-gray-600 hover:bg-red-200 hover:text-gray-900"
                       >
                         {item.icon}
                         {item.name}
@@ -380,7 +382,7 @@ function Navbar() {
                       <Link
                         key={item.name}
                         to={item.path}
-                        className="flex items-center px-4 py-3 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 cursor-pointer"
+                        className="flex items-center px-4 py-3 text-sm text-gray-600 hover:bg-amber-100 hover:text-gray-900 cursor-pointer"
                         onClick={() => {
                           setActiveDropdown(null);
                           toggleMenu();

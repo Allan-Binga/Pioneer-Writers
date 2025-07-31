@@ -2,11 +2,11 @@ const client = require("../config/dbConfig");
 
 //Get Client Profile
 const getProfile = async (req, res) => {
-  const userId = req.userId; // From authentication middleware
+  const userId = req.userId;
 
   try {
     const result = await client.query(
-      `SELECT user_id, username, email, avatar_url FROM users WHERE user_id = $1`,
+      `SELECT user_id, username, email, phone_number, avatar_url FROM users WHERE user_id = $1`,
       [userId]
     );
     const user = result.rows[0];
@@ -51,7 +51,6 @@ const updateProfile = async (req, res) => {
   const { username, email, phone_number } = req.body;
 
   try {
-    // Check if tenant exists
     const checkQuery = "SELECT * FROM users WHERE user_id = $1";
     const checkResult = await client.query(checkQuery, [userId]);
 
@@ -76,6 +75,13 @@ const updateProfile = async (req, res) => {
     if (phone_number) {
       fields.push(`phone_number = $${counter++}`);
       values.push(phone_number);
+    }
+
+    // Handle avatar upload
+    if (req.files && req.files.length > 0) {
+      const avatarUrl = req.files[0].location;
+      fields.push(`avatar_url = $${counter++}`);
+      values.push(avatarUrl);
     }
 
     if (fields.length === 0) {

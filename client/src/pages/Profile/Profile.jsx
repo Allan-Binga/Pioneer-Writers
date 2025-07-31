@@ -13,8 +13,9 @@ function Profile() {
   const [userData, setUserData] = useState({
     name: "",
     email: "",
-    phone: "",
+    phone_number: "",
     avatar: "",
+    avatarFile: null,
   });
 
   useEffect(() => {
@@ -24,8 +25,7 @@ function Profile() {
         setUserData({
           name: profile.username || "",
           email: profile.email || "",
-          bio: profile.bio || "",
-          phone: profile.phone || "",
+          phone_number: profile.phone_number || "",
           avatar: profile.avatar_url || "",
         });
       } catch (err) {
@@ -42,25 +42,47 @@ function Profile() {
 
   const handleAvatarUpload = (e) => {
     const file = e.target.files[0];
-    setUserData({ ...userData, avatar: URL.createObjectURL(file) });
+    if (file) {
+      setUserData((prev) => ({
+        ...prev,
+        avatarFile: file, // Save file for upload
+        avatar: URL.createObjectURL(file), // For preview
+      }));
+    }
   };
 
   const handleSave = async () => {
     setLoading(true);
 
     try {
+      const formData = new FormData();
+      formData.append("username", userData.name);
+      formData.append("email", userData.email);
+      formData.append("phone_number", userData.phone_number);
+
+      // Append avatar file if selected
+      if (userData.avatarFile) {
+        formData.append("avatar", userData.avatarFile);
+      }
+
       const response = await axios.patch(
         `${endpoint}/profile/update-profile`,
+        formData,
         {
-          username: userData.name,
-          email: userData.email,
-          phone_number: userData.phone,
-        },
-        { withCredentials: true }
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
 
       if (response.status === 200) {
         notify.success("Profile updated successfully!");
+        // Update avatar preview with the new one from response
+        setUserData((prev) => ({
+          ...prev,
+          avatar: response.data.user.avatar_url,
+        }));
       } else {
         notify.error("Failed to update profile.");
       }
@@ -75,123 +97,125 @@ function Profile() {
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
-      <div className="flex">
-        <main className="flex-1 transition-all duration-300 pt-20 px-4">
-          <div className="max-w-6xl mx-auto space-y-10">
-            <h1 className="text-3xl font-bold text-slate-800 mb-8 mt-8">
-              My Profile
-            </h1>
+      <main className="flex-1 pt-20 px-4">
+        <div className="max-w-5xl mx-auto space-y-10">
+          <h1 className="text-2xl font-bold text-slate-800 mb-8 mt-8">
+            My Profile
+          </h1>
 
-            {/* Section 1: Personal Info */}
-            <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-700 mb-4">
-                Personal Information
-              </h2>
-              <div className="space-y-4">
-                <InfoRow icon={User} label="Name" value={userData.name} />
-                <InfoRow icon={Mail} label="Email" value={userData.email} />
-                <InfoRow
-                  icon={Phone}
-                  label="Phone"
-                  value={userData.phone || "Not Set Up"}
+          {/* Section 1: Personal Info */}
+          <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-700 mb-4">
+              Personal Information
+            </h2>
+            <div className="space-y-4">
+              <InfoRow icon={User} label="Name" value={userData.name} />
+              <InfoRow icon={Mail} label="Email" value={userData.email} />
+              <InfoRow
+                icon={Phone}
+                label="Phone"
+                value={userData.phone_number || "Not Set Up"}
+              />
+
+              <div className="flex items-center gap-3">
+                <ToggleSwitch
+                  isEnabled={smsEnabled}
+                  onToggle={() => setSmsEnabled(!smsEnabled)}
                 />
-
-                <div className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={smsEnabled}
-                    onChange={() => setSmsEnabled(!smsEnabled)}
-                    className="w-4 h-4 text-slate-600 border-gray-300 focus:ring-slate-500"
-                  />
-                  <span className="text-md text-gray-700">
-                    Enable SMS notifications for order updates
-                  </span>
-                </div>
+                <span className="text-sm text-gray-700">
+                  Enable SMS notifications for order updates
+                </span>
               </div>
             </div>
-
-            {/* Section 2: Edit Profile */}
-            <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
-              <h2 className="text-xl font-semibold text-slate-700 mb-4">
-                Edit Profile
-              </h2>
-              <div className="space-y-5">
-                {/* Avatar */}
-                <div className="flex items-center gap-4">
-                  {userData.avatar ? (
-                    <img
-                      src={userData.avatar}
-                      alt="avatar"
-                      className="w-16 h-16 rounded-full object-cover border border-gray-300"
-                    />
-                  ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                      <User className="w-6 h-6" />
-                    </div>
-                  )}
-                  <label className="text-md text-slate-600 hover:underline cursor-pointer flex items-center gap-1">
-                    <ImagePlus className="w-4 h-4" />
-                    Change Avatar
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleAvatarUpload}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
-
-                {/* Name */}
-                <InputField
-                  label="Username"
-                  name="name"
-                  value={userData.name}
-                  onChange={handleInputChange}
-                />
-
-                {/* Email */}
-                <InputField
-                  label="Email"
-                  name="email"
-                  value={userData.email}
-                  onChange={handleInputChange}
-                />
-
-                {/* Phone */}
-                <InputField
-                  label="Phone"
-                  name="phone"
-                  value={userData.phone}
-                  onChange={handleInputChange}
-                />
-
-                {/* Save Button */}
-                <button
-                  onClick={handleSave}
-                  disabled={loading}
-                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition disabled:opacity-50 cursor-pointer"
-                >
-                  {loading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4" />
-                  )}
-                  Save Changes
-                </button>
-              </div>
-            </div>
-
-            {/* Optional: Reset Password
-            <div className="text-right">
-              <button className="text-md text-slate-600 hover:underline flex items-center gap-1">
-                <Lock className="w-4 h-4" />
-                Reset Password
-              </button>
-            </div> */}
           </div>
-        </main>
-      </div>
+
+          {/* Section 2: Edit Profile */}
+          <div className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-slate-700 mb-4">
+              Edit Profile
+            </h2>
+            <div className="space-y-5">
+              {/* Avatar */}
+              <div className="flex items-center gap-4">
+                {userData.avatar ? (
+                  <img
+                    src={userData.avatar}
+                    alt="avatar"
+                    className="w-16 h-16 rounded-full object-cover border border-gray-300"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
+                    <User className="w-6 h-6" />
+                  </div>
+                )}
+                <label className="text-sm text-slate-600 hover:underline cursor-pointer flex items-center gap-1">
+                  <ImagePlus className="w-4 h-4" />
+                  Change Avatar
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarUpload}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {/* Form Fields */}
+              <InputField
+                label="Username"
+                name="name"
+                value={userData.name}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Email"
+                name="email"
+                value={userData.email}
+                onChange={handleInputChange}
+              />
+              <InputField
+                label="Phone"
+                name="phone"
+                value={userData.phone_number}
+                onChange={handleInputChange}
+              />
+
+              {/* Save Button */}
+              <button
+                onClick={handleSave}
+                disabled={loading}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl flex items-center gap-2 transition disabled:opacity-50 cursor-pointer"
+              >
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Save className="w-4 h-4" />
+                )}
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </main>
       <Footer />
+    </div>
+  );
+}
+
+// Toggle Switch Component
+function ToggleSwitch({ isEnabled, onToggle }) {
+  return (
+    <div
+      onClick={onToggle}
+      className={`w-10 h-5 flex items-center rounded-full cursor-pointer transition-all duration-300 ${
+        isEnabled ? "bg-green-500" : "bg-gray-300"
+      }`}
+    >
+      <div
+        className={`bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300 ${
+          isEnabled ? "translate-x-5" : "translate-x-1"
+        }`}
+      ></div>
     </div>
   );
 }
@@ -199,7 +223,7 @@ function Profile() {
 // Info Row Component
 function InfoRow({ icon: Icon, label, value }) {
   return (
-    <div className="flex items-center gap-3 text-md text-gray-700">
+    <div className="flex items-center gap-3 text-sm text-gray-700">
       <Icon className="w-4 h-4 text-slate-500" />
       <span className="font-medium">{label}:</span>
       <span>{value}</span>
@@ -211,7 +235,7 @@ function InfoRow({ icon: Icon, label, value }) {
 function InputField({ label, name, value, onChange }) {
   return (
     <div>
-      <label className="block text-md font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium text-gray-700 mb-1">
         {label}
       </label>
       <input
@@ -219,7 +243,7 @@ function InputField({ label, name, value, onChange }) {
         name={name}
         value={value}
         onChange={onChange}
-        className="w-full border border-gray-300 rounded-md p-2 text-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+        className="w-full border border-gray-300 rounded-md p-2 text-sm focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder:text-sm"
       />
     </div>
   );

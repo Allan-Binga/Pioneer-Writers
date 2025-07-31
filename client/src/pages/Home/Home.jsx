@@ -11,6 +11,7 @@ import {
   FileEdit,
   BanknoteArrowUp,
   FileCheck,
+  Hourglass,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -49,8 +50,7 @@ function Home() {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 space-y-4">
-        <Spinner size="medium" />
-        <div className="text-lg text-slate-500">Loading your dashboard...</div>
+        <Spinner size="small" />
       </div>
     );
   }
@@ -65,7 +65,7 @@ function Home() {
     {
       key: "inProgress",
       label: "Orders In Progress",
-      icon: Loader,
+      icon: Hourglass,
       color: "bg-blue-100 text-blue-600",
     },
     {
@@ -117,7 +117,7 @@ function Home() {
       <Navbar />
 
       <main className="flex-1 pt-20 px-4 md:px-10 max-w-7xl mx-auto w-full">
-        <h1 className="text-3xl font-semibold text-slate-800 mt-8 mb-4">
+        <h1 className="text-2xl font-semibold text-slate-800 mt-8 mb-4">
           Welcome Back!
         </h1>
 
@@ -132,10 +132,10 @@ function Home() {
                 <Icon className="w-8 h-8" />
               </div>
               <div>
-                <p className="text-lg font-semibold text-slate-800 group-hover:text-slate-900">
+                <p className="text-md font-semibold text-slate-800 group-hover:text-slate-900">
                   {label}
                 </p>
-                <p className="text-2xl font-bold text-slate-700">
+                <p className="text-xl font-bold text-slate-700">
                   {dashboard.dashboardStats?.[key] ?? 0}
                 </p>
               </div>
@@ -186,20 +186,22 @@ function Home() {
                 <tbody>
                   {dashboard.recentOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-slate-50 transition">
-                      <td className="px-6 py-4 font-mono text-sm text-slate-600 hover:underline">
+                      <td className="px-6 py-4 font-mono text-xs text-slate-600 hover:underline">
                         <Link to={`/order-details/${order.id}`}>
                           {order.id}
                         </Link>
                       </td>
 
-                      <td className="px-6 py-4">{order.title}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-6 py-4 text-sm">{order.title}</td>
+                      <td className="px-6 py-4 text-sm">
                         <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            order.status === "Completed"
+                          className={`px-3 py-1 rounded-full font-medium ${
+                            order.status === "Paid"
                               ? "bg-green-100 text-green-700"
                               : order.status === "In Progress"
                               ? "bg-blue-100 text-blue-700"
+                              : order.status === "Pending"
+                              ? "bg-amber-100 text-amber-700"
                               : order.status === "Draft"
                               ? "bg-indigo-100 text-indigo-700"
                               : "bg-slate-200 text-slate-700"

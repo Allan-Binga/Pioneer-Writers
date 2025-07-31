@@ -316,7 +316,7 @@ function Inbox() {
       <Navbar />
       <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-slate-800 mb-8 mt-10">
+          <h1 className="text-2xl font-bold text-slate-800 mb-8 mt-10">
             Manage your messages
           </h1>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
@@ -326,10 +326,9 @@ function Inbox() {
                 <div className="text-xs uppercase font-medium text-slate-500 mb-4 tracking-wider px-2">
                   Folders
                 </div>
-                <div className="space-y-3 text-md">
+                <div className="space-y-3 text-sm">
                   {[
                     { icon: Mail, label: "Inbox", filter: "inbox" },
-                    { icon: Star, label: "Starred", filter: "unread" }, // Adjust filter as needed
                     { icon: Send, label: "Sent", filter: "sent" },
                     { icon: Archive, label: "Archived", filter: "archived" },
                     {
@@ -501,7 +500,7 @@ function Inbox() {
 
         {isComposeModalOpen && <ComposeModal onClose={closeComposeModal} />}
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

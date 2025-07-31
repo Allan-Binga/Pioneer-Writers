@@ -77,9 +77,10 @@ function MyOrders() {
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       <Navbar />
+
       <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-slate-900 mb-8 mt-8 capitalize">
+        <div className="max-w-7xl mx-auto w-full">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-8 mb-6 capitalize">
             {selectedStatus === "all"
               ? "My Orders"
               : `${selectedStatus} Orders`}
@@ -90,8 +91,8 @@ function MyOrders() {
               <LoaderCircle className="animate-spin w-10 h-10 text-slate-500" />
             </div>
           ) : filteredOrders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-sm border border-slate-200">
-              <FileText className="w-12 h-12 text-slate-400 mb-2" />
+            <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-sm border border-slate-200 text-center px-4 sm:px-6">
+              <FileText className="w-12 h-12 text-slate-400 mb-3" />
               <p className="text-lg text-slate-500">No orders found.</p>
               <a
                 href="/new-order"
@@ -105,63 +106,56 @@ function MyOrders() {
               {filteredOrders.map((order, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 hover:shadow-md transition-shadow"
+                  className="bg-white rounded-lg shadow-sm border border-slate-200 p-4 sm:p-6 grid gap-4 lg:grid-cols-3 hover:shadow-md transition-shadow"
                 >
                   {/* Left: Order Details */}
                   <div className="lg:col-span-2 space-y-4">
-                    <h2 className="text-xl font-semibold text-slate-800">
+                    <h2 className="text-lg sm:text-xl font-semibold text-slate-800">
                       {order.topic}
                     </h2>
+
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm text-slate-600">
                       <OrderDetail
                         icon={PenTool}
                         label={order.type_of_service}
-                        aria-label={`Service Type: ${order.type_of_service}`}
                       />
                       <OrderDetail
                         icon={FileText}
                         label={order.document_type}
-                        aria-label={`Document Type: ${order.document_type}`}
                       />
                       <OrderDetail
                         icon={GraduationCap}
                         label={order.writer_level}
-                        aria-label={`Writer Level: ${order.writer_level}`}
                       />
                       <OrderDetail
                         icon={LayoutTemplate}
                         label={order.paper_format.toUpperCase()}
-                        aria-label={`Paper Format: ${order.paper_format.toUpperCase()}`}
                       />
                       <OrderDetail
                         icon={Flag}
                         label={order.english_type.toUpperCase()}
-                        aria-label={`English Type: ${order.english_type.toUpperCase()}`}
                       />
                       <OrderDetail
                         icon={BookOpenText}
                         label={`${order.pages} pages`}
-                        aria-label={`Pages: ${order.pages}`}
                       />
                       <OrderDetail
                         icon={ClipboardList}
                         label={`${order.number_of_sources} sources`}
-                        aria-label={`Sources: ${order.number_of_sources}`}
                       />
                       <OrderDetail
                         icon={AlignJustify}
                         label={`${order.spacing} spacing`}
-                        aria-label={`Spacing: ${order.spacing}`}
                       />
                     </div>
+
                     {order.uploaded_file && (
                       <a
                         href={order.uploaded_file}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 transition-colors"
                         download
-                        aria-label="Download attached file"
+                        className="inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 transition-colors"
                       >
                         <Paperclip className="w-4 h-4" />
                         Download File
@@ -169,8 +163,8 @@ function MyOrders() {
                     )}
                   </div>
 
-                  {/* Right: Order Status and Metadata */}
-                  <div className="flex flex-col items-start lg:items-end gap-4 text-sm">
+                  {/* Right: Status and Meta */}
+                  <div className="flex flex-col justify-between items-start lg:items-end gap-4 text-sm">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
                         order.order_status === "Pending"
@@ -182,13 +176,16 @@ function MyOrders() {
                     >
                       {order.order_status}
                     </span>
+
                     <span className="text-lg font-semibold text-slate-800">
                       ${parseFloat(order.checkout_amount).toFixed(2)}
                     </span>
+
                     <div className="flex items-center gap-2 text-slate-600">
                       <CalendarClock className="w-4 h-4 text-sky-600" />
                       {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
                     </div>
+
                     <div
                       className={`flex items-center gap-2 font-medium ${getCountdownColor(
                         order.deadline
@@ -204,6 +201,7 @@ function MyOrders() {
           )}
         </div>
       </main>
+
       <Footer />
     </div>
   );

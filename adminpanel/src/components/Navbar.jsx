@@ -137,11 +137,14 @@ function Navbar() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20 lg:h-24">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center ml-2 sm:ml-4">
+          <Link
+            to="/dashboard"
+            className="flex items-center ml-0 cursor-pointer"
+          >
             <img
               src={Logo}
               alt="Pioneer-Writers"
-              className="h-8 w-auto sm:h-10 lg:h-12 object-contain"
+              className="h-10 w-auto sm:h-12 lg:h-14 object-contain"
             />
           </Link>
 
@@ -153,14 +156,14 @@ function Navbar() {
                   {isNavigable(item.name) ? (
                     <Link
                       to={`/${item.name.toLowerCase()}`}
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-sm lg:text-base font-medium flex items-center`}
+                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-sm font-medium flex items-center`}
                     >
                       {item.name}
                     </Link>
                   ) : (
                     <button
                       type="button"
-                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-sm lg:text-base font-medium flex items-center`}
+                      className={`text-gray-600 ${item.color} transition-colors duration-200 text-sm font-medium flex items-center`}
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleDropdown(item.name);
@@ -169,7 +172,7 @@ function Navbar() {
                       {item.name}
                       {item.subItems && (
                         <ChevronDown
-                          className={`ml-1 w-4 h-4 lg:w-5 lg:h-5 transition-transform duration-200 ${
+                          className={`ml-1 w-4 h-4 transition-transform duration-200 ${
                             activeDropdown === item.name ? "rotate-180" : ""
                           }`}
                         />
@@ -183,7 +186,7 @@ function Navbar() {
                         <Link
                           key={subItem.name}
                           to={subItem.path}
-                          className="flex items-center px-4 py-2 text-sm lg:text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900"
+                          className="flex items-center px-4 py-2 text-sm text-gray-600 hover:bg-amber-100 hover:text-gray-900"
                           onClick={() => setActiveDropdown(null)}
                         >
                           {subItem.icon}
@@ -206,7 +209,9 @@ function Navbar() {
             >
               <Bell className="w-6 h-6 sm:w-7 sm:h-7" />
               {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 sm:w-4 sm:h-4"></span>
+                <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-3 h-3 sm:w-4 sm:h-4 text-[10px] text-white flex items-center justify-center">
+                  {notificationCount}
+                </span>
               )}
             </Link>
 
@@ -221,7 +226,7 @@ function Navbar() {
                     alt="User Avatar"
                     className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover border border-slate-200"
                   />
-                  <span className="hidden lg:inline text-gray-600 text-sm lg:text-base font-medium">
+                  <span className="hidden lg:inline text-gray-600 text-sm font-medium">
                     {userName}
                   </span>
                 </div>
@@ -232,7 +237,7 @@ function Navbar() {
                         setActiveDropdown(null);
                         handleLogout();
                       }}
-                      className="flex items-center w-full px-4 py-2 text-left cursor-pointer text-sm lg:text-base text-gray-600 hover:bg-red-400 hover:text-gray-900"
+                      className="flex items-center w-full px-4 py-2 text-left cursor-pointer text-sm text-gray-600 hover:bg-red-400 hover:text-gray-900"
                     >
                       <span className="mr-2">
                         <LogOutIcon />
@@ -246,13 +251,13 @@ function Navbar() {
               <div className="hidden md:flex items-center space-x-2 lg:space-x-3">
                 <Link
                   to="/sign-in"
-                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-sm lg:text-base font-medium"
+                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-sm font-medium"
                 >
                   Log In
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-4 lg:px-6 py-1.5 lg:py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-sm lg:text-base"
+                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-4 lg:px-6 py-1.5 lg:py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 shadow-md hover:shadow-lg text-sm"
                 >
                   Sign Up
                 </Link>
@@ -278,14 +283,14 @@ function Navbar() {
                 {isNavigable(item.name) ? (
                   <Link
                     to={`/${item.name.toLowerCase()}`}
-                    className={`text-gray-600 ${item.color} text-base font-medium`}
+                    className={`text-gray-600 ${item.color} text-sm font-medium`}
                     onClick={toggleMenu}
                   >
                     {item.name}
                   </Link>
                 ) : (
                   <div
-                    className={`text-gray-600 ${item.color} text-base font-medium cursor-pointer flex items-center`}
+                    className={`text-gray-600 ${item.color} text-sm font-medium cursor-pointer flex items-center`}
                     onClick={() =>
                       toggleDropdown(
                         activeDropdown === item.name ? null : item.name
@@ -295,7 +300,7 @@ function Navbar() {
                     {item.name}
                     {item.subItems && (
                       <ChevronDown
-                        className={`ml-1 w-5 h-5 transition-transform duration-200 ${
+                        className={`ml-1 w-4 h-4 transition-transform duration-200 ${
                           activeDropdown === item.name ? "rotate-180" : ""
                         }`}
                       />
@@ -309,7 +314,7 @@ function Navbar() {
                       <Link
                         key={subItem.name}
                         to={subItem.path}
-                        className="flex items-center text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 px-3 py-2 rounded-md"
+                        className="flex items-center text-sm text-gray-600 hover:bg-amber-100 hover:text-gray-900 px-3 py-2 rounded-md"
                         onClick={toggleMenu}
                       >
                         {subItem.icon}
@@ -323,7 +328,7 @@ function Navbar() {
 
             {isLoggedIn && (
               <div>
-                <span className="text-gray-600 text-base font-medium">
+                <span className="text-gray-600 text-sm font-medium">
                   {userName}
                 </span>
                 <div className="ml-4 mt-2 space-y-2">
@@ -336,7 +341,7 @@ function Navbar() {
                           handleLogout();
                           toggleMenu();
                         }}
-                        className="flex items-center w-full px-3 py-2 text-left text-base text-gray-600 hover:bg-red-200 hover:text-gray-900 rounded-md"
+                        className="flex items-center w-full px-3 py-2 text-left text-sm text-gray-600 hover:bg-red-200 hover:text-gray-900 rounded-md"
                       >
                         {item.icon}
                         {item.name}
@@ -345,7 +350,7 @@ function Navbar() {
                       <Link
                         key={item.name}
                         to={item.path}
-                        className="flex items-center px-3 py-2 text-base text-gray-600 hover:bg-amber-100 hover:text-gray-900 rounded-md"
+                        className="flex items-center px-3 py-2 text-sm text-gray-600 hover:bg-amber-100 hover:text-gray-900 rounded-md"
                         onClick={() => {
                           setActiveDropdown(null);
                           toggleMenu();
@@ -364,14 +369,14 @@ function Navbar() {
               <div className="flex flex-col space-y-2">
                 <Link
                   to="/sign-in"
-                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-base font-medium"
+                  className="text-gray-600 hover:text-gray-700 transition-colors duration-200 text-sm font-medium"
                   onClick={toggleMenu}
                 >
                   Log In
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-4 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 text-base"
+                  className="bg-gradient-to-r from-slate-600 to-slate-600 text-white px-4 py-2 rounded-full hover:from-slate-700 hover:to-slate-700 transition-all duration-200 text-sm"
                   onClick={toggleMenu}
                 >
                   Sign Up
