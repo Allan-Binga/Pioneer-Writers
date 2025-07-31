@@ -234,10 +234,9 @@ const SignUp = () => {
   });
 
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-white to-gray-100">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-white to-gray-100">
       {/* Left Column */}
-      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
-        {/* Auth Background Image */}
+      <div className="hidden lg:flex w-full lg:w-1/2 h-[300px] lg:h-screen items-center justify-center relative overflow-hidden">
         <div className="w-full h-full relative z-0">
           <img
             src={AuthImage}
@@ -248,21 +247,19 @@ const SignUp = () => {
       </div>
 
       {/* Right Column */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl p-8 border border-slate-200">
-          {/* Logo Image */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 md:px-8 py-10">
+        <div className="w-full sm:max-w-md md:max-w-lg bg-white rounded-xl shadow-2xl p-6 sm:p-8 border border-slate-200">
+          {/* Logo */}
           <div className="text-center mb-6">
             <img
               src={LogoImage}
               alt="Logo"
-              className="w-[200px] h-auto object-contain mx-auto mb-4"
+              className="w-[160px] sm:w-[200px] h-auto object-contain mx-auto mb-4"
             />
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">
+            <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">
               Join us!
             </h1>
-            <p className="text-stone-600 mt-2 text-sm">
-              Sign up now
-            </p>
+            <p className="text-stone-600 mt-2 text-sm">Sign up now</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -277,7 +274,7 @@ const SignUp = () => {
                 value={formData.userName}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
+                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
               />
               {validationErrors.userName && (
                 <p className="text-amber-600 text-xs mt-1 ml-2">
@@ -297,7 +294,7 @@ const SignUp = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
+                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
               />
               {validationErrors.email && (
                 <p className="text-amber-600 text-xs mt-1 ml-2">
@@ -307,11 +304,11 @@ const SignUp = () => {
             </div>
 
             {/* Phone */}
-            <div className="flex space-x-2">
-              <div className="relative w-24" ref={dropdownRef}>
+            <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0">
+              <div className="relative w-full sm:w-24" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="w-full py-3 px-4 border border-stone-300 rounded-full bg-white text-gray-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-amber-100"
+                  className="w-full py-3 px-4 border border-stone-300 rounded-full bg-white text-gray-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-gray-100"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <span>{formData.countryCode}</span>
@@ -342,7 +339,7 @@ const SignUp = () => {
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
                   required
-                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
+                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
                 />
               </div>
             </div>
@@ -358,7 +355,7 @@ const SignUp = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-amber-100"
+                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
               />
               <button
                 type="button"
@@ -396,15 +393,12 @@ const SignUp = () => {
                 I agree to the{" "}
                 <Link
                   to="/terms-and-conditions"
-                  className="text-gray-600 underline font-semibold"
+                  className="text-amber-600 font-semibold"
                 >
                   Terms & Conditions
                 </Link>{" "}
                 and{" "}
-                <Link
-                  to="/sign-up"
-                  className="text-gray-600 underline font-semibold"
-                >
+                <Link to="/sign-up" className="text-amber-600 font-semibold">
                   Fair Use Policy
                 </Link>
               </label>
@@ -471,15 +465,15 @@ const SignUp = () => {
           </div>
 
           {/* Footer */}
-          <p className="text-center text-sm text-stone-700 mt-6">
-            Already have an account?{" "}
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-600">Already have an account?</p>
             <Link
               to="/sign-in"
-              className="text-slate-700 hover:font-semibold hover:underline"
+              className="inline-block mt-2 px-6 py-2 text-amber-600 border border-amber-400 rounded-full hover:bg-amber-50 transition-all duration-200 font-medium"
             >
               Sign In
             </Link>
-          </p>
+          </div>
         </div>
       </div>
     </div>

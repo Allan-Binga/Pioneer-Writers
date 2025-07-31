@@ -30,7 +30,8 @@ function OrderConfirmation() {
     uploadedFiles: [],
     writer_category: "standard",
     number_of_sources: 0,
-    charts_graphs: 0,
+    slides: 0,
+    charts_or_graphs: 0,
     paper_format: "",
     number_of_words: 0,
     spacing: "double",
@@ -57,7 +58,18 @@ function OrderConfirmation() {
     const orderId =
       localStorage.getItem("order_id") || location.state?.order_id || null;
     const merged = { ...step1, ...step2 };
-    const initialTotalPrice = parseFloat(merged.total_price) || 0;
+
+    // Calculate base price (excluding sources, slides, charts, etc.)
+    let initialTotalPrice = parseFloat(merged.total_price) || 0;
+    initialTotalPrice -= (parseInt(merged.number_of_sources) || 0) * 1.99;
+    initialTotalPrice -= (parseInt(merged.slides) || 0) * 8;
+    initialTotalPrice -= (parseInt(merged.charts_or_graphs) || 0) * 8;
+    if (merged.plagiarism_report) initialTotalPrice -= 6;
+    if (merged.writer_category === "advanced") initialTotalPrice -= 5;
+    else if (merged.writer_category === "premium") initialTotalPrice -= 10;
+    if (merged.spacing === "single") initialTotalPrice /= 2; // Adjust for single spacing
+    if (merged.writer_tip) initialTotalPrice -= parseFloat(merged.writer_tip);
+    initialTotalPrice = Math.max(initialTotalPrice, 0); // Ensure non-negative
 
     setFormData((prev) => ({
       ...prev,
@@ -70,17 +82,19 @@ function OrderConfirmation() {
       writer_category: merged.writer_category || "standard",
       number_of_words: parseInt(merged.number_of_words) || 0,
       number_of_sources: parseInt(merged.number_of_sources) || 0,
-      powerpoint_slides: parseInt(merged.powerpoint_slides) || 0,
-      charts_graphs: parseInt(merged.charts_graphs) || 0,
+      slides: parseInt(merged.slides) || 0, // Changed to match step2Data
+      charts_or_graphs: parseInt(merged.charts_or_graphs) || 0, // Changed to match step2Data
       paper_format: merged.paper_format || "",
       spacing: merged.spacing || "double",
       plagiarism_report: merged.plagiarism_report || false,
       writer_tip: merged.writer_tip || "",
       payment_option: merged.payment_option || "full",
       coupon_code: merged.coupon_code || "",
-      initial_total_price: initialTotalPrice,
-      total_price: merged.total_price || initialTotalPrice,
-      checkout_amount: initialTotalPrice * 1.06,
+      initial_total_price: parseFloat(initialTotalPrice.toFixed(2)),
+      total_price: parseFloat(merged.total_price) || initialTotalPrice,
+      checkout_amount:
+        parseFloat((merged.total_price * 1.06).toFixed(2)) ||
+        initialTotalPrice * 1.06,
       document_type: merged.document_type || "",
       writer_level: merged.writer_level || "",
       pages: merged.pages || "",
@@ -98,6 +112,28 @@ function OrderConfirmation() {
   // Price calculation
   useEffect(() => {
     const calculatePrice = () => {
+      // If step2Data has total_price and no relevant fields have changed, use it directly
+      const step2 = JSON.parse(localStorage.getItem("step2Data")) || {};
+      if (
+        step2.total_price &&
+        formData.writer_tip === step2.writer_tip &&
+        formData.plagiarism_report === step2.plagiarism_report &&
+        formData.writer_category === step2.writer_category &&
+        formData.spacing === step2.spacing &&
+        formData.slides === step2.slides && // Updated to match
+        formData.charts_or_graphs === step2.charts_or_graphs && // Updated to match
+        formData.number_of_sources === step2.number_of_sources &&
+        formData.payment_option === step2.payment_option
+      ) {
+        setFormData((prev) => ({
+          ...prev,
+          total_price: parseFloat(step2.total_price),
+          checkout_amount: parseFloat(step2.checkout_amount),
+        }));
+        return;
+      }
+
+      // Otherwise, calculate the price
       let total = parseFloat(formData.initial_total_price) || 0;
       const tip = parseFloat(formData.writer_tip) || 0;
 
@@ -106,8 +142,8 @@ function OrderConfirmation() {
       if (formData.writer_category === "advanced") total += 5;
       else if (formData.writer_category === "premium") total += 10;
       total += (parseInt(formData.number_of_sources) || 0) * 1.99;
-      total += (parseInt(formData.powerpoint_slides) || 0) * 8;
-      total += (parseInt(formData.charts_graphs) || 0) * 8;
+      total += (parseInt(formData.slides) || 0) * 8; // Updated to match
+      total += (parseInt(formData.charts_or_graphs) || 0) * 8; // Updated to match
       if (formData.spacing === "single") total *= 2;
 
       const finalTotal = formData.payment_option === "half" ? total / 2 : total;
@@ -126,8 +162,8 @@ function OrderConfirmation() {
     formData.plagiarism_report,
     formData.writer_category,
     formData.spacing,
-    formData.powerpoint_slides,
-    formData.charts_graphs,
+    formData.slides, // Updated to match
+    formData.charts_or_graphs, // Updated to match
     formData.number_of_sources,
     formData.payment_option,
   ]);
@@ -258,6 +294,8 @@ function OrderConfirmation() {
         pages: parseInt(formData.pages) || 1,
         number_of_words: parseInt(formData.number_of_words) || 0,
         deadline: formData.deadline,
+        slides: parseInt(formData.slides) || 0, // Updated to match
+        charts_or_graphs: parseInt(formData.charts_or_graphs) || 0, // Updated to match
         ...(isDraft && { order_status: "draft" }),
       };
 
@@ -393,7 +431,7 @@ function OrderConfirmation() {
     };
 
     return (
-      <div>
+      <div className="text-sm">
         <label className="block text-sm font-semibold text-slate-700 mb-2">
           {label} {required && <span className="text-red-500">*</span>}
         </label>
@@ -430,15 +468,15 @@ function OrderConfirmation() {
             </div>
           )}
           {/* Progress Tracker */}
-          <div className="p-6 mb-4 mt-4">
-            <div className="flex items-center justify-between relative">
+          <div className="p-4 sm:p-6 mb-4 mt-4">
+            <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-between">
               {steps.map((step) => (
                 <div
                   key={step.number}
                   className="relative z-10 flex items-center"
                 >
                   <div
-                    className={`flex items-center px-8 py-4 rounded-full border text-sm font-medium transition-all duration-300 ${
+                    className={`flex items-center px-4 sm:px-6 py-3 rounded-full border text-sm font-medium transition-all duration-300 ${
                       step.completed
                         ? "bg-gradient-to-r from-teal-500 to-teal-700 border-teal-600 text-white"
                         : step.current
@@ -466,7 +504,7 @@ function OrderConfirmation() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                <h2 className="text-xl font-bold text-slate-800 mb-6">
                   Order Confirmation
                 </h2>
                 <form className="space-y-6" onSubmit={handleSubmit}>
@@ -554,7 +592,7 @@ function OrderConfirmation() {
                       value={formData.topic}
                       onChange={handleChange}
                       placeholder="Enter your topic"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      className="w-full text-sm px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder:text-sm"
                     />
                   </div>
                   {/* Instructions */}
@@ -568,7 +606,7 @@ function OrderConfirmation() {
                       value={formData.instructions}
                       onChange={handleChange}
                       placeholder="Provide detailed instructions"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent min-h-32 resize-vertical"
+                      className="w-full text-sm px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent min-h-32 resize-vertical placeholder:text-sm"
                     />
                   </div>
                   {/* File Attachment */}
@@ -592,7 +630,7 @@ function OrderConfirmation() {
                           className="mx-auto mb-4 text-slate-500"
                           size={48}
                         />
-                        <p className="text-slate-600 mb-2">
+                        <p className="text-slate-600 mb-2 text-sm">
                           Drag and Drop or{" "}
                           <span className="text-teal-600 font-medium underline">
                             Choose Files
@@ -661,7 +699,7 @@ function OrderConfirmation() {
                     <label className="block text-sm font-semibold text-slate-700 mb-2">
                       Spacing <span className="text-red-500">*</span>
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       {[
                         { value: "double", label: "Double Spaced" },
                         { value: "single", label: "Single Spaced" },
@@ -774,10 +812,8 @@ function OrderConfirmation() {
                               key={i}
                               value={i}
                               label={`${i}`}
-                              selected={formData.powerpoint_slides === i}
-                              onClick={() =>
-                                handleCustomChange("powerpoint_slides", i)
-                              }
+                              selected={formData.slides === i}
+                              onClick={() => handleCustomChange("slides", i)}
                             />
                           ))}
                         </div>
@@ -796,9 +832,9 @@ function OrderConfirmation() {
                               key={i}
                               value={i}
                               label={`${i}`}
-                              selected={formData.charts_graphs === i}
+                              selected={formData.charts_or_graphs === i}
                               onClick={() =>
-                                handleCustomChange("charts_graphs", i)
+                                handleCustomChange("charts_or_graphs", i)
                               }
                             />
                           ))}
@@ -843,7 +879,7 @@ function OrderConfirmation() {
                       value={formData.writer_tip}
                       onChange={handleChange}
                       placeholder="Enter tip in USD"
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent placeholder:text-sm"
                       min="0"
                     />
                   </div>
@@ -886,11 +922,11 @@ function OrderConfirmation() {
                         value={formData.coupon_code}
                         onChange={handleChange}
                         placeholder="Enter coupon code"
-                        className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
                       />
                     </div>
                   </div>
-                  <div className="flex justify-between gap-3">
+                  <div className="flex justify-between gap-3 text-sm">
                     <button
                       type="button"
                       onClick={handlePrevious}
@@ -941,10 +977,10 @@ function OrderConfirmation() {
             {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-20">
-                <h3 className="text-xl font-bold text-slate-800 mb-6">
+                <h3 className="text-lg font-bold text-slate-800 mb-6">
                   Summary
                 </h3>
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6 text-sm">
                   <div className="flex justify-between">
                     <span className="text-slate-600">Subject</span>
                     <span className="font-semibold">
@@ -1021,13 +1057,13 @@ function OrderConfirmation() {
                   <div className="flex justify-between">
                     <span className="text-slate-600">PowerPoint Slides</span>
                     <span className="font-semibold">
-                      {formData.powerpoint_slides || 0}
+                      {formData.slides || 0}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Charts & Graphs</span>
                     <span className="font-semibold">
-                      {formData.charts_graphs || 0}
+                      {formData.charts_or_graphs || 0}
                     </span>
                   </div>
                   <div className="flex justify-between">

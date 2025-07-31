@@ -19,9 +19,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 //Create Paypal Checkout
 const paypalCheckout = async (req, res) => {
   const userId = req.userId;
+  const { orderId } = req.body;
+
   try {
-    const orderQuery = `SELECT * FROM orders WHERE user_id = $1 AND order_status = 'Pending'`;
-    const { rows } = await client.query(orderQuery, [userId]);
+    const orderQuery = `SELECT * FROM orders WHERE order_id = $1 AND user_id = $2`;
+    const { rows } = await client.query(orderQuery, [orderId, userId]);
 
     if (rows.length === 0) {
       return res.status(404).json({ error: "Order not found." });
@@ -29,7 +31,6 @@ const paypalCheckout = async (req, res) => {
 
     const order = rows[0];
     const totalAmount = order.checkout_amount;
-    const orderId = order.order_id;
 
     const request = new paypal.orders.OrdersCreateRequest();
     request.prefer("return=representation");
@@ -46,7 +47,7 @@ const paypalCheckout = async (req, res) => {
         },
       ],
       application_context: {
-        return_url: `${process.env.CLIENT_URL}/payment/successful`,
+        return_url: `${process.env.CLIENT_URL}/payment/success`,
         cancel_url: `${process.env.CLIENT_URL}/payment/failed`,
       },
     });

@@ -124,8 +124,8 @@ function Home() {
         {/* Dashboard Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
           {dashboardItems.map(({ key, label, icon: Icon, color }) => (
-            <div
-              key={key}
+            <Link
+              to={`/my-orders/${key}`}
               className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-all border border-slate-100 flex items-center space-x-5 group"
             >
               <div className={`p-4 rounded-full ${color}`}>
@@ -139,7 +139,7 @@ function Home() {
                   {dashboard.dashboardStats?.[key] ?? 0}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 
@@ -167,7 +167,7 @@ function Home() {
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             {dashboard.recentOrders.length > 0 ? (
               <table className="w-full table-auto text-left">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-slate-100 border-b border-slate-200">
                   <tr>
                     <th className="px-6 py-4 text-sm font-medium text-slate-500">
                       Order ID

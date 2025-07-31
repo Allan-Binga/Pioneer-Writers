@@ -7,8 +7,8 @@ const postOrder = async (req, res) => {
   try {
     const schema = Joi.object({
       order_id: Joi.string()
-        .guid({ version: ["uuidv4"] }) // Validate as UUID v4
-        .optional(), // Add order_id to schema
+        .guid({ version: ["uuidv4"] })
+        .optional(),
       subject: Joi.string().required(),
       type_of_service: Joi.string().required(),
       document_type: Joi.string().required(),
@@ -19,6 +19,8 @@ const postOrder = async (req, res) => {
       spacing: Joi.string().required(),
       number_of_words: Joi.number().integer().min(0),
       number_of_sources: Joi.number().integer().min(0),
+      slides: Joi.number().integer().min(0),
+      charts_or_graphs: Joi.number().integer().min(0),
       topic: Joi.string().required(),
       instructions: Joi.string().allow(""),
       writer_category: Joi.string().required(),
@@ -30,7 +32,6 @@ const postOrder = async (req, res) => {
       order_status: Joi.string()
         .valid("draft", "pending", "paid", "cancelled")
         .optional(),
-
       payment_option: Joi.string().allow(""),
       coupon_code: Joi.string().allow(""),
     });
@@ -60,24 +61,36 @@ const postOrder = async (req, res) => {
 
       // Update existing order
       query = `
-  INSERT INTO orders (
-    subject, type_of_service, document_type, writer_level,
-    paper_format, english_type, pages, spacing, number_of_words,
-    number_of_sources, topic, instructions, uploaded_file,
-    writer_category, deadline, total_price, checkout_amount,
-    writer_tip, plagiarism_report, payment_option, coupon_code,
-    user_id, order_status
-  )
-  VALUES (
-    $1, $2, $3, $4, $5,
-    $6, $7, $8, $9, $10,
-    $11, $12, $13, $14,
-    $15, $16, $17, $18, $19, $20,
-    $21, $22, $23
-  )
-  RETURNING *;
-`;
-
+        UPDATE orders
+        SET
+          subject = $1,
+          type_of_service = $2,
+          document_type = $3,
+          writer_level = $4,
+          paper_format = $5,
+          english_type = $6,
+          pages = $7,
+          spacing = $8,
+          number_of_words = $9,
+          number_of_sources = $10,
+          topic = $11,
+          instructions = $12,
+          uploaded_file = $13,
+          writer_category = $14,
+          deadline = $15,
+          total_price = $16,
+          checkout_amount = $17,
+          writer_tip = $18,
+          plagiarism_report = $19,
+          payment_option = $20,
+          coupon_code = $21,
+          order_status = $22,
+          slides = $23,
+          charts_or_graphs = $24,
+          updated_at = CURRENT_TIMESTAMP
+        WHERE order_id = $25 AND user_id = $26
+        RETURNING *;
+      `;
       values = [
         value.subject,
         value.type_of_service,
@@ -100,8 +113,11 @@ const postOrder = async (req, res) => {
         value.plagiarism_report ?? false,
         value.payment_option || "",
         value.coupon_code || "",
+        value.order_status || "pending",
+        value.slides || 0,
+        value.charts_or_graphs || 0,
+        value.order_id,
         userId,
-        value.order_status || "pending", // This is the key line
       ];
     } else {
       // Insert new order
@@ -112,14 +128,14 @@ const postOrder = async (req, res) => {
           number_of_sources, topic, instructions, uploaded_file,
           writer_category, deadline, total_price, checkout_amount,
           writer_tip, plagiarism_report, payment_option, coupon_code,
-          user_id
+          user_id, slides, charts_or_graphs
         )
         VALUES (
           $1, $2, $3, $4, $5,
           $6, $7, $8, $9, $10,
           $11, $12, $13, $14,
           $15, $16, $17, $18, $19, $20,
-          $21, $22
+          $21, $22, $23, $24
         )
         RETURNING *;
       `;
@@ -146,6 +162,8 @@ const postOrder = async (req, res) => {
         value.payment_option || "",
         value.coupon_code || "",
         userId,
+        value.slides || 0,
+        value.charts_or_graphs || 0,
       ];
     }
 

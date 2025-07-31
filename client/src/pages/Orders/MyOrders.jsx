@@ -19,10 +19,15 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { notify } from "../../utils/toast";
 import moment from "moment";
+import { useParams } from "react-router-dom";
 
 function MyOrders() {
+  const { status } = useParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  // Convert param to lowercase safely
+  const selectedStatus = status?.toLowerCase() || "all";
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -60,21 +65,33 @@ function MyOrders() {
     return `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m`;
   };
 
+  const filteredOrders =
+    selectedStatus === "all"
+      ? orders
+      : orders.filter(
+          (order) =>
+            order.order_status.toLowerCase().replace(/\s/g, "") ===
+            selectedStatus
+        );
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
       <Navbar />
       <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl font-bold text-slate-900 mb-8 mt-8">
-            My Orders
+          <h1 className="text-3xl font-bold text-slate-900 mb-8 mt-8 capitalize">
+            {selectedStatus === "all"
+              ? "My Orders"
+              : `${selectedStatus} Orders`}
           </h1>
 
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <LoaderCircle className="animate-spin w-10 h-10 text-slate-500" />
             </div>
-          ) : orders.length === 0 ? (
+          ) : filteredOrders.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-sm border border-slate-200">
+              <FileText className="w-12 h-12 text-slate-400 mb-2" />
               <p className="text-lg text-slate-500">No orders found.</p>
               <a
                 href="/new-order"
@@ -85,7 +102,7 @@ function MyOrders() {
             </div>
           ) : (
             <div className="grid gap-6">
-              {orders.map((order, index) => (
+              {filteredOrders.map((order, index) => (
                 <div
                   key={index}
                   className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 hover:shadow-md transition-shadow"

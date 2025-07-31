@@ -108,7 +108,8 @@ function Navbar() {
   }, [isLoggedIn]);
 
   const avatarUrl =
-    profile?.avatar_url?.trim() || "https://via.placeholder.com/40";
+    profile?.avatar_url?.trim() ||
+    "https://pioneer-writers-bucket.s3.eu-north-1.amazonaws.com/pioneer-writers/logo.webp";
 
   const userName = profile?.username || "User";
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { notify } from "../../utils/toast";
@@ -14,9 +14,10 @@ function Success() {
   const [loading, setLoading] = useState(true);
   const [searchParams] = useSearchParams();
   const [showSuccessMessage, setShowSuccessMessage] = useState(true);
-  const [pollingAttempts, setPollingAttempts] = useState(0);
-  const maxPollingAttempts = 5;
-  const pollingInterval = 2000;
+  const [pollingAttempts, setPollAttempts] = useState(0);
+  const maxPollingAttempts = 10; // Increased to allow more time
+  const pollingInterval = 3000; // Increased to 3 seconds
+  const hasCaptured = useRef(false); // Prevent multiple captures
 
   const formatDate = (dateString) => {
     const options = {
@@ -37,11 +38,13 @@ function Success() {
 
       if (orderId) {
         const payment = response.data.find((p) => p.order_id === orderId);
+
         if (payment) {
           setLoading(false);
           notify.success("Payment confirmed!");
+          setPollAttempts(0); // Reset polling
         } else if (pollingAttempts < maxPollingAttempts) {
-          setPollingAttempts((prev) => prev + 1);
+          setPollAttempts((prev) => prev + 1);
         } else {
           setLoading(false);
           notify.warn("Payment is being processed. Please check back later.");
@@ -55,61 +58,70 @@ function Success() {
         setLoading(false);
         notify.error("Failed to fetch payments. Please try again later.");
       } else {
-        setPollingAttempts((prev) => prev + 1);
+        setPollAttempts((prev) => prev + 1);
       }
     }
   };
 
   useEffect(() => {
     const token = searchParams.get("token");
+    let interval;
 
     const captureAndFetchPayments = async () => {
-      if (!token) {
+      if (!token || hasCaptured.current) {
         fetchPayments();
         return;
       }
 
       try {
+        hasCaptured.current = true; // Mark as captured
         const captureResponse = await axios.post(
           `${endpoint}/payments/capture`,
           { token },
           { withCredentials: true }
         );
-        notify.success("Payment captured successfully.");
 
-        localStorage.removeItem("step1Data");
-        localStorage.removeItem("step2Data");
-        localStorage.removeItem("checkoutAmount");
-        localStorage.removeItem("order_id");
-        localStorage.removeItem("orderData");
+        if (captureResponse.data.success) {
+          notify.success(
+            captureResponse.data.message || "Payment captured successfully."
+          );
 
-        const orderId =
-          captureResponse.data.capture.purchase_units[0]?.custom_id;
-        if (orderId) {
-          fetchPayments(orderId);
-          if (pollingAttempts < maxPollingAttempts) {
-            const interval = setInterval(() => {
-              fetchPayments(orderId);
+          localStorage.removeItem("step1Data");
+          localStorage.removeItem("step2Data");
+          localStorage.removeItem("checkoutAmount");
+          localStorage.removeItem("order_id");
+          localStorage.removeItem("orderData");
+
+          const orderId = captureResponse.data.orderId;
+          if (orderId) {
+            fetchPayments(orderId);
+            interval = setInterval(() => {
+              if (pollingAttempts < maxPollingAttempts) {
+                fetchPayments(orderId);
+              } else {
+                clearInterval(interval);
+              }
             }, pollingInterval);
-            return () => clearInterval(interval);
+          } else {
+            fetchPayments();
           }
-        } else {
-          fetchPayments();
         }
       } catch (error) {
         console.error("Capture failed:", error);
         notify.error("Failed to capture PayPal payment.");
         setLoading(false);
+        clearInterval(interval);
       }
     };
 
     captureAndFetchPayments();
+
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, [pollingAttempts]);
 
   return (
-    <div className="min-h-screen  flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
-
       <main className="flex-1 transition-all duration-300 pt-34 px-4">
         <div className="max-w-6xl mx-auto space-y-8">
           {showSuccessMessage && !loading && (
@@ -218,7 +230,7 @@ function Success() {
           </div>
         </div>
       </main>
-      <Footer/>
+      <Footer />
     </div>
   );
 }

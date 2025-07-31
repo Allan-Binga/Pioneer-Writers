@@ -27,6 +27,7 @@ import DataDeletion from "./pages/TermsOfUse/DataDeletion";
 import Drafts from "./pages/Orders/Drafts";
 import Home from "./pages/Home/Home";
 import OrderDetails from "./pages/Orders/OrderDetails";
+import PasswordReset from "./pages/PasswordReset/PasswordReset";
 
 function App() {
   return (
@@ -36,10 +37,11 @@ function App() {
         <Route path="/" element={<Navigate to="/sign-up" />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/new-order" element={<NewOrder />} />
-        <Route path="/my-orders" element={<MyOrders />} />
+        <Route path="/my-orders/:status" element={<MyOrders />} />
         <Route path="/order-details/:orderId" element={<OrderDetails />} />
         <Route path="/drafts" element={<Drafts />} />
         <Route path="/sign-in" element={<SignIn />} />
+        <Route path="/password/reset" element={<PasswordReset />} />
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/order-confirmation" element={<OrderConfirmation />} />
         <Route path="/home" element={<Home />} />

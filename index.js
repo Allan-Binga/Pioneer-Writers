@@ -14,6 +14,7 @@ const inboxRoute = require("./routes/emails");
 const writersRoute = require("./routes/writers");
 const profileRoute = require("./routes/profile");
 const dashboardRoute = require("./routes/dashboard")
+const passwordRoute = require("./routes/password")
 const {
   handlePaypalWebhook,
   handleStripeWebhook,
@@ -78,6 +79,7 @@ app.use("/pioneer-writers/v1/drafts", draftRoute);
 app.use("/pioneer-writers/v1/dashboard", dashboardRoute)
 app.use("/pioneer-writers/v1/writers", writersRoute);
 app.use("/pioneer-writers/v1/profile", profileRoute);
+app.use("/pioneer-writers/v1/password", passwordRoute)
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {

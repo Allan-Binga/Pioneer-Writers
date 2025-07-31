@@ -10,12 +10,12 @@ import AuthImage from "../../assets/signupImage.webp";
 import LogoImage from "../../assets/logo.jpeg";
 
 function SignIn() {
+  const [email, setEmail] = useState("");
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fieldErrors, setFieldErrors] = useState({});
   const [showForgotModal, setShowForgotModal] = useState(false);
-  const [forgotEmail, setForgotEmail] = useState("");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
 
@@ -113,9 +113,7 @@ function SignIn() {
 
       notify.success("Login successful.");
       setTimeout(() => {
-        navigate(
-          data.user.role === "Admin" ? "/home" : "/home"
-        );
+        navigate(data.user.role === "Admin" ? "/home" : "/home");
       }, 1500);
     } catch (error) {
       const msg = error.message?.toLowerCase?.();
@@ -224,9 +222,47 @@ function SignIn() {
     flow: "implicit",
   });
 
+  //Reset Password API call
+  const resetPassword = async () => {
+    if (!email) {
+      notify.error("Please enter an email");
+      return;
+    }
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      notify.error("Invalid email format");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${endpoint}/password/send/password-reset-email`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        }
+      );
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to send reset email");
+      }
+
+      notify.success(data.message);
+      setShowForgotModal(false);
+      setEmail("");
+    } catch (error) {
+      notify.info(error.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex bg-gradient-to-br from-white to-white">
-      <div className="hidden lg:flex w-1/2 h-screen flex-col items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gradient-to-br from-white to-white">
+      {/* Left Column */}
+      <div className="hidden lg:flex w-full lg:w-1/2 h-[300px] lg:h-screen items-center justify-center relative overflow-hidden">
         <div className="w-full h-full relative z-0">
           <img
             src={AuthImage}
@@ -236,46 +272,50 @@ function SignIn() {
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-slate-200">
-          <div className="text-center pb-4">
-            <div className="mb-4">
-              <img
-                src={LogoImage}
-                alt="Logo"
-                className="mx-auto w-[180px] h-auto object-contain"
-              />
-            </div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
-              Welcome back !
+      {/* Right Column */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-4 sm:px-6 md:px-8 py-4 sm:py-6 min-h-screen lg:min-h-0">
+        <div className="w-full max-w-md bg-white rounded-xl shadow-2xl p-6 sm:p-8 border border-slate-200">
+          {/* Rest of the form content remains unchanged */}
+          {/* Logo + Welcome */}
+          <div className="text-center mb-6">
+            <img
+              src={LogoImage}
+              alt="Logo"
+              className="mx-auto w-[180px] h-auto object-contain mb-4"
+            />
+            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
+              Welcome back!
             </h1>
           </div>
 
-          <form className="space-y-4 mt-4" onSubmit={handleSubmit}>
+          {/* Form */}
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            {/* Email */}
             <div className="relative">
-              <Mail className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+              <Mail className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
-                className="w-full pl-10 py-2.5 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-amber-100"
+                className="w-full pl-10 py-2.5 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder:text-sm"
               />
               {fieldErrors.email && (
                 <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
               )}
             </div>
 
+            {/* Password */}
             <div className="relative">
-              <Lock className="absolute left-4 top-4 h-4 w-4 text-slate-400" />
+              <Lock className="absolute left-4 top-3.5 h-4 w-4 text-slate-400" />
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
-                className="w-full pl-10 py-2.5 border border-stone-300 rounded-full focus:outline-none focus:ring-1 focus:ring-amber-100"
+                className="w-full pl-10 pr-10 py-2.5 border border-stone-300 rounded-full focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder:text-sm"
               />
               <button
                 type="button"
@@ -291,16 +331,18 @@ function SignIn() {
               )}
             </div>
 
+            {/* Forgot Password */}
             <div className="text-right">
               <button
                 type="button"
                 onClick={() => setShowForgotModal(true)}
-                className="text-sm text-slate-700 hover:underline"
+                className="text-sm text-amber-600 hover:underline cursor-pointer"
               >
                 Forgot password?
               </button>
             </div>
 
+            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
@@ -320,12 +362,12 @@ function SignIn() {
                     r="10"
                     stroke="currentColor"
                     strokeWidth="4"
-                  ></circle>
+                  />
                   <path
                     className="opacity-75"
                     fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
                 </svg>
               ) : (
                 "Sign In"
@@ -334,7 +376,7 @@ function SignIn() {
           </form>
 
           {/* Divider */}
-          <div className="my-8 relative">
+          <div className="my-8">
             <div className="flex items-center justify-center">
               <div className="flex-grow border-t border-slate-300"></div>
               <span className="mx-4 text-sm text-slate-600 bg-white px-3">
@@ -347,33 +389,33 @@ function SignIn() {
           {/* Social Logins */}
           <div className="grid grid-cols-2 gap-4">
             <button
-              onClick={() => googleLogin()}
-              className="group border border-gray-300 p-4 rounded-full bg-white hover:border-gray-400 transition duration-200 flex items-center justify-center cursor-pointer"
+              onClick={googleLogin}
+              className="border border-gray-300 p-3 rounded-full bg-white hover:border-gray-400 transition duration-200 flex items-center justify-center"
             >
               <img src={GoogleIcon} alt="Google" className="w-6 h-6" />
             </button>
-
             <button
               onClick={handleFacebookLogin}
-              className="group border border-gray-300 p-4 rounded-full bg-white hover:border-gray-400 transition duration-200 flex items-center justify-center cursor-pointer"
+              className="border border-gray-300 p-3 rounded-full bg-white hover:border-gray-400 transition duration-200 flex items-center justify-center"
             >
               <img src={FacebookIcon} alt="Facebook" className="w-6 h-6" />
             </button>
           </div>
 
           {/* Footer */}
-          <p className="text-slate-600 mt-6 text-center text-sm">
-            New to Pioneer Writers?{" "}
+          <div className="mt-8 text-center">
+            <p className="text-xs text-gray-600">Don’t have an account?</p>
             <Link
               to="/sign-up"
-              className="text-slate-700 hover:underline hover:font-semibold"
+              className="inline-block mt-2 px-6 text-sm py-2 text-amber-600 border border-amber-400 rounded-full hover:bg-amber-50 transition-all duration-200 font-medium"
             >
-              Sign Up
+              Sign Up Now
             </Link>
-          </p>
+          </div>
         </div>
       </div>
 
+      {/* Forgot Password Modal */}
       {showForgotModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm bg-black/10">
           <div className="relative bg-white w-full max-w-md mx-auto rounded-2xl p-6 shadow-lg border border-slate-300">
@@ -383,38 +425,55 @@ function SignIn() {
             >
               <X className="w-6 h-6" />
             </button>
-
             <h2 className="text-xl font-semibold text-slate-700 mb-4">
               Reset your password
             </h2>
-
             <div className="mb-4">
               <label
-                className="block text-sm text-slate-600 mb-1"
                 htmlFor="forgotEmail"
+                className="block text-sm text-slate-600 mb-1"
               >
-                Please enter your email
+                Please enter your associated email
               </label>
               <input
-                id="forgotEmail"
+                id="email"
                 type="email"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-4 py-2 rounded-full border border-slate-300 focus:ring-1 focus:ring-slate-600 focus:outline-none"
+                className="w-full px-4 py-2 rounded-full border border-slate-300 focus:ring-1 focus:ring-gray-200 focus:outline-none placeholder:text-sm"
+                required
               />
             </div>
-
             <button
               type="button"
-              onClick={() => {
-                if (!forgotEmail) return notify.error("Please enter an email");
-                notify.success("Password reset link sent!");
-                setShowForgotModal(false);
-              }}
+              onClick={resetPassword}
               className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white py-2.5 rounded-full shadow hover:shadow-md transition-all duration-200 cursor-pointer"
             >
-              Send
+              {loading ? (
+                <svg
+                  className="animate-spin h-5 w-5 mx-auto text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              ) : (
+                "Send"
+              )}
             </button>
           </div>
         </div>

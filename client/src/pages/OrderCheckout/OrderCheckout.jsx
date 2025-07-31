@@ -89,11 +89,18 @@ function OrderPayment() {
           break;
 
         case "paypal":
+          const orderId = localStorage.getItem("order_id");
+
+          if (!orderId) {
+            throw new Error("No order ID found in localStorage");
+          }
+
           response = await axios.post(
             `${endpoint}/checkout/pay-with-paypal`,
-            {},
+            { orderId },
             { withCredentials: true }
           );
+
           redirectUrl = response.data.approvalUrl;
           if (!redirectUrl) throw new Error("No approval URL received");
           break;
@@ -192,15 +199,15 @@ function OrderPayment() {
       <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
           {/* Progress Tracker */}
-          <div className="p-6 mb-4 mt-4">
-            <div className="flex items-center justify-between relative">
+          <div className="p-4 sm:p-6 mb-4 mt-4">
+            <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-between">
               {steps.map((step) => (
                 <div
                   key={step.number}
                   className="relative z-10 flex items-center"
                 >
                   <div
-                    className={`flex items-center px-8 py-4 rounded-full border text-sm font-medium transition-all duration-300 ${
+                    className={`flex items-center px-4 sm:px-6 py-3 rounded-full border text-sm font-medium transition-all duration-300 ${
                       step.completed
                         ? "bg-gradient-to-r from-teal-500 to-teal-700 border-teal-600 text-white"
                         : step.current
@@ -233,7 +240,7 @@ function OrderPayment() {
                 Order Summary
               </h2>
               {orderData ? (
-                <div className="space-y-4 text-slate-600">
+                <div className="space-y-4 text-slate-600 text-sm">
                   <div className="flex items-center gap-3 border-b border-slate-100 pb-3">
                     <Book size={18} className="text-slate-400" />
                     <div className="flex-1">

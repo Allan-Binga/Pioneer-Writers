@@ -42,12 +42,13 @@ const capturePayment = async (req, res) => {
 
     const capture = await paypalClient.execute(request);
     const captureData = capture.result;
+    const orderId = capture.result.purchase_units[0]?.custom_id;
 
     console.log("PayPal capture successful:", captureData);
 
     // Optional: Save captureData to DB here if needed
 
-    res.status(200).json({ success: true, capture: captureData });
+    res.status(200).json({ success: true, capture: captureData, orderId });
   } catch (error) {
     console.error("PayPal capture failed:", error.message || error);
     res.status(500).json({ error: "Capture failed." });

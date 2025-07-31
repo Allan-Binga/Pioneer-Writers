@@ -3,7 +3,7 @@ import Select from "react-select";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { useState, useEffect, useCallback } from "react";
-import { Check, Calendar } from "lucide-react";
+import { Check } from "lucide-react";
 import { notify } from "../../utils/toast";
 
 function NewOrder() {
@@ -46,7 +46,10 @@ function NewOrder() {
       number_of_words: storedOrder.number_of_words || 275,
       document_type: storedOrder.document_type || "essay",
       deadline: storedOrder.deadline
-        ? new Date(storedOrder.deadline).toISOString().slice(0, 16)
+        ? new Date(storedOrder.deadline)
+            .toLocaleString("sv-SE")
+            .replace(" ", "T")
+            .slice(0, 16)
         : "",
       total_price: storedOrder.total_price || 20,
       english_type: storedOrder.english_type || "usa",
@@ -176,13 +179,14 @@ function NewOrder() {
         })
       : "Not set";
 
-  // react-select custom styles
+  // react-select custom styles with reduced text size
   const selectStyles = {
     control: (provided) => ({
       ...provided,
       border: "1px solid #e2e8f0",
       borderRadius: "0.5rem",
-      padding: "0.5rem",
+      padding: "0.375rem",
+      fontSize: "0.875rem",
       boxShadow: "none",
       "&:hover": { borderColor: "#2dd4bf" },
       "&:focus-within": {
@@ -198,13 +202,15 @@ function NewOrder() {
         ? "#f1f5f9"
         : "white",
       color: state.isSelected ? "white" : "#1e293b",
-      padding: "0.75rem 1rem",
+      fontSize: "0.875rem",
+      padding: "0.5rem 0.75rem",
     }),
     menu: (provided) => ({
       ...provided,
       borderRadius: "0.5rem",
       border: "1px solid #e2e8f0",
       boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1)",
+      fontSize: "0.875rem",
     }),
   };
 
@@ -234,15 +240,15 @@ function NewOrder() {
       <Navbar />
       <main className="flex-1 pt-16">
         <div className="container mx-auto px-4 py-8">
-          <div className="p-6 mb-4 mt-4">
-            <div className="flex items-center justify-between relative">
+          <div className="p-4 sm:p-6 mb-4 mt-4">
+            <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-between">
               {steps.map((step) => (
                 <div
                   key={step.number}
                   className="relative z-10 flex items-center"
                 >
                   <div
-                    className={`flex items-center px-8 py-4 rounded-full border text-sm font-medium transition-all duration-300 ${
+                    className={`flex items-center px-4 sm:px-6 py-3 rounded-full border text-sm font-medium transition-all duration-300 ${
                       step.completed
                         ? "bg-gradient-to-r from-teal-500 to-teal-700 border-teal-600 text-white"
                         : step.current
@@ -267,15 +273,17 @@ function NewOrder() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column (Form) */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-8">
+                <h2 className="text-xl font-bold text-slate-800 mb-6">
                   Basic Paper Instructions
                 </h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Type of Service */}
-                  <div className="col-span-2">
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
                       Type of Service <span className="text-red-500">*</span>
                     </label>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -301,11 +309,11 @@ function NewOrder() {
                   </div>
 
                   {/* Writer Level */}
-                  <div className="col-span-2">
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  <div className="col-span-1 md:col-span-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
                       Writer Level <span className="text-red-500">*</span>
                     </label>
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                       {[
                         { value: "university", label: "University" },
                         { value: "college", label: "College" },
@@ -327,7 +335,7 @@ function NewOrder() {
 
                   {/* Document Type */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
                       Document Type <span className="text-red-500">*</span>
                     </label>
                     <Select
@@ -346,7 +354,7 @@ function NewOrder() {
 
                   {/* Pages */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
                       Pages <span className="text-red-500">*</span>
                     </label>
                     <Select
@@ -365,7 +373,7 @@ function NewOrder() {
 
                   {/* Number of Words */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
                       Number of Words
                     </label>
                     <input
@@ -375,13 +383,13 @@ function NewOrder() {
                       onChange={(e) =>
                         handleInputChange("number_of_words", e.target.value)
                       }
-                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm"
                     />
                   </div>
 
                   {/* Deadline */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
                       Deadline <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
@@ -392,15 +400,15 @@ function NewOrder() {
                         onChange={(e) =>
                           handleInputChange("deadline", e.target.value)
                         }
-                        className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent pr-10"
+                        className="w-full px-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent pr-10 text-sm"
                       />
-                      <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
+                      {/* <Calendar className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" /> */}
                     </div>
                   </div>
 
                   {/* English Type */}
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-2">
+                    <label className="block text-xs font-semibold text-slate-700 mb-2">
                       Select English Type{" "}
                       <span className="text-red-500">*</span>
                     </label>
@@ -420,13 +428,14 @@ function NewOrder() {
                 </div>
               </div>
             </div>
-            {/* Summary */}
+
+            {/* Right Column (Summary) */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sticky top-6">
-                <h3 className="text-xl font-bold text-slate-800 mb-6">
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 lg:sticky lg:top-6">
+                <h3 className="text-lg font-bold text-slate-800 mb-6">
                   Summary
                 </h3>
-                <div className="space-y-4 mb-6">
+                <div className="space-y-4 mb-6 text-sm">
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Document Type</span>
                     <span className="font-semibold">
