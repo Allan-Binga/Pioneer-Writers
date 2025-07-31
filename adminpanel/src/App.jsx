@@ -13,6 +13,7 @@ import News from "./pages/News/News";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Clients from "./pages/Users/Clients";
 import UserDetails from "./pages/Users/UserDetails";
+import WriterDetails from "./pages/Users/WriterDetails";
 import Writers from "./pages/Users/Writers";
 import Administrators from "./pages/Users/Admins";
 import Settings from "./pages/Settings/Settings";
@@ -37,6 +38,7 @@ function App() {
         <Route path="/writers" element={<Writers />} />
         <Route path="/clients" element={<Clients />} />
         <Route path="/clients/:clientId" element={<UserDetails />} />
+        <Route path="/writers/:writerId" element={<WriterDetails />} />
         <Route path="/administrators" element={<Administrators />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/disputes" element={<Disputes />} />

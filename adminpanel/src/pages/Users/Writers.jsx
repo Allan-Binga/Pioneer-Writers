@@ -31,8 +31,8 @@ function Writers() {
     fetchWriters();
   }, []);
 
-  const handleRowClick = (clientId) => {
-    navigate(`/clients/${clientId}`);
+  const handleRowClick = (writerId) => {
+    navigate(`/writers/${writerId}`);
   };
 
   return (

@@ -43,6 +43,39 @@ const getSingleUser = async (req, res) => {
   }
 };
 
+//Fetch Single Writer
+const getSingleWriter = async (req, res) => {
+  const { writerId } = req.params;
+
+  try {
+    //Fetch writer
+    const writerResult = await client.query(
+      "SELECT * FROM writers WHERE writer_id = $1",
+      [writerId]
+    );
+
+    if (writerResult.rows.length === 0) {
+      return res.status(404).json({ message: "Writer not found." });
+    }
+
+    const writer = writerResult.rows[0];
+
+    // Fetch user's orders
+    const ordersResult = await client.query(
+      "SELECT * FROM orders WHERE writer_id = $1 ORDER BY created_at DESC",
+      [writerId]
+    );
+
+    const orders = ordersResult.rows;
+
+    // Respond with both
+    res.status(200).json({ writer, orders });
+  } catch (error) {
+    console.error("Error fetching writer and orders:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 //Get Writers
 const getWriters = async (req, res) => {
   try {
@@ -63,4 +96,10 @@ const getAdmins = async (req, res) => {
   }
 };
 
-module.exports = { getUsers, getWriters, getAdmins, getSingleUser };
+module.exports = {
+  getUsers,
+  getWriters,
+  getSingleWriter,
+  getAdmins,
+  getSingleUser,
+};
