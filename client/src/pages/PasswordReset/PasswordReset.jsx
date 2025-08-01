@@ -108,7 +108,7 @@ function PasswordReset() {
       <div className="flex-grow flex items-center justify-center">
         <div className="w-full max-w-md mt-4 bg-white p-6 rounded-lg shadow-md border-amber-100">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-            Reset Password
+            Reset your password
           </h2>
 
           {/* Status Message */}
@@ -148,32 +148,34 @@ function PasswordReset() {
               </div>
               <button
                 onClick={resendPasswordResetEmail}
-                className="w-full bg-slate-600 text-white py-3 rounded-full hover:bg-slate-700 transition cursor-pointer flex justify-center items-center gap-2 disabled:bg-slate-400"
+                className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white py-2.5 rounded-full shadow hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 disabled={loading}
               >
-                {loading && (
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    ></path>
-                  </svg>
-                )}
-                {loading ? "Sending..." : "Resend Email"}
+                <div className="flex justify-center items-center space-x-2">
+                  {loading && (
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      ></path>
+                    </svg>
+                  )}
+                  <span>{loading ? "Sending..." : "Resend Email"}</span>
+                </div>
               </button>
             </div>
           ) : (
@@ -237,32 +239,36 @@ function PasswordReset() {
 
               <button
                 type="submit"
-                className="w-full bg-slate-600 text-white py-3 rounded-full hover:bg-slate-800 transition cursor-pointer"
+                className="w-full bg-gradient-to-r from-amber-400 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-white py-2.5 rounded-full shadow hover:shadow-md transition-all duration-200 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 disabled={loading}
               >
-                {loading && (
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                    ></path>
-                  </svg>
-                )}
-                {loading ? "Reseting..." : "Reset your password"}
+                <div className="flex justify-center items-center space-x-2">
+                  {loading && (
+                    <svg
+                      className="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                      ></path>
+                    </svg>
+                  )}
+                  <span>
+                    {loading ? "Resetting..." : "Reset your password"}
+                  </span>
+                </div>
               </button>
             </form>
           )}

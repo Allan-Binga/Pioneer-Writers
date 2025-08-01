@@ -135,7 +135,7 @@ const verifyPasswordResetToken = async (req, res) => {
 
     if (new Date(user.password_reset_token_expiry) < new Date()) {
       return res.status(400).json({
-        message: "Session expired. Please request a new reset email.",
+        message: "Session expired. Please request a new password reset email.",
       });
     }
 
@@ -148,15 +148,8 @@ const verifyPasswordResetToken = async (req, res) => {
   }
 };
 
-//Resend Password Reset Email
-const resendPasswordResetEmail = async (req, res) => {
-  try {
-  } catch (error) {}
-};
-
 module.exports = {
   resetPasswordEmail,
   resetPasswordToken,
   verifyPasswordResetToken,
-  resendPasswordResetEmail,
 };

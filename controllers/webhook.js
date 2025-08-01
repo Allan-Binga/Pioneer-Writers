@@ -10,8 +10,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 //PayPal Webhook Handler
 const handlePaypalWebhook = async (req, res) => {
   const event = req.body;
-  console.log("Webhook received: ", event.event_type);
-  console.log(event);
+  // console.log("Webhook received: ", event.event_type);
+  // console.log(event);
 
   switch (event.event_type) {
     case "PAYMENT.CAPTURE.COMPLETED": {
@@ -46,6 +46,16 @@ const handlePaypalWebhook = async (req, res) => {
           [updatedStatus, orderId]
         );
 
+        const existingCheck = await client.query(
+          `SELECT * FROM payments WHERE transaction_reference = $1`,
+          [transactionId]
+        );
+
+        if (existingCheck.rows.length > 0) {
+          // console.log("Payment already recorded. Skipping webhook insert.");
+          return res.status(200).send("Already processed.");
+        }
+
         // 2. Insert into payments table
         const insertQuery = `
           INSERT INTO payments (
@@ -69,7 +79,9 @@ const handlePaypalWebhook = async (req, res) => {
           transactionId,
         ]);
 
-        console.log(`Payment recorded for order ${orderId}`);
+        // console.log(
+        //   `Payment recorded for order ${orderId} with webhook instead.`
+        // );
       } catch (error) {
         console.error("Error handling completed webhook:", error);
       }

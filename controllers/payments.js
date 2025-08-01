@@ -31,22 +31,65 @@ const getMyPayments = async (req, res) => {
 // Capture PayPal Payment
 const capturePayment = async (req, res) => {
   const { token } = req.body;
-
-  if (!token) {
-    return res.status(400).json({ error: "Missing PayPal token." });
-  }
+  if (!token) return res.status(400).json({ error: "Missing PayPal token." });
 
   try {
     const request = new paypal.orders.OrdersCaptureRequest(token);
     request.requestBody({});
-
     const capture = await paypalClient.execute(request);
+
     const captureData = capture.result;
-    const orderId = capture.result.purchase_units[0]?.custom_id;
+    const orderId =
+      captureData.purchase_units[0]?.payments?.captures[0]?.custom_id;
 
-    console.log("PayPal capture successful:", captureData);
+    const transactionId =
+      captureData.purchase_units[0].payments?.captures[0]?.id;
 
-    // Optional: Save captureData to DB here if needed
+    // console.log("CaptureData:", JSON.stringify(captureData, null, 2));
+
+    // Check if payment already exists
+    const existsQuery = `SELECT * FROM payments WHERE transaction_reference = $1`;
+    const { rows: existing } = await client.query(existsQuery, [transactionId]);
+
+    if (existing.length === 0) {
+      const { rows } = await client.query(
+        `SELECT * FROM orders WHERE order_id = $1`,
+        [orderId]
+      );
+      if (rows.length > 0) {
+        const order = rows[0];
+
+        await client.query(
+          `INSERT INTO payments (
+            order_id, user_id, amount, payment_type,
+            payment_status, payment_method, transaction_reference,
+            paid_at, created_at, updated_at
+          ) VALUES (
+            $1, $2, $3, $4, 'completed', 'PayPal', $5, NOW(), NOW(), NOW()
+          )`,
+          [
+            orderId,
+            order.user_id,
+            order.checkout_amount,
+            order.payment_option || "full",
+            transactionId,
+          ]
+        );
+        // console.log(
+        //   `Payment for order ${orderId} recorded with the capture handler.`
+        // );
+
+        await client.query(
+          `UPDATE orders SET order_status = $1 WHERE order_id = $2`,
+          [
+            (order.payment_option || "full") === "half"
+              ? "Partially Paid"
+              : "Paid",
+            orderId,
+          ]
+        );
+      }
+    }
 
     res.status(200).json({ success: true, capture: captureData, orderId });
   } catch (error) {
