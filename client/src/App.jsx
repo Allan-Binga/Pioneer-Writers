@@ -29,6 +29,7 @@ import Home from "./pages/Home/Home";
 import OrderDetails from "./pages/Orders/OrderDetails";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import Payments from "./pages/Payments/Payments";
+import ClassHelp from "./pages/ClassHelp/ClassHelp";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
         <Route path="/" element={<Navigate to="/sign-up" />} />
         <Route path="/landing" element={<Landing />} />
         <Route path="/new-order" element={<NewOrder />} />
+        <Route path="/class-help" element={<ClassHelp />} />
         <Route path="/my-orders/:status" element={<MyOrders />} />
         <Route path="/order-details/:orderId" element={<OrderDetails />} />
         <Route path="/drafts" element={<Drafts />} />

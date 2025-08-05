@@ -179,6 +179,15 @@ function NewOrder() {
         })
       : "Not set";
 
+  const formatDocumentType = (str) => {
+    if (!str) return "Essay";
+    return str
+      .replace(/[-_]/g, " ") // Replace - and _ with space
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   // react-select custom styles with reduced text size
   const selectStyles = {
     control: (provided) => ({
@@ -216,12 +225,26 @@ function NewOrder() {
 
   // Options for document type and pages
   const documentTypeOptions = [
-    { value: "essay", label: "Essay (Any Type)" },
-    { value: "coursework", label: "Coursework" },
+    { value: "essay", label: "Custom Essay" },
     { value: "business-plan", label: "Business Plan" },
+    { value: "literature-review", label: "Literature Review" },
+    { value: "research-paper", label: "Research Paper" },
+    { value: "admission-essay", label: "Admission Essay" },
+    { value: "case-study", label: "Case Study" },
+    { value: "multiple-choice-questions", label: "Multiple Choice Questions" },
+    { value: "research-proposal", label: "Research Proposal" },
+    { value: "annotated-bibliography", label: "Annotated Bibliography" },
+    { value: "coursework", label: "Coursework" },
+    { value: "speech-presentation", label: "Speech/Presentation" },
+    { value: "term-paper", label: "Term Paper" },
     { value: "article_review", label: "Article Review" },
-    { value: "dissertation", label: "Dissertation" },
-    { value: "thesis", label: "Thesis" },
+    { value: "creative-writing", label: "Creative Writing" },
+    { value: "reflective-writing", label: "Reflective Writing" },
+    { value: "thesis-dissertation", label: "Thesis/Dissertation" },
+    { value: "book-movie-review", label: "Book/Movie Review" },
+    { value: "critical-thinking", label: "Critical Thinking" },
+    { value: "report", label: "Report" },
+    { value: "editing-proofreading", label: "Editing and Proofreading" },
     { value: "math-problems", label: "Mathematics Problems" },
   ];
 
@@ -439,10 +462,7 @@ function NewOrder() {
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600">Document Type</span>
                     <span className="font-semibold">
-                      {formData.document_type
-                        ? formData.document_type.charAt(0).toUpperCase() +
-                          formData.document_type.slice(1)
-                        : "Essay"}
+                      {formatDocumentType(formData.document_type)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">

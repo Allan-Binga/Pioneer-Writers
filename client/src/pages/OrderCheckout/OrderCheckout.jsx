@@ -78,16 +78,6 @@ function OrderPayment() {
       let redirectUrl;
 
       switch (selectedMethod) {
-        case "googlepay":
-          response = await axios.post(
-            `${endpoint}/checkout/google`,
-            {},
-            { withCredentials: true }
-          );
-          redirectUrl = response.data.sessionUrl;
-          if (!redirectUrl) throw new Error("No session URL received");
-          break;
-
         case "paypal":
           const orderId = localStorage.getItem("order_id");
 

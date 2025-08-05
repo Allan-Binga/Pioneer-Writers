@@ -44,7 +44,6 @@ function OrderDetails() {
           }
         );
         setOrder(response.data);
-        // Assuming the API returns an array of uploaded files
         setUploadedFiles(response.data.uploaded_files || []);
       } catch (error) {
         notify.error("Failed to fetch order details");
@@ -116,8 +115,8 @@ function OrderDetails() {
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
-      case "pending":
-        return "bg-amber-100 text-amber-700";
+      case "paid":
+        return "bg-green-200 text-green-800";
       case "completed":
         return "bg-green-100 text-green-700";
       case "cancelled":
@@ -141,7 +140,6 @@ function OrderDetails() {
               onClick={() => setShowActions(true)}
               aria-label="Open order actions"
             >
-              
               Order Actions
               <MoreVertical className="w-4 h-4" />
             </button>
@@ -189,7 +187,9 @@ function OrderDetails() {
                     {
                       label: "Subject",
                       value: order.subject || "N/A",
-                      icon: <BookOpenText className="text-slate-600" size={18} />,
+                      icon: (
+                        <BookOpenText className="text-slate-600" size={18} />
+                      ),
                     },
                     {
                       label: "Pages",
@@ -208,7 +208,7 @@ function OrderDetails() {
                       ),
                     },
                     {
-                      label: "Status",
+                      label: "Payment Status",
                       value: (
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${getStatusColor(
@@ -218,7 +218,9 @@ function OrderDetails() {
                           {order.order_status || "N/A"}
                         </span>
                       ),
-                      icon: <AlignJustify className="text-slate-600" size={18} />,
+                      icon: (
+                        <AlignJustify className="text-slate-600" size={18} />
+                      ),
                     },
                     {
                       label: "Created At",

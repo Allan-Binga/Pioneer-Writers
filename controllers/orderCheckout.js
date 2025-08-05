@@ -130,7 +130,7 @@ const stripeCheckout = async (req, res) => {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.CLIENT_URL}/payment/successful`,
+      success_url: `${process.env.CLIENT_URL}/payment/success`,
       cancel_url: `${process.env.CLIENT_URL}/payment/failed`,
       metadata: {
         paymentId: paymentId.toString(),
