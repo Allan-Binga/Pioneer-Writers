@@ -7,7 +7,7 @@ const router = express.Router()
 
 //Routes
 router.get("/", getDrafts)
-router.delete("/delete-drafts", authUser, deleteDrafts)
-router.patch("/update-draft", authUser, uploadedFile.array(), updateDraft)
+router.delete("/delete-draft/:draftId", authUser, deleteDrafts)
+router.patch("/update-draft/:draftId", authUser, uploadedFile.array(), updateDraft)
 
 module.exports = router

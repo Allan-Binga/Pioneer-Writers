@@ -1,9 +1,11 @@
 const client = require("../config/dbConfig");
 const Joi = require("joi");
 
+//Update Draft
 const updateDraft = async (req, res) => {
   const userId = req.userId;
-  const orderId = req.params.order_id;
+  const { draftId } = req.params;
+  const orderId = draftId;
 
   const schema = Joi.object({
     subject: Joi.string().required(),
@@ -105,6 +107,25 @@ const getDrafts = async (req, res) => {
 };
 
 //Delete Drafts
-const deleteDrafts = async (req, res) => {};
+const deleteDrafts = async (req, res) => {
+  const { draftId } = req.params;
+  const userId = req.userId;
+
+  try {
+    const result = await client.query(
+      `DELETE FROM orders WHERE order_id = $1 AND user_id = $2 AND order_status = 'draft' RETURNING *`,
+      [draftId, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Draft not found or unauthorized" });
+    }
+
+    res.json({ message: "Draft deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting draft:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 
 module.exports = { updateDraft, getDrafts, deleteDrafts };

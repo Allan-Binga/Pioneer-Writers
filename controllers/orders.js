@@ -5,7 +5,11 @@ const Joi = require("joi");
 const postOrder = async (req, res) => {
   const userId = req.userId; // From middleware
   try {
-    const schema = Joi.object({
+    // First extract order_status from raw body
+    const orderStatus = req.body.order_status;
+
+    // Schema for final orders (strict)
+    const strictSchema = Joi.object({
       order_id: Joi.string()
         .guid({ version: ["uuidv4"] })
         .optional(),
@@ -36,6 +40,42 @@ const postOrder = async (req, res) => {
       coupon_code: Joi.string().allow(""),
     });
 
+    // Schema for draft orders (loose)
+    const draftSchema = Joi.object({
+      order_id: Joi.string()
+        .guid({ version: ["uuidv4"] })
+        .optional(),
+      subject: Joi.string().allow("", null),
+      type_of_service: Joi.string().allow("", null),
+      document_type: Joi.string().allow("", null),
+      writer_level: Joi.string().allow("", null),
+      paper_format: Joi.string().allow("", null),
+      english_type: Joi.string().allow("", null),
+      pages: Joi.number().integer().min(0).allow(null),
+      spacing: Joi.string().allow("", null),
+      number_of_words: Joi.number().integer().min(0).allow(null),
+      number_of_sources: Joi.number().integer().min(0).allow(null),
+      slides: Joi.number().integer().min(0).allow(null),
+      charts_or_graphs: Joi.number().integer().min(0).allow(null),
+      topic: Joi.string().allow("", null),
+      instructions: Joi.string().allow("", null),
+      writer_category: Joi.string().allow("", null),
+      deadline: Joi.date().iso().allow(null),
+      total_price: Joi.number().min(0).allow(null),
+      checkout_amount: Joi.number().min(0).allow(null),
+      writer_tip: Joi.number().min(0).allow(null),
+      plagiarism_report: Joi.boolean().allow(null),
+      order_status: Joi.string()
+        .valid("draft", "pending", "paid", "cancelled")
+        .optional(),
+      payment_option: Joi.string().allow("", null),
+      coupon_code: Joi.string().allow("", null),
+    });
+
+    // Choose schema based on order_status
+    const schema = orderStatus === "draft" ? draftSchema : strictSchema;
+
+    // Validate with chosen schema
     const { error, value } = schema.validate(req.body);
     if (error) return res.status(400).json({ error: error.details[0].message });
 
@@ -338,7 +378,7 @@ const deleteOrder = async (req, res) => {
   const { orderId } = req.params;
 
   try {
-    // Optional: Check if order exists and belongs to the user
+    // Check if order exists and belongs to the user
     const checkQuery = `SELECT * FROM orders WHERE order_id = $1`;
     const checkResult = await client.query(checkQuery, [orderId]);
 

@@ -182,7 +182,7 @@ function NewOrder() {
   const formatDocumentType = (str) => {
     if (!str) return "Essay";
     return str
-      .replace(/[-_]/g, " ") // Replace - and _ with space
+      .replace(/[-_]/g, " ") 
       .split(" ")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");

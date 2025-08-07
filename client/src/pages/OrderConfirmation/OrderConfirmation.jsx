@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Check, CloudUpload, FileText, X, Tag } from "lucide-react";
 import Navbar from "../../components/Navbar";
+import Spinner from "../../components/Spinner";
 import axios from "axios";
 import { endpoint } from "../../server";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -48,8 +49,18 @@ function OrderConfirmation() {
     deadline: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDraftSaving, setIsDraftSaving] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
   const [error, setError] = useState(null);
+
+  const formatSubjectDocument = (str) => {
+    if (!str) return "Essay";
+    return str
+      .replace(/[-_]/g, " ")
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   // Load data from localStorage and location.state
   useEffect(() => {
@@ -162,8 +173,8 @@ function OrderConfirmation() {
     formData.plagiarism_report,
     formData.writer_category,
     formData.spacing,
-    formData.slides, // Updated to match
-    formData.charts_or_graphs, // Updated to match
+    formData.slides,
+    formData.charts_or_graphs,
     formData.number_of_sources,
     formData.payment_option,
   ]);
@@ -248,8 +259,8 @@ function OrderConfirmation() {
   // Form submission
   const handleSubmit = async (e, isDraft = false) => {
     e.preventDefault();
-    setIsSubmitting(true);
     setError(null);
+    setIsSubmitting(true);
 
     if (!isDraft) {
       const requiredFields = [
@@ -266,6 +277,8 @@ function OrderConfirmation() {
         setIsSubmitting(false);
         return;
       }
+    } else {
+      setIsDraftSaving(true); // Show spinner for draft saves
     }
 
     try {
@@ -294,8 +307,8 @@ function OrderConfirmation() {
         pages: parseInt(formData.pages) || 1,
         number_of_words: parseInt(formData.number_of_words) || 0,
         deadline: formData.deadline,
-        slides: parseInt(formData.slides) || 0, // Updated to match
-        charts_or_graphs: parseInt(formData.charts_or_graphs) || 0, // Updated to match
+        slides: parseInt(formData.slides) || 0,
+        charts_or_graphs: parseInt(formData.charts_or_graphs) || 0,
         ...(isDraft && { order_status: "draft" }),
       };
 
@@ -305,6 +318,7 @@ function OrderConfirmation() {
           payload.append(key, value);
         }
       });
+
       formData.uploadedFiles.forEach((file) => {
         if (file.file) payload.append("uploadedFiles", file.file);
       });
@@ -322,6 +336,7 @@ function OrderConfirmation() {
         "checkoutAmount",
         formData.checkout_amount.toString()
       );
+
       const fileMetadata = formData.uploadedFiles.map((f) => ({
         name: f.name,
         size: f.size,
@@ -331,6 +346,7 @@ function OrderConfirmation() {
         "step2Data",
         JSON.stringify({ ...orderData, uploadedFiles: fileMetadata })
       );
+
       localStorage.setItem("order_id", response.data.order.order_id);
 
       notify.success(
@@ -341,7 +357,12 @@ function OrderConfirmation() {
           : "Order posted, awaiting payment."
       );
 
-      if (!isDraft) {
+      if (isDraft) {
+        // Wait for 4 seconds before navigating
+        setTimeout(() => {
+          navigate("/drafts");
+        }, 4000);
+      } else {
         setSteps((prev) =>
           prev.map((step, index) =>
             index === 1
@@ -364,6 +385,7 @@ function OrderConfirmation() {
       setError(error.response?.data?.error || error.message);
     } finally {
       setIsSubmitting(false);
+      setIsDraftSaving(false);
     }
   };
 
@@ -460,6 +482,13 @@ function OrderConfirmation() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
+      {isDraftSaving && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <Spinner />
+          {/* <p className="text-amber-700 text-lg ml-4">Saving draft...</p> */}
+        </div>
+      )}
+
       <main className="pt-16">
         <div className="container mx-auto px-4 py-8">
           {error && (
@@ -1040,16 +1069,13 @@ function OrderConfirmation() {
                   <div className="flex justify-between">
                     <span className="text-slate-600">Subject</span>
                     <span className="font-semibold">
-                      {formData.subject
-                        ? formData.subject.charAt(0).toUpperCase() +
-                          formData.subject.slice(1)
-                        : "Not set"}
+                      {formatSubjectDocument(formData.subject)}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-600">Document Type</span>
                     <span className="font-semibold capitalize">
-                      {formData.document_type || "Essay"}
+                      {formatSubjectDocument(formData.document_type)}
                     </span>
                   </div>
                   <div className="flex justify-between">
@@ -1157,7 +1183,7 @@ function OrderConfirmation() {
                   <button
                     type="button"
                     onClick={(e) => handleSubmit(e, true)}
-                    className="inline-flex items-center justify-center gap-2 bg-white text-slate-700 border border-slate-200 hover:bg-teal-50 font-medium px-4 py-2 text-sm rounded-lg transition cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 bg-amber-100 text-amber-800 border border-amber-300 hover:bg-amber-200 font-medium px-4 py-2 text-sm rounded-lg transition cursor-pointer"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import { notify } from "../../utils/toast";
 import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
 import { XCircle } from "lucide-react";
 import { endpoint } from "../../server";
 
 function Failure() {
+  const [searchParams] = useSearchParams();
+  const orderId = searchParams.get("orderId");
   const [orders, setOrders] = useState([]);
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -52,11 +54,72 @@ function Failure() {
     fetchOrders();
   }, []);
 
+  useEffect(() => {
+    const cancelOrder = async () => {
+      if (!orderId) return;
+
+      try {
+        await axios.post(
+          `${endpoint}/checkout/cancel/paypal-payment`,
+          { orderId },
+          { withCredentials: true }
+        );
+        console.log("Order cancelled successfully.");
+      } catch (error) {
+        console.error("Cancel failed:", error);
+      }
+    };
+
+    cancelOrder();
+  }, [orderId]);
+
+  const handleRetry = async (payment) => {
+    try {
+      const { order_id, payment_method } = payment;
+
+      if (!order_id || !payment_method) {
+        notify.error("Missing order or payment method");
+        return;
+      }
+
+      let response;
+      let redirectUrl;
+
+      if (payment_method.toLowerCase() === "paypal") {
+        response = await axios.post(
+          `${endpoint}/checkout/pay-with-paypal`,
+          { orderId: order_id },
+          { withCredentials: true }
+        );
+        redirectUrl = response.data.approvalUrl;
+      } else if (["stripe", "visa"].includes(payment_method.toLowerCase())) {
+        response = await axios.post(
+          `${endpoint}/checkout/stripe`,
+          { orderId: order_id },
+          { withCredentials: true }
+        );
+        redirectUrl = response.data.sessionUrl;
+      } else {
+        notify.error("Unsupported payment method");
+        return;
+      }
+
+      if (redirectUrl) {
+        window.location.href = redirectUrl;
+      } else {
+        notify.error("Failed to get redirect URL");
+      }
+    } catch (error) {
+      console.error("Retry error:", error);
+      notify.error("Retry failed. Please try again.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
 
-      <main className="flex-1 pt-34 px-4 md:px-10 max-w-7xl mx-auto w-full">
+      <main className="flex-1 transition-all duration-300 pt-34 px-4">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Failure Banner */}
           <div className="bg-red-100 border border-red-300 text-red-800 px-6 py-4 rounded-lg flex items-center gap-3">
@@ -101,7 +164,7 @@ function Failure() {
                       <tr key={idx}>
                         <td className="px-4 py-2">{payment.order_id}</td>
                         <td className="px-4 py-2">${payment.amount}</td>
-                        <td className="px-4 py-2">
+                        <td className="px-4 py-2 flex items-center gap-2">
                           <span
                             className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${
                               payment.payment_status?.toLowerCase() ===
@@ -112,7 +175,19 @@ function Failure() {
                           >
                             {payment.payment_status}
                           </span>
+
+                          {["failed", ""].includes(
+                            payment.payment_status?.toLowerCase()
+                          ) && (
+                            <button
+                              onClick={() => handleRetry(payment)}
+                              className="text-blue-600 text-xs underline hover:text-blue-800"
+                            >
+                              Retry
+                            </button>
+                          )}
                         </td>
+
                         <td className="px-4 py-2">
                           {new Date(payment.created_at).toLocaleDateString()}
                         </td>

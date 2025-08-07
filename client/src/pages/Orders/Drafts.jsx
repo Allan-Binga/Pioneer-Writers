@@ -14,8 +14,9 @@ import {
   Paperclip,
   Hourglass,
   Trash2,
-  X,
   ShoppingCart,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { endpoint } from "../../server";
 import axios from "axios";
@@ -26,13 +27,13 @@ import moment from "moment";
 function Drafts() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${endpoint}/orders/my-orders`, {
+        const response = await axios.get(`${endpoint}/drafts`, {
           withCredentials: true,
         });
         setOrders(response.data);
@@ -51,9 +52,9 @@ function Drafts() {
     const due = moment(deadline);
     const hoursLeft = due.diff(now, "hours");
 
-    if (hoursLeft < 6) return "text-red-500";
-    if (hoursLeft < 24) return "text-amber-500";
-    return "text-green-500";
+    if (hoursLeft < 6) return "text-red-600";
+    if (hoursLeft < 24) return "text-amber-600";
+    return "text-green-600";
   };
 
   const formatCountdown = (deadline) => {
@@ -66,11 +67,11 @@ function Drafts() {
 
   const handleDeleteDraft = async (orderId) => {
     try {
-      await axios.delete(`${endpoint}/orders/${orderId}`, {
+      await axios.delete(`${endpoint}/draft/delete-draft/${orderId}`, {
         withCredentials: true,
       });
       setOrders(orders.filter((order) => order.id !== orderId));
-      setSelectedOrder(null);
+      setExpandedOrder(null);
       notify.success("Draft deleted successfully");
     } catch (error) {
       notify.error("Failed to delete draft");
@@ -79,8 +80,11 @@ function Drafts() {
   };
 
   const handleContinueToCheckout = (orderId) => {
-    // Replace with your checkout route or logic
     window.location.href = `/checkout/${orderId}`;
+  };
+
+  const toggleExpand = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
   return (
@@ -93,255 +97,185 @@ function Drafts() {
           </h1>
 
           {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <LoaderCircle className="animate-spin w-10 h-10 text-slate-500" />
+            <div className="grid gap-4">
+              {[...Array(3)].map((_, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 animate-pulse"
+                >
+                  <div className="h-6 bg-slate-200 rounded w-3/4 mb-4"></div>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {[...Array(6)].map((_, i) => (
+                      <div key={i} className="h-4 bg-slate-200 rounded"></div>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           ) : orders.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 bg-white rounded-lg shadow-sm border border-slate-200">
-              <p className="text-lg text-slate-500">No drafts found.</p>
+            <div className="flex flex-col items-center justify-center h-96 bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+              <FileText className="w-16 h-16 text-slate-400 mb-4" />
+              <p className="text-xl font-medium text-slate-700 mb-2">
+                No Drafts Found
+              </p>
+              <p className="text-sm text-slate-500 mb-6">
+                Start creating a new draft to get started.
+              </p>
               <a
                 href="/new-order"
-                className="mt-4 px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors"
+                className="px-6 py-3 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors font-medium"
               >
                 Create a Draft
               </a>
             </div>
           ) : (
-            <div className="grid gap-6">
-              {orders.map((order, index) => (
+            <div className="grid gap-4">
+              {orders.map((order) => (
                 <div
-                  key={index}
-                  className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => setSelectedOrder(order)}
+                  key={order.id}
+                  className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 transition-all duration-300 hover:shadow-md"
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) =>
-                    e.key === "Enter" && setSelectedOrder(order)
-                  }
-                  aria-label={`View details for draft: ${order.topic}`}
+                  onKeyDown={(e) => e.key === "Enter" && toggleExpand(order.id)}
                 >
-                  {/* Left: Draft Details */}
-                  <div className="lg:col-span-2 space-y-4">
-                    <h2 className="text-xl font-semibold text-slate-800">
+                  {/* Header */}
+                  <div
+                    className="flex justify-between items-start cursor-pointer"
+                    onClick={() => toggleExpand(order.id)}
+                  >
+                    <h2 className="text-lg font-semibold text-slate-800">
                       {order.topic}
                     </h2>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm text-slate-600">
-                      <OrderDetail
-                        icon={PenTool}
-                        label={order.type_of_service}
-                        aria-label={`Service Type: ${order.type_of_service}`}
-                      />
-                      <OrderDetail
-                        icon={FileText}
-                        label={order.document_type}
-                        aria-label={`Document Type: ${order.document_type}`}
-                      />
-                      <OrderDetail
-                        icon={GraduationCap}
-                        label={order.writer_level}
-                        aria-label={`Writer Level: ${order.writer_level}`}
-                      />
-                      <OrderDetail
-                        icon={LayoutTemplate}
-                        label={order.paper_format.toUpperCase()}
-                        aria-label={`Paper Format: ${order.paper_format.toUpperCase()}`}
-                      />
-                      <OrderDetail
-                        icon={Flag}
-                        label={order.english_type.toUpperCase()}
-                        aria-label={`English Type: ${order.english_type.toUpperCase()}`}
-                      />
-                      <OrderDetail
-                        icon={BookOpenText}
-                        label={`${order.pages} pages`}
-                        aria-label={`Pages: ${order.pages}`}
-                      />
-                      <OrderDetail
-                        icon={ClipboardList}
-                        label={`${order.number_of_sources} sources`}
-                        aria-label={`Sources: ${order.number_of_sources}`}
-                      />
-                      <OrderDetail
-                        icon={AlignJustify}
-                        label={`${order.spacing} spacing`}
-                        aria-label={`Spacing: ${order.spacing}`}
-                      />
-                    </div>
-                    {order.uploaded_file && (
-                      <a
-                        href={order.uploaded_file}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-slate-600 transition-colors"
-                        download
-                        aria-label="Download attached file"
-                        onClick={(e) => e.stopPropagation()}
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-medium capitalize ${
+                          order.order_status === "Pending"
+                            ? "bg-amber-100 text-amber-700"
+                            : order.order_status === "Completed"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-sky-100 text-sky-700"
+                        }`}
                       >
-                        <Paperclip className="w-4 h-4 text-sky-600" />
-                        Download File
-                      </a>
-                    )}
+                        {order.order_status}
+                      </span>
+                      {expandedOrder === order.id ? (
+                        <ChevronUp className="w-5 h-5 text-slate-500" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-slate-500" />
+                      )}
+                    </div>
                   </div>
 
-                  {/* Right: Draft Status and Metadata */}
-                  <div className="flex flex-col items-start lg:items-end gap-4 text-sm">
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium capitalize ${
-                        order.order_status === "Pending"
-                          ? "bg-amber-100 text-amber-700"
-                          : order.order_status === "Completed"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-sky-100 text-sky-700"
-                      }`}
-                    >
-                      {order.order_status}
-                    </span>
-                    <span className="text-lg font-semibold text-slate-800">
-                      $
-                      {isNaN(parseFloat(order.checkout_amount))
-                        ? "N/A"
-                        : parseFloat(order.checkout_amount).toFixed(2)}
-                    </span>
-                    <div className="flex items-center gap-2 text-slate-600">
-                      <CalendarClock className="w-4 h-4 text-sky-600" />
-                      {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
-                    </div>
-                    <div
-                      className={`flex items-center gap-2 font-medium ${getCountdownColor(
-                        order.deadline
-                      )}`}
-                    >
-                      <Hourglass className="w-4 h-4 text-sky-600" />
-                      {formatCountdown(order.deadline)} remaining
-                    </div>
+                  {/* Summary */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm text-slate-600 mt-4">
+                    <OrderDetail icon={PenTool} label={order.type_of_service} />
+                    <OrderDetail icon={FileText} label={order.document_type} />
+                    <OrderDetail
+                      icon={GraduationCap}
+                      label={order.writer_level}
+                    />
                   </div>
+
+                  {/* Expanded Details */}
+                  {expandedOrder === order.id && (
+                    <div className="mt-6 pt-6 border-t border-slate-200">
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm text-slate-600">
+                        <OrderDetail
+                          icon={LayoutTemplate}
+                          label={order.paper_format.toUpperCase()}
+                        />
+                        <OrderDetail
+                          icon={Flag}
+                          label={order.english_type.toUpperCase()}
+                        />
+                        <OrderDetail
+                          icon={BookOpenText}
+                          label={`${order.pages} pages`}
+                        />
+                        <OrderDetail
+                          icon={ClipboardList}
+                          label={`${order.number_of_sources} sources`}
+                        />
+                        <OrderDetail
+                          icon={AlignJustify}
+                          label={`${order.spacing} spacing`}
+                        />
+                      </div>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4 text-sm text-slate-600">
+                        <div className="flex items-center gap-2">
+                          <CalendarClock className="w-4 h-4 text-sky-600" />
+                          {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
+                        </div>
+                        <div
+                          className={`flex items-center gap-2 font-medium ${getCountdownColor(
+                            order.deadline
+                          )}`}
+                        >
+                          <Hourglass className="w-4 h-4 text-sky-600" />
+                          {formatCountdown(order.deadline)} remaining
+                        </div>
+                        {order.uploaded_file && (
+                          <a
+                            href={order.uploaded_file}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 transition-colors"
+                            download
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Paperclip className="w-4 h-4" />
+                            Download File
+                          </a>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between mt-4">
+                        <span className="text-lg font-semibold text-slate-800">
+                          $
+                          {isNaN(parseFloat(order.checkout_amount))
+                            ? "N/A"
+                            : parseFloat(order.checkout_amount).toFixed(2)}
+                        </span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteDraft(order.id);
+                            }}
+                            className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors flex items-center gap-2"
+                            aria-label={`Delete draft: ${order.topic}`}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleContinueToCheckout(order.id);
+                            }}
+                            className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors flex items-center gap-2"
+                            aria-label={`Continue to checkout for draft: ${order.topic}`}
+                          >
+                            <ShoppingCart className="w-4 h-4" />
+                            Checkout
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           )}
         </div>
       </main>
-      {/* Draft Details Modal */}
-      {selectedOrder && (
-        <div className="fixed inset-0 flex items-center justify-center bg-slate-50/20 backdrop-blur-sm z-50">
-          <div className="relative bg-white rounded-lg shadow-lg p-6 w-full max-w-xl border border-slate-200">
-            {/* Top-right Close Button */}
-            <button
-              onClick={() => setSelectedOrder(null)}
-              className="absolute top-4 right-4 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full p-2 transition-colors"
-              aria-label="Close modal"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <h2 className="text-2xl font-semibold text-slate-800 mb-4">
-              {selectedOrder.topic}
-            </h2>
-
-            <div className="grid grid-cols-2 gap-4 text-sm text-slate-600 mb-6">
-              <OrderDetail
-                icon={PenTool}
-                label={selectedOrder.type_of_service}
-                ariaLabel={`Service Type: ${selectedOrder.type_of_service}`}
-              />
-              <OrderDetail
-                icon={FileText}
-                label={selectedOrder.document_type}
-                ariaLabel={`Document Type: ${selectedOrder.document_type}`}
-              />
-              <OrderDetail
-                icon={GraduationCap}
-                label={selectedOrder.writer_level}
-                ariaLabel={`Writer Level: ${selectedOrder.writer_level}`}
-              />
-              <OrderDetail
-                icon={LayoutTemplate}
-                label={selectedOrder.paper_format.toUpperCase()}
-                ariaLabel={`Paper Format: ${selectedOrder.paper_format.toUpperCase()}`}
-              />
-              <OrderDetail
-                icon={Flag}
-                label={selectedOrder.english_type.toUpperCase()}
-                ariaLabel={`English Type: ${selectedOrder.english_type.toUpperCase()}`}
-              />
-              <OrderDetail
-                icon={BookOpenText}
-                label={`${selectedOrder.pages} pages`}
-                ariaLabel={`Pages: ${selectedOrder.pages}`}
-              />
-              <OrderDetail
-                icon={ClipboardList}
-                label={`${selectedOrder.number_of_sources} sources`}
-                ariaLabel={`Sources: ${selectedOrder.number_of_sources}`}
-              />
-              <OrderDetail
-                icon={AlignJustify}
-                label={`${selectedOrder.spacing} spacing`}
-                ariaLabel={`Spacing: ${selectedOrder.spacing}`}
-              />
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-2 text-sm text-slate-600 mb-6">
-              <div className="flex items-center gap-2">
-                <CalendarClock className="w-4 h-4 text-sky-600" />
-                {moment(selectedOrder.deadline).format("MMM D, YYYY, h:mm A")}
-              </div>
-              <div
-                className={`flex items-center gap-2 font-medium ${getCountdownColor(
-                  selectedOrder.deadline
-                )}`}
-              >
-                <Hourglass className="w-4 h-4 text-sky-600" />
-                {formatCountdown(selectedOrder.deadline)} remaining
-              </div>
-              {selectedOrder.uploaded_file && (
-                <a
-                  href={selectedOrder.uploaded_file}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sky-600 hover:text-sky-700 transition-colors"
-                  download
-                  aria-label="Download attached file"
-                >
-                  <Paperclip className="w-4 h-4 font-bold" />
-                  Download File
-                </a>
-              )}
-            </div>
-
-            {/* Buttons */}
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                onClick={() => handleDeleteDraft(selectedOrder.id)}
-                className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors flex items-center justify-center gap-2"
-                aria-label="Delete draft"
-              >
-                <Trash2 className="w-4 h-4" />
-                Delete Draft
-              </button>
-              <button
-                onClick={() => handleContinueToCheckout(selectedOrder.id)}
-                className="w-full px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors flex items-center justify-center gap-2"
-                aria-label="Continue to checkout"
-              >
-                <ShoppingCart className="w-4 h-4" />
-                Continue to Checkout
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
       <Footer />
     </div>
   );
 }
 
-function OrderDetail({ icon: Icon, label, ariaLabel }) {
+function OrderDetail({ icon: Icon, label }) {
   return (
-    <span
-      className="flex items-center gap-2 text-sm text-slate-600"
-      aria-label={ariaLabel}
-    >
+    <span className="flex items-center gap-2 text-sm text-slate-600">
       <Icon className="w-4 h-4 text-sky-600" />
       {label}
     </span>
