@@ -18,7 +18,7 @@ const dashboardRoute = require("./routes/dashboard");
 const passwordRoute = require("./routes/password");
 const newsRoute = require("./routes/news");
 const ratingsRoute = require("./routes/ratings");
-const smsRoute = require("./routes/smsService")
+const smsRoute = require("./routes/smsService");
 const {
   handlePaypalWebhook,
   handleStripeWebhook,
@@ -53,7 +53,7 @@ const allowedOrigins = [
   "http://localhost:5174",
   "http://localhost:5175",
   "https://pioneer-administrator.vercel.app",
-  "https://pioneer-writers.vercel.app/",
+  "https://pioneer-writers.vercel.app ",
   "https://pioneer-writers-8a531f1c7067.herokuapp.com",
 ];
 
@@ -89,7 +89,7 @@ app.use("/pioneer-writers/v1/writers", writersRoute);
 app.use("/pioneer-writers/v1/profile", profileRoute);
 app.use("/pioneer-writers/v1/news", newsRoute);
 app.use("/pioneer-writers/v1/password", passwordRoute);
-app.use("/pioneer-writers/v1/sms", smsRoute)
+app.use("/pioneer-writers/v1/sms", smsRoute);
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {
