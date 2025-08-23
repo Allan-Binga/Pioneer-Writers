@@ -11,6 +11,10 @@ import {
   Star,
   ChevronDown,
   GraduationCap,
+  Globe,
+  Loader,
+  CircleCheck,
+  CheckLine,
 } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Logo from "../assets/logo.jpeg";
@@ -43,6 +47,26 @@ function Navbar() {
           name: "New Order",
           path: "/new-order",
           icon: <Plus className="w-4 h-4 mr-2" />,
+        },
+        {
+          name: "Public Orders",
+          path: "/my-orders/public",
+          icon: <Globe className="w-4 h-4 mr-2" />,
+        },
+        {
+          name: "In Progress",
+          path: "/my-orders/in-progress",
+          icon: <Loader className="w-4 h-4 mr-2" />,
+        },
+        {
+          name: "Submitted",
+          path: "/my-orders/submitted",
+          icon: <CircleCheck className="w-4 h-4 mr-2" />,
+        },
+        {
+          name: "Completed",
+          path: "/my-orders/completed",
+          icon: <CheckLine className="w-4 h-4 mr-2" />,
         },
         {
           name: "All Orders",

@@ -23,11 +23,11 @@ const getDashboard = async (req, res) => {
       submitted: 0,
     };
 
-    // Count each order by status
+    // Count each order by assignment_status
     orders.forEach((order) => {
-      const rawStatus = order.order_status?.toLowerCase();
+      const rawStatus = order.assignment_status?.toLowerCase();
 
-      // Special case for 'Assigned' status
+      // Special case: treat "assigned" as inProgress
       if (rawStatus === "assigned") {
         statusCounters.inProgress++;
       } else {
@@ -52,7 +52,9 @@ const getDashboard = async (req, res) => {
     const recentOrders = orders.slice(0, 3).map((order) => ({
       id: order.order_id,
       title: order.topic,
-      status: formatStatus(order.order_status),
+      payment_status: formatStatus(order.payment_status),
+      assignmentStatus: order.assignment_status,
+      writer: order.writer_id,
       date: new Date(order.created_at).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -91,13 +93,28 @@ const getAdminDashboard = async (req, res) => {
       submitted: 0,
     };
 
+    // Count each order by assignment_status
     orders.forEach((order) => {
-      const rawStatus = order.order_status?.toLowerCase();
+      const rawStatus = order.assignment_status?.toLowerCase();
 
+      // Special case: treat "assigned" as inProgress
       if (rawStatus === "assigned") {
         statusCounters.inProgress++;
-      } else if (statusCounters.hasOwnProperty(rawStatus)) {
-        statusCounters[rawStatus]++;
+      } else {
+        // Other statuses must match keys in the statusCounters
+        const mappedKeys = [
+          "completed",
+          "disputed",
+          "unconfirmed",
+          "draft",
+          "paid",
+          "cancelled",
+          "submitted",
+        ];
+
+        if (mappedKeys.includes(rawStatus)) {
+          statusCounters[rawStatus]++;
+        }
       }
     });
 
@@ -107,7 +124,7 @@ const getAdminDashboard = async (req, res) => {
       title: order.topic,
       userId: order.user_id,
       writerId: order.writer_id,
-      status: formatStatus(order.order_status),
+      status: formatStatus(order.assignment_status),
       date: new Date(order.created_at).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
@@ -139,9 +156,6 @@ const getAdminDashboard = async (req, res) => {
         WHERE payment_status = 'completed'
       `),
     ]);
-
-    // (Optional) Placeholder for future: Total messages
-    // const { rows: [{ total_messages }] } = await client.query("SELECT COUNT(*) AS total_messages FROM messages");
 
     // 5. Send response
     res.status(200).json({

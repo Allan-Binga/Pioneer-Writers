@@ -9,12 +9,14 @@ import { endpoint } from "../../server";
 
 function Profile() {
   const [smsEnabled, setSmsEnabled] = useState(true);
+  const [showSmsModal, setShowSmsModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
     name: "",
     email: "",
     phone_number: "",
     avatar: "",
+    sms_updates: "",
     avatarFile: null,
   });
 
@@ -27,7 +29,9 @@ function Profile() {
           email: profile.email || "",
           phone_number: profile.phone_number || "",
           avatar: profile.avatar_url || "",
+          sms_updates: profile.sms_updates || "",
         });
+        setSmsEnabled(profile.sms_updates || false);
       } catch (err) {
         console.error("Failed to fetch profile:", err.message);
       }
@@ -94,8 +98,126 @@ function Profile() {
     }
   };
 
+  const handleActivateSMS = async () => {
+    if (smsEnabled) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${endpoint}/sms/client/activate-sms`,
+        {}, // POST body is empty
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        notify.success("SMS notifications activated!");
+        setSmsEnabled(true); // update toggle
+      } else {
+        notify.error(response.data.message || "Failed to activate SMS.");
+      }
+    } catch (error) {
+      console.error("Activate SMS error:", error);
+      notify.error("An error occurred while activating SMS.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Deactivate SMS
+  const handleDeactivateSMS = async () => {
+    if (!smsEnabled) return; // only run if currently enabled
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${endpoint}/sms/client/deactivate-sms`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        notify.success("SMS notifications deactivated!");
+        setSmsEnabled(false); // update toggle
+      } else {
+        notify.error(response.data.message || "Failed to deactivate SMS.");
+      }
+    } catch (error) {
+      console.error("Deactivation SMS error:", error);
+      notify.error("An error occurred while deactivating SMS");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Animated Background Waves - Fixed z-index */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Top wave */}
+        <svg
+          className="absolute top-0 left-0 w-full h-[200px] opacity-10"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#1D4ED8" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,200 Q250,50 500,200 T1000,200 L1000,0 L0,0 Z"
+            fill="url(#wave1)"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Bottom wave */}
+        <svg
+          className="absolute bottom-0 left-0 w-full h-[200px] opacity-5"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#6366F1" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,0 Q250,150 500,0 T1000,0 L1000,200 L0,200 Z"
+            fill="url(#wave2)"
+            className="animate-pulse"
+            style={{ animationDelay: "2s" }}
+          />
+        </svg>
+
+        {/* Floating Particles */}
+        {/* Left side */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-60"></div>
+        <div className="absolute top-40 left-10 w-3 h-3 bg-pink-400 rounded-full animate-pulse opacity-50"></div>
+        <div
+          className="absolute bottom-28 left-16 w-2 h-2 bg-green-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/5 w-4 h-4 bg-indigo-300 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
+        {/* Right side */}
+        <div
+          className="absolute top-40 right-32 w-3 h-3 bg-amber-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute bottom-32 left-1/4 w-2 h-2 bg-indigo-400 rounded-full animate-bounce opacity-50"
+          style={{ animationDelay: "3s" }}
+        ></div>
+        <div className="absolute top-1/3 right-20 w-4 h-4 bg-green-300 rounded-full animate-pulse opacity-30"></div>
+      </div>
       <Navbar />
       <main className="flex-1 pt-20 px-4">
         <div className="max-w-5xl mx-auto space-y-10">
@@ -120,10 +242,13 @@ function Profile() {
               <div className="flex items-center gap-3">
                 <ToggleSwitch
                   isEnabled={smsEnabled}
-                  onToggle={() => setSmsEnabled(!smsEnabled)}
+                  onToggle={() => setShowSmsModal(true)} //Open the SMS modal toggle
                 />
+
                 <span className="text-sm text-gray-700">
-                  Enable SMS notifications for order updates
+                  {smsEnabled
+                    ? "Disable SMS notifications for order updates"
+                    : "Enable SMS notifications for order updates"}
                 </span>
               </div>
             </div>
@@ -197,6 +322,46 @@ function Profile() {
           </div>
         </div>
       </main>
+
+      {/* SMS Modal for Toggling SMS UPDATES */}
+      {showSmsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="bg-white rounded-xl p-6 w-80 shadow-lg">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+              {smsEnabled
+                ? "Confirm SMS Deactivation"
+                : "Confirm SMS Activation"}
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              {smsEnabled
+                ? "Are you sure you want to disable SMS updates for order notifications?"
+                : "Are you sure you want to activate SMS updates for order notifications?"}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+                onClick={() => setShowSmsModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`px-4 py-2 text-white rounded-md cursor-pointer ${
+                  smsEnabled
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+                onClick={() => {
+                  setShowSmsModal(false);
+                  smsEnabled ? handleDeactivateSMS() : handleActivateSMS();
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

@@ -68,6 +68,73 @@ function Payments() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
+      {/* Animated Background Waves */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {/* Top wave */}
+        <svg
+          className="absolute top-0 left-0 w-full h-[200px] opacity-10"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#1D4ED8" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,200 Q250,50 500,200 T1000,200 L1000,0 L0,0 Z"
+            fill="url(#wave1)"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Bottom wave */}
+        <svg
+          className="absolute bottom-0 left-0 w-full h-[200px] opacity-5"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#6366F1" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,0 Q250,150 500,0 T1000,0 L1000,200 L0,200 Z"
+            fill="url(#wave2)"
+            className="animate-pulse"
+            style={{ animationDelay: "2s" }}
+          />
+        </svg>
+
+        {/* Floating Particles */}
+        {/* Left side */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-60"></div>
+        <div className="absolute top-40 left-10 w-3 h-3 bg-pink-400 rounded-full animate-pulse opacity-50"></div>
+        <div
+          className="absolute bottom-28 left-16 w-2 h-2 bg-green-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/5 w-4 h-4 bg-indigo-300 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
+        {/* Right side */}
+        <div
+          className="absolute top-40 right-32 w-3 h-3 bg-amber-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute bottom-32 left-1/4 w-2 h-2 bg-indigo-400 rounded-full animate-bounce opacity-50"
+          style={{ animationDelay: "3s" }}
+        ></div>
+        <div className="absolute top-1/3 right-20 w-4 h-4 bg-green-300 rounded-full animate-pulse opacity-30"></div>
+      </div>
       <Navbar />
       <main className="flex-1 pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -92,7 +159,7 @@ function Payments() {
             ))}
           </div>
 
-          {/* Responsive Payments Table */}
+          {/* Payments Table */}
           <div className="overflow-x-auto bg-white rounded-2xl shadow-md border border-slate-200">
             {loading ? (
               <div className="p-8 text-center text-slate-600 text-xs">

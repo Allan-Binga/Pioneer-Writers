@@ -3,7 +3,6 @@ import Footer from "../../components/Footer";
 import {
   Mail,
   Phone,
-  MapPin,
   BadgeCheck,
   Star,
   BookOpenCheck,
@@ -25,8 +24,10 @@ function Writers() {
     const fetchWriters = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`${endpoint}/writers/all`);
-        setWriters(response.data);
+        const response = await axios.get(`${endpoint}/writers/my-writers`, {
+          withCredentials: true,
+        });
+        setWriters(response.data.writers);
       } catch (error) {
         notify.info("Failed to fetch writers.");
         console.error("Failed to fetch writers.");
@@ -36,8 +37,81 @@ function Writers() {
     };
     fetchWriters();
   }, []);
+
+  function capitalize(str) {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Animated Background Waves - Fixed z-index */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Top wave */}
+        <svg
+          className="absolute top-0 left-0 w-full h-[200px] opacity-10"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#1D4ED8" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,200 Q250,50 500,200 T1000,200 L1000,0 L0,0 Z"
+            fill="url(#wave1)"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Bottom wave */}
+        <svg
+          className="absolute bottom-0 left-0 w-full h-[200px] opacity-5"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#6366F1" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,0 Q250,150 500,0 T1000,0 L1000,200 L0,200 Z"
+            fill="url(#wave2)"
+            className="animate-pulse"
+            style={{ animationDelay: "2s" }}
+          />
+        </svg>
+
+        {/* Floating Particles */}
+        {/* Left side */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-60"></div>
+        <div className="absolute top-40 left-10 w-3 h-3 bg-pink-400 rounded-full animate-pulse opacity-50"></div>
+        <div
+          className="absolute bottom-28 left-16 w-2 h-2 bg-green-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/5 w-4 h-4 bg-indigo-300 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
+        {/* Right side */}
+        <div
+          className="absolute top-40 right-32 w-3 h-3 bg-amber-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute bottom-32 left-1/4 w-2 h-2 bg-indigo-400 rounded-full animate-bounce opacity-50"
+          style={{ animationDelay: "3s" }}
+        ></div>
+        <div className="absolute top-1/3 right-20 w-4 h-4 bg-green-300 rounded-full animate-pulse opacity-30"></div>
+      </div>
       <Navbar />
       <div className="flex">
         {/* Main Content Area */}
@@ -70,7 +144,6 @@ function Writers() {
                       alt={writer.full_name}
                       className="w-20 h-20 rounded-full object-cover shadow"
                     />
-
                     {/* Details */}
                     <div className="flex-1">
                       <div className="flex justify-between flex-wrap">
@@ -90,25 +163,21 @@ function Writers() {
                         <WriterDetail icon={Mail} label={writer.email} />
                         <WriterDetail
                           icon={Phone}
-                          label={writer.phone_number}
+                          label={`Phone: ${writer.phone_number}`}
                         />
-                        <WriterDetail
-                          icon={MapPin}
-                          label={`${writer.state}, ${writer.country}`}
-                        />
+
                         <WriterDetail
                           icon={BadgeCheck}
-                          label={`Level: ${writer.writer_level}`}
+                          label={`Level: ${capitalize(writer.writer_level)}`}
                         />
                         <WriterDetail
                           icon={UserCheck}
-                          label={`Type: ${writer.writer_type}`}
+                          label={`Type: ${capitalize(writer.writer_type)}`}
                         />
                         <WriterDetail
                           icon={Layers}
-                          label={`Field: ${writer.primary_topic_field.replace(
-                            /-/g,
-                            " "
+                          label={`Field: ${capitalize(
+                            writer.primary_topic_field
                           )}`}
                         />
                         <WriterDetail
@@ -117,7 +186,9 @@ function Writers() {
                         />
                         <WriterDetail
                           icon={Star}
-                          label={`Rating: ${writer.rating}`}
+                          label={`Rating: ${Number(
+                            writer.average_rating
+                          ).toFixed(1)}`}
                         />
                         <WriterDetail
                           icon={CircleCheck}

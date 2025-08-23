@@ -6,7 +6,7 @@ const getProfile = async (req, res) => {
 
   try {
     const result = await client.query(
-      `SELECT user_id, username, email, phone_number, avatar_url FROM users WHERE user_id = $1`,
+      `SELECT user_id, username, email, phone_number, avatar_url, sms_updates FROM users WHERE user_id = $1`,
       [userId]
     );
     const user = result.rows[0];
@@ -108,4 +108,38 @@ const updateProfile = async (req, res) => {
   }
 };
 
-module.exports = { getProfile, updateProfile, getAdminProfile };
+//Fetch Writer Profile
+const getWriterProfile = async (req, res) => {
+  const writerId = req.writerId;
+
+  try {
+    const result = await client.query(
+      `SELECT writer_id, full_name, email, phone_number, bio, writer_level, writer_type, rating, completed_orders, primary_topic_field, profile_picture_url FROM writers WHERE writer_id = $1`,
+      [writerId]
+    );
+    const writer = result.rows[0];
+
+    if (!writer) {
+      return res.status(404).json({ error: "Writer not found" });
+    }
+
+    return res.status(200).json(writer);
+  } catch (err) {
+    console.error("Error fetching profile:", err);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//Udate Writer Profile
+const updateWriterProfile = async (req, res) => {
+  try {
+  } catch (error) {}
+};
+
+module.exports = {
+  getProfile,
+  updateProfile,
+  getAdminProfile,
+  getWriterProfile,
+  updateWriterProfile,
+};

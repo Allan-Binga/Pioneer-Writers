@@ -5,11 +5,9 @@ import {
   Send,
   SquarePen,
   Trash2,
-  Star,
   Archive,
   Search,
   X,
-  Paperclip,
 } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -270,7 +268,7 @@ function ComposeModal({ onClose }) {
   );
 }
 
-// Inbox Component (remove unnecessary writers fetch)
+// Inbox Component
 function Inbox() {
   const [messages, setMessages] = useState([]);
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -313,6 +311,73 @@ function Inbox() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-indigo-50">
+      {/* Animated Background Waves - Fixed z-index */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Top wave */}
+        <svg
+          className="absolute top-0 left-0 w-full h-[200px] opacity-10"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#1D4ED8" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,200 Q250,50 500,200 T1000,200 L1000,0 L0,0 Z"
+            fill="url(#wave1)"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Bottom wave */}
+        <svg
+          className="absolute bottom-0 left-0 w-full h-[200px] opacity-5"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#6366F1" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,0 Q250,150 500,0 T1000,0 L1000,200 L0,200 Z"
+            fill="url(#wave2)"
+            className="animate-pulse"
+            style={{ animationDelay: "2s" }}
+          />
+        </svg>
+
+        {/* Floating Particles */}
+        {/* Left side */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-60"></div>
+        <div className="absolute top-40 left-10 w-3 h-3 bg-pink-400 rounded-full animate-pulse opacity-50"></div>
+        <div
+          className="absolute bottom-28 left-16 w-2 h-2 bg-green-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/5 w-4 h-4 bg-indigo-300 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
+        {/* Right side */}
+        <div
+          className="absolute top-40 right-32 w-3 h-3 bg-amber-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute bottom-32 left-1/4 w-2 h-2 bg-indigo-400 rounded-full animate-bounce opacity-50"
+          style={{ animationDelay: "3s" }}
+        ></div>
+        <div className="absolute top-1/3 right-20 w-4 h-4 bg-green-300 rounded-full animate-pulse opacity-30"></div>
+      </div>
       <Navbar />
       <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -320,9 +385,9 @@ function Inbox() {
             Manage your messages
           </h1>
           <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 sm:p-6">
-            <div className="flex flex-col lg:flex-row">
+            <div className="flex flex-col lg:flex-row h-full">
               {/* Sidebar */}
-              <aside className="w-full lg:w-64 lg:pr-6 border-b lg:border-b-0 lg:border-r border-slate-100 pt-6 lg:pt-10 mb-6 lg:mb-0">
+              <aside className="w-full lg:w-64 lg:pr-6 border-b lg:border-b-0 lg:border-r border-slate-100 pt-6 lg:pt-10 mb-6 lg:mb-0 flex-shrink-0">
                 <div className="text-xs uppercase font-medium text-slate-500 mb-4 tracking-wider px-2">
                   Folders
                 </div>
@@ -359,9 +424,9 @@ function Inbox() {
               </aside>
 
               {/* Main Panel */}
-              <section className="flex-1 lg:pl-6 flex flex-col">
+              <section className="flex-1 lg:pl-6 flex flex-col min-h-0 min-w-0">
                 {/* Toolbar */}
-                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6">
+                <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 mb-6 flex-shrink-0">
                   <select
                     value={filter}
                     onChange={(e) => handleFilterChange(e.target.value)}
@@ -393,104 +458,111 @@ function Inbox() {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex flex-col lg:flex-row flex-1 overflow-hidden gap-4">
+                <div className="flex flex-col lg:flex-row flex-1 gap-4 overflow-hidden min-h-[30rem] max-h-[30rem]">
                   {/* Message List */}
-                  <div className="lg:w-1/3 border border-slate-200 bg-white rounded-xl shadow-sm overflow-y-auto max-h-[30rem]">
-                    {loading ? (
-                      <div className="flex justify-center py-4">
-                        <p className="text-slate-500">Loading...</p>
-                      </div>
-                    ) : messages.length === 0 ? (
-                      <div className="flex justify-center py-4">
-                        <p className="text-slate-500">No messages found</p>
-                      </div>
-                    ) : (
-                      <ul className="divide-y divide-slate-100">
-                        {messages.map((message) => (
-                          <li
-                            key={message.message_id}
-                            onClick={() =>
-                              setSelectedMessage((prev) =>
-                                prev?.message_id === message.message_id
-                                  ? null
-                                  : message
-                              )
-                            }
-                            className={`px-4 py-4 hover:bg-slate-50 cursor-pointer transition relative ${
-                              selectedMessage?.message_id === message.message_id
-                                ? "bg-slate-100"
-                                : ""
-                            }`}
-                          >
-                            <div
-                              className={`absolute top-2 left-2 w-4 h-4 rounded-full border-2 z-10 ${
-                                !message.is_read
-                                  ? "bg-slate-800 border-slate-800"
-                                  : "bg-white border-slate-300"
+                  <div className="w-full lg:w-96 flex-shrink-0 border border-slate-200 bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div className="h-full overflow-y-auto">
+                      {loading ? (
+                        <div className="flex justify-center items-center h-full">
+                          <p className="text-slate-500">Loading...</p>
+                        </div>
+                      ) : messages.length === 0 ? (
+                        <div className="flex justify-center items-center h-full">
+                          <p className="text-slate-500">No messages found</p>
+                        </div>
+                      ) : (
+                        <ul className="divide-y divide-slate-100">
+                          {messages.map((message) => (
+                            <li
+                              key={message.message_id}
+                              onClick={() =>
+                                setSelectedMessage((prev) =>
+                                  prev?.message_id === message.message_id
+                                    ? null
+                                    : message
+                                )
+                              }
+                              className={`px-4 py-4 hover:bg-slate-50 cursor-pointer transition relative ${
+                                selectedMessage?.message_id ===
+                                message.message_id
+                                  ? "bg-slate-100"
+                                  : ""
                               }`}
-                            ></div>
+                            >
+                              <div
+                                className={`absolute top-2 left-2 w-4 h-4 rounded-full border-2 z-10 ${
+                                  !message.is_read
+                                    ? "bg-slate-800 border-slate-800"
+                                    : "bg-white border-slate-300"
+                                }`}
+                              ></div>
 
-                            <div className="pl-6">
-                              <div className="flex justify-between mb-1">
-                                <span className="font-semibold text-slate-800">
-                                  {message.sender_email || "Unknown Sender"}
-                                </span>
-                                <span className="text-xs text-slate-400">
-                                  {new Date(message.sent_at).toLocaleTimeString(
-                                    [],
-                                    {
+                              <div className="pl-6">
+                                <div className="flex justify-between mb-1">
+                                  <span className="font-semibold text-slate-800 truncate">
+                                    {message.sender_id || "Unknown Sender"}
+                                  </span>
+                                  <span className="text-xs text-slate-400 flex-shrink-0 ml-2">
+                                    {new Date(
+                                      message.sent_at
+                                    ).toLocaleTimeString([], {
                                       hour: "2-digit",
                                       minute: "2-digit",
-                                    }
-                                  )}
-                                </span>
+                                    })}
+                                  </span>
+                                </div>
+                                <div className="text-md text-slate-600 truncate">
+                                  {message.subject}
+                                </div>
+                                <div className="text-xs text-slate-400 truncate">
+                                  {message.content}
+                                </div>
                               </div>
-                              <div className="text-md text-slate-600">
-                                {message.subject}
-                              </div>
-                              <div className="text-xs text-slate-400 truncate">
-                                {message.content}
-                              </div>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
 
                   {/* Message Viewer */}
-                  <div className="flex-1 px-2 bg-gradient-to-br from-slate-50 to-white overflow-y-auto rounded-xl border border-slate-200">
-                    {selectedMessage ? (
-                      <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-100 space-y-4">
-                        <div className="flex justify-between items-center">
-                          <div>
-                            <h2 className="text-lg font-semibold text-slate-800">
-                              {selectedMessage.subject}
-                            </h2>
-                            <p className="text-md text-slate-500">
-                              From: {selectedMessage.sender_email}
-                            </p>
-                            <p className="text-md text-slate-500">
-                              To: {selectedMessage.receiver_email}
-                            </p>
+                  <div className="flex-1 min-w-0 border border-slate-200 bg-gradient-to-br from-slate-50 to-white rounded-xl overflow-hidden">
+                    <div className="h-full overflow-y-auto">
+                      {selectedMessage ? (
+                        <div className="p-6 space-y-4 h-full">
+                          <div className="flex justify-between items-start flex-shrink-0">
+                            <div className="min-w-0 flex-1">
+                              <h2 className="text-lg font-semibold text-slate-800 break-words">
+                                {selectedMessage.subject}
+                              </h2>
+                              <p className="text-md text-slate-500 break-words">
+                                From: {selectedMessage.sender_email}
+                              </p>
+                              <p className="text-md text-slate-500 break-words">
+                                To: {selectedMessage.receiver_email}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => setSelectedMessage(null)}
+                              className="text-slate-400 hover:text-red-500 ml-4 flex-shrink-0"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
                           </div>
-                          <button
-                            onClick={() => setSelectedMessage(null)}
-                            className="text-slate-400 hover:text-red-500"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
+                          <div className="text-md text-slate-700 leading-relaxed break-words flex-1 overflow-y-auto">
+                            {selectedMessage.content}
+                          </div>
                         </div>
-                        <div className="text-md text-slate-700 leading-relaxed">
-                          {selectedMessage.content}
+                      ) : (
+                        <div className="flex flex-col items-center justify-center h-full space-y-4 text-center text-slate-400 p-8">
+                          <Mail className="w-14 h-14 text-slate-300" />
+                          <p className="text-md italic">No message selected</p>
+                          <p className="text-sm text-slate-300">
+                            Select a message from the list to view its content
+                          </p>
                         </div>
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full space-y-4 text-center text-slate-400 p-8">
-                        <Mail className="w-14 h-14 text-slate-300" />
-                        <p className="text-md italic">No messages selected</p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </section>

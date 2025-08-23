@@ -41,6 +41,57 @@ const authAdmin = (req, res, next) => {
   }
 };
 
+//Writer ID
+const authWriter = (req, res, next) => {
+  try {
+    // console.log("Cookies received:", req.cookies); // Debug
+    const token = req.cookies.writerPioneerSession;
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized, please login to proceed." });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // console.log("Decoded JWT:", decoded); // Debug
+    req.writerId = decoded.writerId;
+    next();
+  } catch (error) {
+    console.error("JWT error:", error); // Debug
+    return res.status(403).json({ message: "Invalid or expired token" });
+  }
+};
+
+//Writer, Administrator or User
+const authAnyRole = (req, res, next) => {
+  try {
+    const cookieNames = [
+      "writerPioneerSession",
+      "pioneerAdminSession",
+      "userPioneerSession",
+    ];
+
+    for (const cookieName of cookieNames) {
+      const token = req.cookies[cookieName];
+      if (token) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        req.user = {
+          id: decoded.writerId || decoded.adminId || decoded.userId,
+          role: decoded.role,
+        };
+        console.log("Authenticated role:", req.user.role);
+        return next();
+      }
+    }
+
+    return res
+      .status(401)
+      .json({ message: "Unauthorized. Please login to proceed." });
+  } catch (error) {
+    console.error("JWT error:", error);
+    return res.status(403).json({ message: "Invalid or expired token" });
+  }
+};
+
 // Allow either user or admin
 const authUserOrAdmin = (req, res, next) => {
   const userToken = req.cookies.userPioneerSession;
@@ -70,4 +121,10 @@ const authUserOrAdmin = (req, res, next) => {
   return res.status(401).json({ message: "Unauthorized access" });
 };
 
-module.exports = { authUser, authAdmin , authUserOrAdmin};
+module.exports = {
+  authUser,
+  authAdmin,
+  authWriter,
+  authUserOrAdmin,
+  authAnyRole,
+};

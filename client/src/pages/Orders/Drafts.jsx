@@ -10,7 +10,6 @@ import {
   ClipboardList,
   CalendarClock,
   AlignJustify,
-  LoaderCircle,
   Paperclip,
   Hourglass,
   Trash2,
@@ -87,8 +86,79 @@ function Drafts() {
     setExpandedOrder(expandedOrder === orderId ? null : orderId);
   };
 
+  function capitalize(text) {
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
+      {/* Animated Background Waves - Fixed z-index */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Top wave */}
+        <svg
+          className="absolute top-0 left-0 w-full h-[200px] opacity-10"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#1D4ED8" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,200 Q250,50 500,200 T1000,200 L1000,0 L0,0 Z"
+            fill="url(#wave1)"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Bottom wave */}
+        <svg
+          className="absolute bottom-0 left-0 w-full h-[200px] opacity-5"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#6366F1" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,0 Q250,150 500,0 T1000,0 L1000,200 L0,200 Z"
+            fill="url(#wave2)"
+            className="animate-pulse"
+            style={{ animationDelay: "2s" }}
+          />
+        </svg>
+
+        {/* Floating Particles */}
+        {/* Left side */}
+        <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-60"></div>
+        <div className="absolute top-40 left-10 w-3 h-3 bg-pink-400 rounded-full animate-pulse opacity-50"></div>
+        <div
+          className="absolute bottom-28 left-16 w-2 h-2 bg-green-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 left-1/5 w-4 h-4 bg-indigo-300 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "2s" }}
+        ></div>
+
+        {/* Right side */}
+        <div
+          className="absolute top-40 right-32 w-3 h-3 bg-amber-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute bottom-32 left-1/4 w-2 h-2 bg-indigo-400 rounded-full animate-bounce opacity-50"
+          style={{ animationDelay: "3s" }}
+        ></div>
+        <div className="absolute top-1/3 right-20 w-4 h-4 bg-green-300 rounded-full animate-pulse opacity-30"></div>
+      </div>
       <Navbar />
       <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -168,11 +238,17 @@ function Drafts() {
 
                   {/* Summary */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm text-slate-600 mt-4">
-                    <OrderDetail icon={PenTool} label={order.type_of_service} />
-                    <OrderDetail icon={FileText} label={order.document_type} />
+                    <OrderDetail
+                      icon={PenTool}
+                      label={capitalize(order.type_of_service)}
+                    />
+                    <OrderDetail
+                      icon={FileText}
+                      label={capitalize(order.document_type)}
+                    />
                     <OrderDetail
                       icon={GraduationCap}
-                      label={order.writer_level}
+                      label={capitalize(order.writer_level)}
                     />
                   </div>
 
@@ -190,7 +266,7 @@ function Drafts() {
                         />
                         <OrderDetail
                           icon={BookOpenText}
-                          label={`${order.pages} pages`}
+                          label={`${order.pages} Pages`}
                         />
                         <OrderDetail
                           icon={ClipboardList}
@@ -198,22 +274,8 @@ function Drafts() {
                         />
                         <OrderDetail
                           icon={AlignJustify}
-                          label={`${order.spacing} spacing`}
+                          label={`${capitalize(order.spacing)} Spaced`}
                         />
-                      </div>
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mt-4 text-sm text-slate-600">
-                        <div className="flex items-center gap-2">
-                          <CalendarClock className="w-4 h-4 text-sky-600" />
-                          {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
-                        </div>
-                        <div
-                          className={`flex items-center gap-2 font-medium ${getCountdownColor(
-                            order.deadline
-                          )}`}
-                        >
-                          <Hourglass className="w-4 h-4 text-sky-600" />
-                          {formatCountdown(order.deadline)} remaining
-                        </div>
                         {order.uploaded_file && (
                           <a
                             href={order.uploaded_file}
@@ -223,11 +285,34 @@ function Drafts() {
                             download
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <Paperclip className="w-4 h-4" />
+                            <Paperclip className="w-4 h-4 text-sky-600" />
                             Download File
                           </a>
                         )}
                       </div>
+
+                      {/* Time and Deadline Information - Properly Aligned */}
+                      <div className="flex flex-wrap items-center gap-6 mt-4 text-sm text-slate-600">
+                        <div className="flex items-center gap-2">
+                          <CalendarClock className="w-4 h-4 text-sky-600" />
+                          <span>
+                            {moment(order.deadline).format(
+                              "MMM D, YYYY, h:mm A"
+                            )}
+                          </span>
+                        </div>
+                        <div
+                          className={`flex items-center gap-2 font-medium ${getCountdownColor(
+                            order.deadline
+                          )}`}
+                        >
+                          <Hourglass className="w-4 h-4" />
+                          <span>
+                            {formatCountdown(order.deadline)} remaining
+                          </span>
+                        </div>
+                      </div>
+
                       <div className="flex items-center justify-between mt-4">
                         <span className="text-lg font-semibold text-slate-800">
                           $
@@ -241,7 +326,7 @@ function Drafts() {
                               e.stopPropagation();
                               handleDeleteDraft(order.id);
                             }}
-                            className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors flex items-center gap-2"
+                            className="px-4 py-2 bg-red-100 text-red-700 rounded-md hover:bg-red-200 transition-colors flex items-center gap-2 cursor-pointer"
                             aria-label={`Delete draft: ${order.topic}`}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -252,7 +337,7 @@ function Drafts() {
                               e.stopPropagation();
                               handleContinueToCheckout(order.id);
                             }}
-                            className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors flex items-center gap-2"
+                            className="px-4 py-2 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors flex items-center gap-2 cursor-pointer"
                             aria-label={`Continue to checkout for draft: ${order.topic}`}
                           >
                             <ShoppingCart className="w-4 h-4" />

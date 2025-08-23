@@ -3,7 +3,6 @@ import Footer from "../../components/Footer";
 import Spinner from "../../components/Spinner";
 import {
   CheckCircle,
-  Loader,
   FileText,
   Ban,
   Scale,
@@ -11,6 +10,7 @@ import {
   FileEdit,
   BanknoteArrowUp,
   FileCheck,
+  GraduationCap,
   Hourglass,
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -113,10 +113,159 @@ function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex flex-col relative overflow-hidden">
       <Navbar />
 
-      <main className="flex-1 pt-20 px-4 md:px-10 max-w-7xl mx-auto w-full">
+      {/* Animated Background Waves - Fixed z-index */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {/* Top wave */}
+        <svg
+          className="absolute top-0 left-0 w-full h-[200px] opacity-10"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#3B82F6" />
+              <stop offset="100%" stopColor="#1D4ED8" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,200 Q250,50 500,200 T1000,200 L1000,0 L0,0 Z"
+            fill="url(#wave1)"
+            className="animate-pulse"
+          />
+        </svg>
+
+        {/* Bottom wave */}
+        <svg
+          className="absolute bottom-0 left-0 w-full h-[200px] opacity-5"
+          viewBox="0 0 1000 200"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <linearGradient id="wave2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#8B5CF6" />
+              <stop offset="100%" stopColor="#6366F1" />
+            </linearGradient>
+          </defs>
+          <path
+            d="M0,0 Q250,150 500,0 T1000,0 L1000,200 L0,200 Z"
+            fill="url(#wave2)"
+            className="animate-pulse"
+            style={{ animationDelay: "2s" }}
+          />
+        </svg>
+
+        {/* Floating Particles - Layer 1 (Large) */}
+        <div className="absolute top-20 left-20 w-3 h-3 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-full animate-bounce opacity-60 shadow-lg"></div>
+        <div className="absolute top-32 right-28 w-4 h-4 bg-gradient-to-br from-pink-400 to-rose-500 rounded-full animate-pulse opacity-50 shadow-md"></div>
+        <div
+          className="absolute top-1/3 left-1/4 w-5 h-5 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full animate-bounce opacity-40 shadow-lg"
+          style={{ animationDelay: "1.5s" }}
+        ></div>
+        <div
+          className="absolute top-1/2 right-1/3 w-3 h-3 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full animate-pulse opacity-45 shadow-md"
+          style={{ animationDelay: "2.5s" }}
+        ></div>
+
+        {/* Floating Particles - Layer 2 (Medium) */}
+        <div
+          className="absolute top-40 left-10 w-2 h-2 bg-gradient-to-br from-violet-400 to-purple-500 rounded-full animate-bounce opacity-50"
+          style={{ animationDelay: "0.5s" }}
+        ></div>
+        <div
+          className="absolute bottom-40 right-16 w-3 h-3 bg-gradient-to-br from-teal-400 to-cyan-600 rounded-full animate-pulse opacity-35"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-60 left-1/3 w-2 h-2 bg-gradient-to-br from-indigo-400 to-blue-600 rounded-full animate-bounce opacity-45"
+          style={{ animationDelay: "2s" }}
+        ></div>
+        <div
+          className="absolute bottom-60 left-20 w-4 h-4 bg-gradient-to-br from-lime-400 to-green-600 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "3s" }}
+        ></div>
+
+        {/* Floating Particles - Layer 3 (Small & Scattered) */}
+        <div
+          className="absolute top-16 left-1/2 w-1.5 h-1.5 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "0.8s" }}
+        ></div>
+        <div
+          className="absolute top-80 right-40 w-2 h-2 bg-gradient-to-br from-red-400 to-pink-500 rounded-full animate-pulse opacity-35"
+          style={{ animationDelay: "1.8s" }}
+        ></div>
+        <div
+          className="absolute bottom-20 left-40 w-1.5 h-1.5 bg-gradient-to-br from-sky-400 to-blue-500 rounded-full animate-bounce opacity-50"
+          style={{ animationDelay: "2.3s" }}
+        ></div>
+        <div
+          className="absolute top-1/4 right-1/4 w-2 h-2 bg-gradient-to-br from-fuchsia-400 to-violet-500 rounded-full animate-pulse opacity-40"
+          style={{ animationDelay: "1.2s" }}
+        ></div>
+        <div
+          className="absolute bottom-1/3 left-1/5 w-3 h-3 bg-gradient-to-br from-emerald-300 to-teal-500 rounded-full animate-bounce opacity-35"
+          style={{ animationDelay: "2.8s" }}
+        ></div>
+
+        {/* Floating Particles - Layer 4 (Extra decorative) */}
+        <div
+          className="absolute top-28 right-1/5 w-1 h-1 bg-gradient-to-br from-orange-400 to-red-500 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "0.3s" }}
+        ></div>
+        <div
+          className="absolute top-3/4 left-1/6 w-2 h-2 bg-gradient-to-br from-cyan-300 to-blue-400 rounded-full animate-bounce opacity-45"
+          style={{ animationDelay: "1.7s" }}
+        ></div>
+        <div
+          className="absolute bottom-16 right-1/6 w-1.5 h-1.5 bg-gradient-to-br from-purple-300 to-indigo-400 rounded-full animate-pulse opacity-40"
+          style={{ animationDelay: "2.1s" }}
+        ></div>
+        <div
+          className="absolute top-44 left-3/4 w-2 h-2 bg-gradient-to-br from-green-300 to-emerald-400 rounded-full animate-bounce opacity-35"
+          style={{ animationDelay: "3.2s" }}
+        ></div>
+        <div
+          className="absolute bottom-44 right-3/4 w-1 h-1 bg-gradient-to-br from-pink-300 to-rose-400 rounded-full animate-pulse opacity-50"
+          style={{ animationDelay: "0.7s" }}
+        ></div>
+
+        {/* Corner accent particles */}
+        <div
+          className="absolute top-8 left-8 w-2 h-2 bg-gradient-to-br from-blue-300 to-cyan-400 rounded-full animate-bounce opacity-30"
+          style={{ animationDelay: "1.4s" }}
+        ></div>
+        <div
+          className="absolute top-8 right-8 w-1.5 h-1.5 bg-gradient-to-br from-violet-300 to-purple-400 rounded-full animate-pulse opacity-35"
+          style={{ animationDelay: "2.6s" }}
+        ></div>
+        <div
+          className="absolute bottom-8 left-8 w-1 h-1 bg-gradient-to-br from-emerald-300 to-green-400 rounded-full animate-bounce opacity-40"
+          style={{ animationDelay: "0.9s" }}
+        ></div>
+        <div
+          className="absolute bottom-8 right-8 w-2 h-2 bg-gradient-to-br from-amber-300 to-yellow-400 rounded-full animate-pulse opacity-30"
+          style={{ animationDelay: "1.9s" }}
+        ></div>
+
+        {/* Center area accent particles */}
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-1 h-1 bg-gradient-to-br from-rose-300 to-pink-400 rounded-full animate-pulse opacity-25"
+          style={{ animationDelay: "2.4s" }}
+        ></div>
+        <div
+          className="absolute top-1/3 left-1/3 w-1.5 h-1.5 bg-gradient-to-br from-indigo-300 to-blue-400 rounded-full animate-bounce opacity-35"
+          style={{ animationDelay: "3.1s" }}
+        ></div>
+        <div
+          className="absolute bottom-1/4 right-1/5 w-1 h-1 bg-gradient-to-br from-teal-300 to-cyan-400 rounded-full animate-pulse opacity-40"
+          style={{ animationDelay: "0.6s" }}
+        ></div>
+      </div>
+      <main className="flex-1 pt-20 px-4 md:px-10 max-w-7xl mx-auto w-full relative z-10">
         <h1 className="text-2xl font-semibold text-slate-800 mt-8 mb-4">
           Welcome Back!
         </h1>
@@ -125,6 +274,7 @@ function Home() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-14">
           {dashboardItems.map(({ key, label, icon: Icon, color }) => (
             <Link
+              key={key}
               to={`/my-orders/${key}`}
               className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition-all border border-slate-100 flex items-center space-x-5 group"
             >
@@ -143,19 +293,21 @@ function Home() {
           ))}
         </div>
 
-        {/* Call-to-Action Buttons */}
-        <div className="flex flex-wrap gap-4 mb-12">
+        {/* Call-to-Action Buttons - Centered */}
+        <div className="flex flex-wrap justify-center gap-4 mb-12">
           <Link
             to="/new-order"
-            className="bg-blue-600 text-white px-6 py-3 rounded-full font-medium hover:bg-blue-700 transition"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-4 rounded-2xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-3"
           >
-            📄 Place Order
+            <FileText className="w-5 h-5" />
+            Place Order
           </Link>
           <Link
             to="/class-help"
-            className="bg-amber-400 text-slate-900 px-6 py-3 rounded-full font-medium hover:bg-amber-500 transition"
+            className="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 px-8 py-4 rounded-2xl font-semibold hover:from-amber-500 hover:to-amber-600 transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-3"
           >
-            🎓 Click here for online class help
+            <GraduationCap className="w-5 h-5" />
+            Online Class Help
           </Link>
         </div>
 
@@ -172,14 +324,17 @@ function Home() {
                     <th className="px-6 py-4 text-sm font-medium text-slate-500">
                       Order ID
                     </th>
-                    <th className="px-6 py-4 text-sm font-medium text-slate-500">
+                    <th className="px-6 py-4 text-sm font-medium text-slate-500 text-center">
                       Title
                     </th>
-                    <th className="px-6 py-4 text-sm font-medium text-slate-500">
-                      Status
+                    <th className="px-6 py-4 text-sm font-medium text-slate-500 text-center">
+                      Payment Status
                     </th>
-                    <th className="px-6 py-4 text-sm font-medium text-slate-500">
+                    <th className="px-6 py-4 text-sm font-medium text-slate-500 text-center">
                       Date
+                    </th>
+                    <th className="px-6 py-4 text-sm font-medium text-slate-500 text-center">
+                      Assignment Status
                     </th>
                   </tr>
                 </thead>
@@ -192,26 +347,53 @@ function Home() {
                         </Link>
                       </td>
 
-                      <td className="px-6 py-4 text-sm">{order.title}</td>
-                      <td className="px-6 py-4 text-sm">
+                      <td className="px-6 py-4 text-sm text-center">
+                        {order.title}
+                      </td>
+
+                      {/* Payment Status - Centered */}
+                      <td className="px-6 py-4 text-sm text-center">
                         <span
                           className={`px-3 py-1 rounded-full font-medium ${
-                            order.status === "Paid"
+                            order.payment_status === "Paid"
                               ? "bg-green-100 text-green-700"
-                              : order.status === "In Progress"
+                              : order.payment_status === "Pending"
                               ? "bg-blue-100 text-blue-700"
-                              : order.status === "Pending"
+                              : order.payment_status === "Canceled"
                               ? "bg-amber-100 text-amber-700"
-                              : order.status === "Draft"
+                              : order.payment_status === "Draft"
                               ? "bg-indigo-100 text-indigo-700"
                               : "bg-slate-200 text-slate-700"
                           }`}
                         >
-                          {order.status}
+                          {order.payment_status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-500">
+
+                      <td className="px-6 py-4 text-sm text-slate-500 text-center">
                         {order.date}
+                      </td>
+
+                      {/* Assignment Status - Centered & Capitalized */}
+                      <td className="px-6 py-4 text-sm text-center">
+                        <span
+                          className={`px-3 py-1 rounded-full font-medium ${
+                            order.assignmentStatus === "assigned"
+                              ? "bg-green-100 text-green-700"
+                              : order.assignmentStatus === "public"
+                              ? "bg-blue-100 text-blue-700"
+                              : order.assignmentStatus === "submitted"
+                              ? "bg-amber-100 text-amber-700"
+                              : order.assignmentStatus === "disputed"
+                              ? "bg-red-100 text-red-700"
+                              : order.assignmentStatus === "completed"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-slate-200 text-slate-700"
+                          }`}
+                        >
+                          {order.assignmentStatus.charAt(0).toUpperCase() +
+                            order.assignmentStatus.slice(1)}
+                        </span>
                       </td>
                     </tr>
                   ))}

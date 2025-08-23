@@ -1,6 +1,6 @@
 function Spinner({ size = "medium" }) {
   const fontSizes = {
-    small: "text-[30px]",
+    small: "text-[15px]",
     medium: "text-[45px]",
     large: "text-[70px]",
   };
