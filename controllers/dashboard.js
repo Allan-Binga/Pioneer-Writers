@@ -23,28 +23,25 @@ const getDashboard = async (req, res) => {
       submitted: 0,
     };
 
-    // Count each order by assignment_status
+    // Count orders by assignment_status & payment_status
     orders.forEach((order) => {
-      const rawStatus = order.assignment_status?.toLowerCase();
+      const assignment = order.assignment_status?.toLowerCase();
+      const payment = order.payment_status?.toLowerCase();
 
-      // Special case: treat "assigned" as inProgress
-      if (rawStatus === "assigned") {
+      // Assignment status logic
+      if (assignment === "assigned") {
         statusCounters.inProgress++;
-      } else {
-        // Other statuses must match keys in the statusCounters
-        const mappedKeys = [
-          "completed",
-          "disputed",
-          "unconfirmed",
-          "draft",
-          "paid",
-          "cancelled",
-          "submitted",
-        ];
+      } else if (
+        ["completed", "disputed", "unconfirmed", "submitted"].includes(
+          assignment
+        )
+      ) {
+        statusCounters[assignment]++;
+      }
 
-        if (mappedKeys.includes(rawStatus)) {
-          statusCounters[rawStatus]++;
-        }
+      // Payment status logic
+      if (["paid", "draft", "cancelled"].includes(payment)) {
+        statusCounters[payment]++;
       }
     });
 
@@ -93,28 +90,25 @@ const getAdminDashboard = async (req, res) => {
       submitted: 0,
     };
 
-    // Count each order by assignment_status
+    // Count orders by assignment_status & payment_status
     orders.forEach((order) => {
-      const rawStatus = order.assignment_status?.toLowerCase();
+      const assignment = order.assignment_status?.toLowerCase();
+      const payment = order.payment_status?.toLowerCase();
 
-      // Special case: treat "assigned" as inProgress
-      if (rawStatus === "assigned") {
+      // Assignment status logic
+      if (assignment === "assigned") {
         statusCounters.inProgress++;
-      } else {
-        // Other statuses must match keys in the statusCounters
-        const mappedKeys = [
-          "completed",
-          "disputed",
-          "unconfirmed",
-          "draft",
-          "paid",
-          "cancelled",
-          "submitted",
-        ];
+      } else if (
+        ["completed", "disputed", "unconfirmed", "submitted"].includes(
+          assignment
+        )
+      ) {
+        statusCounters[assignment]++;
+      }
 
-        if (mappedKeys.includes(rawStatus)) {
-          statusCounters[rawStatus]++;
-        }
+      // Payment status logic
+      if (["paid", "draft", "cancelled"].includes(payment)) {
+        statusCounters[payment]++;
       }
     });
 
