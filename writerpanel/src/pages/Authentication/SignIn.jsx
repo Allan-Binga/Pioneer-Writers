@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, X } from "lucide-react";
 import { notify } from "../../utils/toast";
 import { backend } from "../../backend";
@@ -13,6 +13,9 @@ function SignIn() {
   const [fieldErrors, setFieldErrors] = useState({});
   const [showForgotModal, setShowForgotModal] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const from = location.state?.from?.pathname || "/public-orders";
 
   const validateField = (name, value) => {
     if (name === "email") {
@@ -77,9 +80,7 @@ function SignIn() {
 
       notify.success("Login successful.");
       setTimeout(() => {
-        navigate(
-          data.writer.role === "Writer" ? "/public-orders" : "/public-orders"
-        );
+        navigate(from, { replace: true });
       }, 1500);
     } catch (error) {
       const msg = error.message?.toLowerCase?.();

@@ -2,6 +2,7 @@ const client = require("../config/dbConfig");
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { welcomeWritersEmail } = require("./emailService");
 
 // Joi schema for sign up
 const signUpSchema = Joi.object({
@@ -342,8 +343,12 @@ const signUpWriter = async (req, res) => {
     ]);
 
     res.status(201).json({
-      message: "Signup successful.",
+      message: "Signup successful.Please check your email.",
       user: result.rows[0],
+    });
+
+    welcomeWritersEmail(email).catch((err) => {
+      console.error("Error sending welcome email:", err);
     });
   } catch (error) {
     console.error("User registration Error:", error);

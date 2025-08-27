@@ -5,6 +5,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import { Toaster } from "sonner";
+import AuthenticateRoute from "./components/AuthenticateRoute";
 import SignUp from "./pages/Authentication/SignUp";
 import SignIn from "./pages/Authentication/SignIn";
 import ProfileCompletion from "./pages/Profile/ProfileCompletion";
@@ -16,6 +17,7 @@ import MyOrders from "./pages/Orders/MyOrders";
 import Classes from "./pages/Orders/Classes";
 import Inbox from "./pages/Services/Inbox";
 import News from "./pages/Services/News";
+import TermsAndConditions from "./pages/TermsAndConditions/TermsAndConditions";
 
 function App() {
   return (
@@ -29,12 +31,27 @@ function App() {
         <Route path="/profile-completion" element={<ProfileCompletion />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/payments" element={<Payments />} />
-        <Route path="/public-orders" element={<Orders />} />
+        <Route
+          path="/public-orders"
+          element={
+            <AuthenticateRoute>
+              <Orders />
+            </AuthenticateRoute>
+          }
+        />
         <Route path="/my-orders/:status" element={<MyOrders />} />
-        <Route path="/order-details/:orderId" element={<OrderDetails />} />
+        <Route
+          path="/order-details/:orderId"
+          element={
+            <AuthenticateRoute>
+              <OrderDetails />
+            </AuthenticateRoute>
+          }
+        />
         <Route path="/classes" element={<Classes />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/news" element={<News />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       </Routes>
     </Router>
   );

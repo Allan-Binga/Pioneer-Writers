@@ -73,14 +73,14 @@ function MyOrders() {
     const now = moment();
     const due = moment(deadline);
     const duration = moment.duration(due.diff(now));
-    if (duration.asSeconds() <= 0) return "Deadline Passed";
+    if (duration.asSeconds() <= 0) return "Submitted";
     return `${duration.days()}d ${duration.hours()}h ${duration.minutes()}m`;
   };
 
   const formatStatus = (status) => {
     const baseClass =
-      "inline-block px-2 py-1 rounded-full text-[10px] font-medium capitalize";
-    switch (status.toLowerCase()) {
+      "inline-block px-2 py-1 rounded-full text-xs font-medium capitalize";
+    switch (status) {
       case "public":
         return `${baseClass} bg-blue-100 text-blue-800`;
       case "completed":
@@ -104,11 +104,11 @@ function MyOrders() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50">
-      {/* Animated Background Waves */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* Animated Background Waves - Hidden on small screens for performance */}
+      <div className="hidden md:block absolute inset-0 overflow-hidden pointer-events-none">
         {/* Top wave */}
         <svg
-          className="absolute top-0 left-0 w-full h-[200px] opacity-10"
+          className="absolute top-0 left-0 w-full h-[150px] sm:h-[200px] opacity-10"
           viewBox="0 0 1000 200"
           preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -128,7 +128,7 @@ function MyOrders() {
 
         {/* Bottom wave */}
         <svg
-          className="absolute bottom-0 left-0 w-full h-[200px] opacity-5"
+          className="absolute bottom-0 left-0 w-full h-[150px] sm:h-[200px] opacity-5"
           viewBox="0 0 1000 200"
           preserveAspectRatio="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -148,7 +148,6 @@ function MyOrders() {
         </svg>
 
         {/* Floating Particles */}
-        {/* Left side */}
         <div className="absolute top-20 left-20 w-2 h-2 bg-blue-400 rounded-full animate-bounce opacity-60"></div>
         <div className="absolute top-40 left-10 w-3 h-3 bg-pink-400 rounded-full animate-pulse opacity-50"></div>
         <div
@@ -159,8 +158,6 @@ function MyOrders() {
           className="absolute top-1/2 left-1/5 w-4 h-4 bg-indigo-300 rounded-full animate-pulse opacity-30"
           style={{ animationDelay: "2s" }}
         ></div>
-
-        {/* Right side */}
         <div
           className="absolute top-40 right-32 w-3 h-3 bg-amber-400 rounded-full animate-bounce opacity-40"
           style={{ animationDelay: "1s" }}
@@ -173,130 +170,188 @@ function MyOrders() {
       </div>
 
       <Navbar />
-      <main className="flex-1 pt-20 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 pt-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-8 mb-6 capitalize">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 mt-6 mb-4 capitalize">
             {selectedStatus === "all"
               ? "All Orders"
               : `${selectedStatus} Orders`}
           </h1>
 
-          <div className="overflow-x-auto bg-white rounded-2xl shadow-md border border-slate-200">
-            {loading ? (
-              <div className="p-8 text-center text-slate-600 text-xs">
-                Loading orders...
-              </div>
-            ) : orders.length === 0 ? (
-              <div className="p-8 text-center text-slate-600 text-xs">
-                No orders found.
-                <a
-                  href="/new-order"
-                  className="ml-2 text-blue-600 hover:underline"
-                >
-                  Place an Order
-                </a>
-              </div>
-            ) : (
-              <table className="min-w-full divide-y divide-slate-200 text-sm text-slate-700">
-                <thead className="bg-slate-100 text-slate-800">
-                  <tr>
-                    <th className="px-4 py-3 text-left font-semibold text-sm">
-                      Order
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-sm">
-                      Topic
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-sm">
-                      Writer
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-sm">
-                      Amount ($)
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-sm">
-                      Deadline
-                    </th>
-                    <th className="px-4 py-3 text-left font-semibold text-sm">
-                      Time Remaining
-                    </th>
-                    <th className="px-4 py-3 text-center font-semibold text-sm">
-                      Submission Status
-                    </th>
-                  </tr>
-                </thead>
+          {/* Loading State */}
+          {loading ? (
+            <div className="p-6 text-center text-slate-600 text-sm">
+              <LoaderCircle className="w-6 h-6 animate-spin mx-auto mb-2" />
+              Loading orders...
+            </div>
+          ) : orders.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-96 bg-white rounded-lg shadow-sm border border-slate-200 p-8">
+              <FileText className="w-16 h-16 text-slate-400 mb-4" />
+              <p className="text-xl font-medium text-slate-700 mb-2">
+                No orders found at the moment.
+              </p>
 
-                <tbody className="divide-y divide-slate-100 bg-white">
-                  {orders.map((order, index) => (
-                    <tr
-                      key={index}
-                      className="hover:bg-slate-50 cursor-pointer"
-                      onClick={() => openModal(order)}
-                    >
-                      {/* Order ID */}
-                      <td className="px-4 py-3 text-sky-500 font-medium">
+              <a
+                href="/new-order"
+                className="px-6 py-3 bg-sky-600 text-white rounded-md hover:bg-sky-700 transition-colors font-medium"
+              >
+                Post Order
+              </a>
+            </div>
+          ) : (
+            <>
+              {/* Mobile/Tablet: Card Layout */}
+              <div className="block md:hidden space-y-4">
+                {orders.map((order, index) => (
+                  <div
+                    key={index}
+                    className="bg-white rounded-lg shadow-md p-4 border border-slate-200 cursor-pointer hover:bg-slate-50"
+                    onClick={() => openModal(order)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
                         <Link
                           to={`/order-details/${order.order_id}`}
                           onClick={(e) => e.stopPropagation()}
+                          className="text-sky-500 font-medium text-sm"
                         >
                           {order.order_id}
                         </Link>
-                      </td>
-
-                      {/* Topic */}
-                      <td className="px-4 py-3">{order.topic}</td>
-
-                      {/* Writer */}
-                      <td className="px-4 py-3 font-semibold">
-                        {order.writer_name || "N/A"}
-                      </td>
-
-                      {/* Amount */}
-                      <td className="px-4 py-3">
-                        ${parseFloat(order.checkout_amount).toFixed(2)}
-                      </td>
-
-                      {/* Deadline */}
-                      <td className="px-4 py-3">
-                        {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
-                      </td>
-
-                      {/* Time Remaining */}
-                      <td className="px-6 py-4 font-medium">
-                        <span
-                          className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                            isUrgent(order.deadline)
-                              ? "bg-red-100 text-red-800"
-                              : "bg-green-100 text-green-800"
+                        <p className="text-slate-700 font-medium mt-1">
+                          {order.topic}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          Writer: {order.writer_name || "N/A"}
+                        </p>
+                        <p className="text-xs text-slate-500">
+                          ${parseFloat(order.checkout_amount).toFixed(2)}
+                        </p>
+                      </div>
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize
+                          ${
+                            order.assignment_status === "submitted"
+                              ? "bg-green-100 text-green-700"
+                              : order.assignment_status === "completed"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : order.assignment_status === "assigned"
+                              ? "bg-blue-100 text-blue-700"
+                              : order.assignment_status === "public"
+                              ? "bg-amber-100 text-amber-700"
+                              : "bg-slate-200 text-slate-700"
                           }`}
-                        >
-                          {formatCountdown(order.deadline)}
-                        </span>
-                      </td>
+                      >
+                        {order.assignment_status}
+                      </span>
+                    </div>
+                    <div className="mt-2 text-xs text-slate-600">
+                      <p>
+                        Deadline:{" "}
+                        {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
+                      </p>
+                      <p
+                        className={`mt-1 font-medium ${
+                          isUrgent(order.deadline)
+                            ? "text-red-500"
+                            : "text-green-500"
+                        }`}
+                      >
+                        {formatCountdown(order.deadline)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
 
-                      {/* Submission Status */}
-                      <td className="px-4 py-3 text-center">
-                        <span
-                          className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize
-              ${
-                order.assignment_status === "submitted"
-                  ? "bg-green-100 text-green-700"
-                  : order.assignment_status === "completed"
-                  ? "bg-emerald-100 text-emerald-700"
-                  : order.assignment_status === "assigned"
-                  ? "bg-blue-100 text-blue-700"
-                  : order.assignment_status === "public"
-                  ? "bg-amber-100 text-amber-700"
-                  : "bg-slate-200 text-slate-700"
-              }`}
-                        >
-                          {order.assignment_status}
-                        </span>
-                      </td>
+              {/* Desktop: Table Layout */}
+              <div className="hidden md:block overflow-x-auto bg-white rounded-2xl shadow-md border border-slate-200">
+                <table className="min-w-full divide-y divide-slate-200 text-sm text-slate-700">
+                  <thead className="bg-slate-100 text-slate-800">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold text-sm">
+                        Order
+                      </th>
+                      <th className="px-4 py-3 text-left font-semibold text-sm">
+                        Topic
+                      </th>
+                      <th className="px-4 py-3 text-left font-semibold text-sm">
+                        Writer
+                      </th>
+                      <th className="px-4 py-3 text-left font-semibold text-sm">
+                        Amount ($)
+                      </th>
+                      <th className="px-4 py-3 text-left font-semibold text-sm">
+                        Deadline
+                      </th>
+                      <th className="px-4 py-3 text-left font-semibold text-sm">
+                        Time Remaining
+                      </th>
+                      <th className="px-4 py-3 text-center font-semibold text-sm">
+                        Submission Status
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white">
+                    {orders.map((order, index) => (
+                      <tr
+                        key={index}
+                        className="hover:bg-slate-50 cursor-pointer"
+                        onClick={() => openModal(order)}
+                      >
+                        <td className="px-4 py-3 text-sky-500 font-medium">
+                          <Link
+                            to={`/order-details/${order.order_id}`}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {order.order_id}
+                          </Link>
+                        </td>
+                        <td className="px-4 py-3">{order.topic}</td>
+                        <td className="px-4 py-3 font-semibold">
+                          {order.writer_name || "N/A"}
+                        </td>
+                        <td className="px-4 py-3">
+                          ${parseFloat(order.checkout_amount).toFixed(2)}
+                        </td>
+                        <td className="px-4 py-3">
+                          {moment(order.deadline).format("MMM D, YYYY, h:mm A")}
+                        </td>
+                        <td className="px-6 py-4 font-medium">
+                          <span
+                            className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                              isUrgent(order.deadline)
+                                ? "bg-red-100 text-red-800"
+                                : "bg-green-100 text-green-800"
+                            }`}
+                          >
+                            {formatCountdown(order.deadline)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-center">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-medium capitalize
+                              ${
+                                order.assignment_status === "submitted"
+                                  ? "bg-green-100 text-green-700"
+                                  : order.assignment_status === "completed"
+                                  ? "bg-emerald-100 text-emerald-700"
+                                  : order.assignment_status === "assigned"
+                                  ? "bg-blue-100 text-blue-700"
+                                  : order.assignment_status === "public"
+                                  ? "bg-amber-100 text-amber-700"
+                                  : "bg-slate-200 text-slate-700"
+                              }`}
+                          >
+                            {order.assignment_status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
       </main>
 
@@ -304,11 +359,12 @@ function MyOrders() {
       <Dialog open={isModalOpen} onClose={closeModal} className="relative z-50">
         <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <DialogPanel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all relative">
+          <div className="flex min-h-full items-center justify-center p-2 sm:p-4">
+            <DialogPanel className="w-full max-w-md sm:max-w-lg md:max-w-2xl transform overflow-hidden rounded-2xl bg-white p-4 sm:p-6 text-left align-middle shadow-xl transition-all relative">
               <button
                 onClick={closeModal}
                 className="absolute top-4 right-4 text-slate-500 hover:text-slate-800 cursor-pointer"
+                aria-label="Close Modal"
               >
                 <X className="w-5 h-5 hover:text-red-600" />
               </button>
@@ -316,12 +372,13 @@ function MyOrders() {
                 <>
                   <DialogTitle
                     as="h3"
-                    className="text-lg font-semibold text-slate-900 mb-4"
+                    className="text-lg sm:text-xl font-semibold text-slate-900 mb-4 capitalize"
                   >
                     {selectedOrder.topic}
                   </DialogTitle>
+
                   <div className="grid gap-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm text-slate-600">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm text-slate-600 capitalize">
                       <OrderDetail
                         icon={PenTool}
                         label={selectedOrder.type_of_service}
@@ -336,11 +393,11 @@ function MyOrders() {
                       />
                       <OrderDetail
                         icon={LayoutTemplate}
-                        label={selectedOrder.paper_format.toUpperCase()}
+                        label={selectedOrder.paper_format}
                       />
                       <OrderDetail
                         icon={Flag}
-                        label={selectedOrder.english_type.toUpperCase()}
+                        label={selectedOrder.english_type}
                       />
                       <OrderDetail
                         icon={BookOpenText}
@@ -362,20 +419,20 @@ function MyOrders() {
                         target="_blank"
                         rel="noopener noreferrer"
                         download
-                        className="inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 transition-colors"
+                        className="inline-flex items-center gap-2 text-sm text-sky-600 hover:text-sky-700 transition-colors capitalize"
                       >
                         <Paperclip className="w-4 h-4" />
                         Download File
                       </a>
                     )}
 
-                    <div className="flex flex-col gap-2 text-sm">
+                    <div className="flex flex-col gap-2 text-sm capitalize">
                       <span
                         className={formatStatus(selectedOrder.order_status)}
                       >
                         {selectedOrder.order_status}
                       </span>
-                      <span className="text-lg font-semibold text-slate-800">
+                      <span className="text-base sm:text-lg font-semibold text-slate-800">
                         ${parseFloat(selectedOrder.checkout_amount).toFixed(2)}
                       </span>
                       <div className="flex items-center gap-2 text-slate-600">
@@ -390,7 +447,7 @@ function MyOrders() {
                         )}`}
                       >
                         <Hourglass className="w-4 h-4" />
-                        {formatCountdown(selectedOrder.deadline)} remaining
+                        {formatCountdown(selectedOrder.deadline)} Remaining
                       </div>
                     </div>
                   </div>

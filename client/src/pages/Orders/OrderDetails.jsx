@@ -24,6 +24,7 @@ import {
   Download,
   Star,
   AlertTriangle,
+  ClockPlus,
 } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -287,7 +288,6 @@ function OrderDetails() {
               disabled={order?.assignment_status?.toLowerCase() === "completed"}
             >
               Order Actions
-              <MoreVertical className="w-4 h-4" />
             </button>
           </div>
 
@@ -538,6 +538,13 @@ function OrderDetails() {
               Order Actions
             </h2>
             <div className="space-y-3">
+              <button
+                onClick={() => handleAction("Complete Order")}
+                className="flex items-center gap-3 w-full px-4 py-2 bg-teal-100 text-teal-700 rounded-md hover:bg-teal-200 transition-colors text-left"
+              >
+                <ClockPlus className="w-4 h-4" />
+                Extend Deadline
+              </button>
               <button
                 onClick={() => handleAction("Complete Order")}
                 className="flex items-center gap-3 w-full px-4 py-2 bg-green-100 text-green-700 rounded-md hover:bg-green-200 transition-colors text-left"

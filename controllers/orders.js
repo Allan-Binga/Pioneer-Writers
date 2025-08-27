@@ -3,6 +3,7 @@ const Joi = require("joi");
 const {
   sendOrderPlacementEmail,
   sendOrderSubmissionEmail,
+  sendDeadlineExtensionEmail,
 } = require("./emailService");
 
 // Post/Update an order
@@ -298,7 +299,7 @@ const getSingleOrder = async (req, res) => {
     if (role === "Writer") {
       // Writers: Can only view their assigned orders
       query = `
-        SELECT o.order_id, o.english_type, o.paper_format, o.order_status,
+        SELECT o.order_id, o.english_type, o.paper_format, 
                o.instructions, o.writer_level, o.subject, o.topic, o.deadline,
                o.pages, o.total_price, o.assignment_status,o.submitted_files, o.user_id,
                w.full_name AS writer_name
@@ -562,6 +563,64 @@ const updateOrder = async (req, res) => {
   }
 };
 
+//Extend Deadline
+const extendDeadline = async (req, res) => {
+  const userId = req.userId;
+  const { orderId } = req.params;
+  const { newDeadline } = req.body;
+
+  if (!newDeadline) {
+    return res.status(400).json({ error: "New deadline is required" });
+  }
+
+  try {
+    // Check if the order exists and belongs to this user
+    const orderResult = await client.query(
+      "SELECT order_id, user_id, writer_id FROM orders WHERE order_id = $1",
+      [orderId]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const order = orderResult.rows[0];
+
+    // Verify ownership
+    if (order.user_id !== userId) {
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    // Update the deadline
+    await client.query("UPDATE orders SET deadline = $1 WHERE order_id = $2", [
+      newDeadline,
+      orderId,
+    ]);
+
+    //Fetch Writers email
+    if (order.writer_id) {
+      const writerResult = await client.query(
+        "SELECT email FROM writers WHERE writer_id = $1",
+        [order.writer_id]
+      );
+
+      if (writerResult.rows.length > 0) {
+        const writerEmail = writerResult.rows[0].email;
+        // Fire-and-forget email
+        sendDeadlineExtensionEmail(writerEmail, orderId, newDeadline);
+      }
+    }
+
+    res.json({
+      message: "Deadline updated successfully",
+      newDeadline,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 //Delete Order
 const deleteOrder = async (req, res) => {
   const userId = req.userId;
@@ -780,5 +839,6 @@ module.exports = {
   getAdminSingleOrder,
   submitAssignment,
   completeOrder,
+  extendDeadline,
   disputeOrder,
 };

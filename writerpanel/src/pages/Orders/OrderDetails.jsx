@@ -497,8 +497,13 @@ function OrderDetails() {
                   </h2>
 
                   <button
-                    className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                    className={`px-4 py-2 rounded-md transition-colors ${
+                      order.assignment_status === "completed"
+                        ? "bg-indigo-600 text-white hover:bg-indigo-700 cursor-pointer"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
                     onClick={() => setShowRatingModal(true)}
+                    disabled={order.assignment_status !== "completed"}
                   >
                     Leave a Rating
                   </button>

@@ -178,14 +178,18 @@ const getBidsForOrder = async (req, res) => {
 const assignWriter = async (req, res) => {
   const userId = req.userId;
   const { bidId } = req.params;
+  console.log(bidId);
   try {
     //Find bid and verify ownership
     const bidData = await client.query(
-      `SELECT b.order_id, b.writer_id, o.user_id, u.email AS writer_email
-       FROM bids b
-       JOIN orders o ON b.order_id = o.order_id
-       JOIN users u ON b.writer_id = u.user_id
-       WHERE b.bid_id = $1`,
+      `SELECT b.order_id, 
+          b.writer_id, 
+          o.user_id, 
+          w.email AS writer_email
+   FROM bids b
+   JOIN orders o ON b.order_id = o.order_id
+   JOIN writers w ON b.writer_id = w.writer_id
+   WHERE b.bid_id = $1`,
       [bidId]
     );
 

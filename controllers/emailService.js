@@ -10,6 +10,88 @@ const transporter = nodemailer.createTransport({
     pass: process.env.EMAIL_PASS,
   },
 });
+
+// Welcome Writers Email
+const welcomeWritersEmail = async (email) => {
+  const logoUrl =
+    "https://pioneer-writers-bucket.s3.eu-north-1.amazonaws.com/pioneer-writers/logo.webp";
+
+  const mailOptions = {
+    from: `"Pioneer Writers" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Welcome to Pioneer Writers!",
+    html: `
+      <div style="margin:0; padding:0; background-color:#f5f7fa; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Ubuntu,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f7fa; padding:20px 0;">
+          <tr>
+            <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="padding:32px 40px; text-align:center; background-color:#ffffff; border-bottom:1px solid #e5e7eb;">
+                    <img src="${logoUrl}" alt="Pioneer Writers" style="height:40px; width:auto;" />
+                  </td>
+                </tr>
+
+                <!-- Content -->
+                <tr>
+                  <td style="padding:40px; background-color:#ffffff;">
+                    <h1 style="margin:0 0 24px 0; font-size:24px; font-weight:600; color:#111827; line-height:1.2;">
+                      Welcome aboard!
+                    </h1>
+                    <p style="margin:0 0 24px 0; font-size:16px; color:#374151; line-height:1.5;">
+                      We're thrilled to have you join <strong>Pioneer Writers</strong>. 
+                      As part of our community, you’ll have the opportunity to share your voice, 
+                      grow your skills, and collaborate with other passionate writers.
+                    </p>
+                    <p style="margin:0 0 32px 0; font-size:16px; color:#374151; line-height:1.5;">
+                      Get started by exploring your dashboard and bid for orders.
+                    </p>
+                    
+                    <table cellpadding="0" cellspacing="0" align="center" style="margin: 0 auto;">
+  <tr>
+    <td style="border-radius:6px; background-color:#3b82f6; text-align:center;">
+      <a href="${
+        process.env.WRITER_CLIENT_URL
+      }/public-orders" style="display:inline-block; padding:14px 24px; background-color:#3b82f6; color:#ffffff; font-size:16px; font-weight:500; text-decoration:none; border-radius:6px;">
+        Start bidding for orders!
+      </a>
+    </td>
+  </tr>
+</table>
+
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td style="padding:24px 40px; background-color:#f9fafb; border-top:1px solid #e5e7eb;">
+                    <p style="margin:0; font-size:12px; color:#9ca3af; line-height:1.4;">
+                      © ${new Date().getFullYear()} Pioneer Writers. All rights reserved.
+                    </p>
+                    <p style="margin:8px 0 0 0; font-size:12px; color:#9ca3af; line-height:1.4;">
+                      If you have any questions, reach out to us at 
+                      <a href="mailto:team@pioneerwriters.com" style="color:#3b82f6; text-decoration:none;">team@pioneerwriters.com</a>
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error(`Error sending welcome email:`, error);
+    throw error;
+  }
+};
+
 // Password Reset Email
 const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.CLIENT_URL}/password/reset?token=${token}`;
@@ -68,7 +150,7 @@ const sendPasswordResetEmail = async (email, token) => {
                     </p>
                     <p style="margin: 8px 0 0 0; font-size: 12px; color: #9ca3af; line-height: 1.4;">
                       This email was sent to ${email}. If you have questions, contact us at 
-                      <a href="mailto:support@pioneerwriters.com" style="color: #3b82f6; text-decoration: none;">support@pioneerwriters.com</a>
+                      <a href="mailto:team@pioneerwriters.com" style="color: #3b82f6; text-decoration: none;">team@pioneerwriters.com</a>
                     </p>
                   </td>
                 </tr>
@@ -92,7 +174,6 @@ const sendPasswordResetEmail = async (email, token) => {
 const sendOrderPlacementEmail = async (email, order) => {
   const logoUrl =
     "https://pioneer-writers-bucket.s3.eu-north-1.amazonaws.com/pioneer-writers/logo.webp";
-  const clientUrl = process.env.CLIENT_URL;
 
   const mailOptions = {
     from: `"Pioneer Writers" <${process.env.EMAIL_USER}>`,
@@ -132,7 +213,9 @@ const sendOrderPlacementEmail = async (email, order) => {
                       You can track progress, view bids, and receive updates directly on your dashboard.
                     </p>
                     
-                    <a href="${clientUrl}/order-details/${order.order_id}" 
+                    <a href="${process.env.CLIENT_URL}/order-details/${
+      order.order_id
+    }" 
                        style="display:inline-block; padding:14px 26px; background-color:#2563eb; color:#ffffff; font-size:16px; font-weight:600; text-decoration:none; border-radius:6px;">
                       Track Your Order
                     </a>
@@ -200,7 +283,7 @@ const sendOrderPlacementEmail = async (email, order) => {
                     </p>
                     <p style="margin:6px 0 0 0; font-size:12px; color:#9ca3af; line-height:1.5;">
                       Questions? Contact us at 
-                      <a href="mailto:support@pioneerwriters.com" style="color:#2563eb; text-decoration:none;">support@pioneerwriters.com</a>
+                      <a href="mailto:team@pioneerwriters.com" style="color:#2563eb; text-decoration:none;">team@pioneerwriters.com</a>
                     </p>
                   </td>
                 </tr>
@@ -274,7 +357,9 @@ const orderPaymentEmail = async (email, order, amount, transactionId) => {
                     <table cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="border-radius: 6px; background-color: #3b82f6;">
-                          <a href="https://pioneerwriters.com/orders" style="display: inline-block; padding: 14px 24px; background-color: #3b82f6; color: #ffffff; font-size: 16px; font-weight: 500; text-decoration: none; border-radius: 6px;">
+                          <a href="${process.env.CLIENT_URL}/order-details/${
+      order.order_id
+    }" style="display: inline-block; padding: 14px 24px; background-color: #3b82f6; color: #ffffff; font-size: 16px; font-weight: 500; text-decoration: none; border-radius: 6px;">
                             View your order
                           </a>
                         </td>
@@ -318,7 +403,7 @@ const orderPaymentEmail = async (email, order, amount, transactionId) => {
                     </p>
                     <p style="margin: 8px 0 0 0; font-size: 12px; color: #9ca3af; line-height: 1.4;">
                       Questions about your payment? Contact us at 
-                      <a href="mailto:support@pioneerwriters.com" style="color: #3b82f6; text-decoration: none;">support@pioneerwriters.com</a>
+                      <a href="mailto:team@pioneerwriters.com" style="color: #3b82f6; text-decoration: none;">team@pioneerwriters.com</a>
                     </p>
                   </td>
                 </tr>
@@ -373,7 +458,7 @@ const sendBidStatusEmail = async (email, orderId) => {
                       You can log in to view their proposals and select the best match.
                     </p>
 
-                    <a href="https://pioneerwriters.com/orders/${orderId}" 
+                    <a href="${process.env.CLIENT_URL}/bids/order/${orderId}" 
                        style="display:inline-block;padding:12px 20px;background-color:#16a34a;color:#fff;font-size:14px;font-weight:500;text-decoration:none;border-radius:6px;">
                       View Bids
                     </a>
@@ -402,7 +487,7 @@ const sendBidStatusEmail = async (email, orderId) => {
   }
 };
 
-// Send Order Assignment Email (minimalist)
+// Send Order Assignment Email
 const sendWriterOrderAssignmentEmail = async (email, orderId) => {
   const logoUrl =
     "https://pioneer-writers-bucket.s3.eu-north-1.amazonaws.com/pioneer-writers/logo.webp";
@@ -422,14 +507,16 @@ const sendWriterOrderAssignmentEmail = async (email, orderId) => {
           </tr>
 
           <tr>
-            <td style="padding:30px;">
+            <td style="padding:30px; text-align:center;">
               <h2 style="margin:0 0 15px; font-size:20px; color:#111;">New Assignment</h2>
-              <p style="margin:0 0 20px; font-size:16px; color:#374151;">
+              <p style="margin:0 0 20px; font-size:16px; color:#374151; line-height:1.5;">
                 You’ve been assigned to work on <strong>Order #${orderId}</strong>.  
                 Please log in to view the order details and get started.
               </p>
-              <a href="https://pioneerwriters.com/writer/orders/${orderId}" 
-                 style="display:inline-block; padding:12px 20px; background:#2563eb; color:#fff; text-decoration:none; border-radius:6px; font-size:14px;">
+              <a href="${
+                process.env.WRITER_CLIENT_URL
+              }/order-details/${orderId}" 
+                 style="display:inline-block; padding:12px 24px; background:#2563eb; color:#fff; text-decoration:none; border-radius:6px; font-size:15px; font-weight:500;">
                 View Order
               </a>
             </td>
@@ -450,6 +537,59 @@ const sendWriterOrderAssignmentEmail = async (email, orderId) => {
     await transporter.sendMail(mailOptions);
   } catch (error) {
     console.error("Failed to send assignment email:", error);
+  }
+};
+
+// Deadline Extension Email
+const sendDeadlineExtensionEmail = async (email, orderId, newDeadline) => {
+  const logoUrl =
+    "https://pioneer-writers-bucket.s3.eu-north-1.amazonaws.com/pioneer-writers/logo.webp";
+
+  const mailOptions = {
+    from: `"Pioneer Writers" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: `Deadline Extended for Order #${orderId}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #f9fafb; padding: 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+          
+          <tr>
+            <td style="padding:20px; text-align:center; border-bottom:1px solid #eee;">
+              <img src="${logoUrl}" alt="Pioneer Writers" style="height:40px;" />
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:30px; text-align:center;">
+              <h2 style="margin:0 0 15px; font-size:20px; color:#111;">Deadline Extended</h2>
+              <p style="margin:0 0 20px; font-size:16px; color:#374151; line-height:1.5;">
+                The deadline for <strong>Order #${orderId}</strong> has been updated to 
+                <strong>${newDeadline}</strong>. Please ensure you complete your work by this new date.
+              </p>
+              <a href="${
+                process.env.WRITER_CLIENT_URL
+              }/order-details/${orderId}" 
+                 style="display:inline-block; padding:12px 24px; background:#2563eb; color:#fff; text-decoration:none; border-radius:6px; font-size:15px; font-weight:500;">
+                View Order
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:15px; background:#f9fafb; font-size:12px; color:#9ca3af; text-align:center;">
+              © ${new Date().getFullYear()} Pioneer Writers
+            </td>
+          </tr>
+
+        </table>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Failed to send deadline extension email:", error);
   }
 };
 
@@ -488,9 +628,9 @@ const sendOrderSubmissionEmail = async (email, order) => {
                       }</strong> has been submitted by the assigned writer.
                     </p>
 
-                    <a href="https://pioneerwriters.com/orders/${
-                      order.order_id
-                    }" 
+                    <a href="${process.env.CLIENT_URL}/order-details/${
+      order.order_id
+    }" 
                        style="display:inline-block;padding:12px 20px;background-color:#2563eb;color:#fff;font-size:14px;font-weight:500;text-decoration:none;border-radius:6px;">
                       View Submitted Files
                     </a>
@@ -544,10 +684,12 @@ const sendOrderSubmissionEmail = async (email, order) => {
 };
 
 module.exports = {
+  welcomeWritersEmail,
   sendPasswordResetEmail,
   sendOrderPlacementEmail,
   orderPaymentEmail,
   sendBidStatusEmail,
   sendWriterOrderAssignmentEmail,
+  sendDeadlineExtensionEmail,
   sendOrderSubmissionEmail,
 };
