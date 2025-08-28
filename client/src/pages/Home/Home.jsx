@@ -63,7 +63,7 @@ function Home() {
       color: "bg-emerald-100 text-emerald-600",
     },
     {
-      key: "inProgress",
+      key: "in-progress",
       label: "Orders In Progress",
       icon: Hourglass,
       color: "bg-blue-100 text-blue-600",

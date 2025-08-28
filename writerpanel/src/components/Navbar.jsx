@@ -208,19 +208,6 @@ function Navbar() {
 
           {/* Right Section */}
           <div className="flex items-center space-x-4 sm:space-x-6 mr-2">
-            <Link
-              to="/news"
-              className="relative text-gray-600 hover:text-amber-500 transition-colors duration-200 cursor-pointer"
-              title="News Notifications"
-            >
-              <Bell className="w-7 h-7" />
-              {notificationCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
-                  {notificationCount}
-                </span>
-              )}
-            </Link>
-
             {isLoggedIn ? (
               <div className="relative" ref={dropdownRef}>
                 <div

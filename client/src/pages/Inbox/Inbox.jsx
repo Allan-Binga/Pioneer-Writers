@@ -213,7 +213,6 @@ function ComposeModal({ onClose }) {
               </div>
             )}
           </div>
-
           <div>
             <label className="block text-md font-medium text-slate-700">
               Subject
@@ -223,7 +222,7 @@ function ComposeModal({ onClose }) {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="Insert Subject"
-              className="w-full border border-slate-300 rounded px-3 py-2 mt-1"
+              className="w-full border border-slate-300 rounded-md px-3 py-2 mt-1 focus:outline-none focus:border-slate-400"
             />
           </div>
 
@@ -236,7 +235,7 @@ function ComposeModal({ onClose }) {
               onChange={(e) => setContent(e.target.value)}
               placeholder="Type your message..."
               rows={5}
-              className="w-full border border-slate-300 rounded px-3 py-2 mt-1 resize-none"
+              className="w-full border border-slate-300 rounded-md px-3 py-2 mt-1 resize-none focus:outline-none focus:border-slate-400"
             />
           </div>
 

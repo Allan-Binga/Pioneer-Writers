@@ -21,6 +21,7 @@ import { backend } from "../../backend";
 
 function Profile() {
   const [smsEnabled, setSmsEnabled] = useState(true);
+  const [showSmsModal, setShowSmsModal] = useState(false);
   const [rating, setRating] = useState({});
   const [loading, setLoading] = useState(false);
   const [userData, setUserData] = useState({
@@ -32,6 +33,7 @@ function Profile() {
     writer_level: "",
     writer_type: "",
     profile_picture_url: "",
+    sms_updates: "",
     completed_orders: "",
     joined_at: "",
     avatarFile: null,
@@ -78,7 +80,9 @@ function Profile() {
           completed_orders: profile.completed_orders || "",
           joined_at: profile.joined_at || "",
           avatarFile: null,
+          sms_updates: profile.sms_updates || "",
         });
+        setSmsEnabled(profile.sms_updates || false);
       } catch (err) {
         console.error("Failed to fetch profile:", err.message);
       }
@@ -144,6 +148,56 @@ function Profile() {
     }
   };
 
+  const handleActivateSMS = async () => {
+    if (smsEnabled) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${backend}/sms/writer/activate-sms`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (response.data.success) {
+        notify.success("SMS notifications activated!");
+        setSmsEnabled(true);
+      } else {
+        notify.error(response.data.message || "Failed to activate SMS");
+      }
+    } catch (error) {
+      console.error("Activate SMS error:", error);
+      notify.error("An error occured while activating SMS");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //Deactivate SMS
+  const handleDeactivateSMS = async () => {
+    if (!smsEnabled) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.post(
+        `${backend}/sms/writer/deactivate-sms`,
+        {},
+        { withCredentials: true }
+      );
+      if (response.data.success) {
+        notify.success("SMS notifications deactivated!");
+        setSmsEnabled(false); // update toggle
+      } else {
+        notify.error(response.data.message || "Failed to deactivate SMS.");
+      }
+    } catch (error) {
+      console.error("Deactivation SMS error:", error);
+      notify.error("An error occurred while deactivating SMS");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       <Navbar />
@@ -204,10 +258,13 @@ function Profile() {
               <div className="flex items-center gap-3">
                 <ToggleSwitch
                   isEnabled={smsEnabled}
-                  onToggle={() => setSmsEnabled(!smsEnabled)}
+                  onToggle={() => setShowSmsModal(true)} //Open the SMS modal toggle
                 />
+
                 <span className="text-sm text-gray-700">
-                  Enable SMS notifications for order updates
+                  {smsEnabled
+                    ? "Disable SMS notifications for order updates"
+                    : "Enable SMS notifications for order updates"}
                 </span>
               </div>
             </div>
@@ -281,6 +338,45 @@ function Profile() {
           </div>
         </div>
       </main>
+
+      {/* SMS Modal for Toggling SMS UPDATES */}
+      {showSmsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="bg-white rounded-xl p-6 w-80 shadow-lg">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">
+              {smsEnabled
+                ? "Confirm SMS Deactivation"
+                : "Confirm SMS Activation"}
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              {smsEnabled
+                ? "Are you sure you want to disable SMS updates for order notifications?"
+                : "Are you sure you want to activate SMS updates for order notifications?"}
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                className="px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 cursor-pointer"
+                onClick={() => setShowSmsModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className={`px-4 py-2 text-white rounded-md cursor-pointer ${
+                  smsEnabled
+                    ? "bg-red-600 hover:bg-red-700"
+                    : "bg-green-600 hover:bg-green-700"
+                }`}
+                onClick={() => {
+                  setShowSmsModal(false);
+                  smsEnabled ? handleDeactivateSMS() : handleActivateSMS();
+                }}
+              >
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );

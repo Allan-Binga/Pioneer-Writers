@@ -157,6 +157,12 @@ const sendMessageToWriter = async (req, res) => {
   }
 };
 
+//Send Mail to Client
+const sendMessageToClient = async (req, res) => {
+  try {
+  } catch (error) {}
+};
+
 // Get Messages
 const getMyMessages = async (req, res) => {
   const userId = req.userId;
@@ -199,6 +205,164 @@ const getMyMessages = async (req, res) => {
     return res.status(200).json({ messages });
   } catch (error) {
     console.error("Error fetching messages:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//User Read or Trash Messages
+const userReadTrashOrArchive = async (req, res) => {
+  const { id } = req.params;
+  const { isRead, isTrashed, isArchived } = req.body;
+  const userId = req.userId;
+
+  try {
+    //Collect Updates
+    const updates = [];
+    const values = [];
+    let idx = 1;
+
+    if (typeof isRead === "boolean") {
+      updates.push(`is_read = $${idx++}`);
+      values.push(isRead);
+    }
+
+    if (typeof isTrashed === "boolean") {
+      updates.push(`is_trashed = $${idx++}`);
+      values.push(isTrashed);
+    }
+
+    if (typeof isArchived === "archived") {
+      updates.push(`is_archived= $${idx++}`);
+      values.push(isArchived);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: "No valid fields to update." });
+    }
+
+    //Identifiers
+    values.push(id, userId);
+
+    const query = `
+      UPDATE messages
+      SET ${updates.join(", ")}
+      WHERE message_id = $${idx++}
+      AND (sender_id = $${idx} OR receiver_id = $${idx})
+      RETURNING *;
+    `;
+
+    const { rows } = await client.query(query, values);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Message not found or unauthorized" });
+    }
+    return res.status(200).json({ message: rows[0] });
+  } catch (error) {
+    console.error("Error updating message:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Get Writer Messages
+const getWriterMessages = async (req, res) => {
+  const writerId = req.writerId;
+  const filter = req.query.filter || "all";
+  try {
+    let query = `
+      SELECT 
+        m.*,
+        COALESCE(usender.email, wsender.email) AS sender_email,
+        COALESCE(ureceiver.email, wreceiver.email) AS receiver_email,
+        COALESCE(usender.username, wsender.full_name) AS sender_name,
+        COALESCE(ureceiver.username, wreceiver.full_name) AS receiver_name
+      FROM messages m
+      LEFT JOIN users   usender  ON m.sender_type = 'client' AND m.sender_id   = usender.user_id
+      LEFT JOIN writers wsender  ON m.sender_type = 'writer' AND m.sender_id   = wsender.writer_id
+      LEFT JOIN users   ureceiver ON m.receiver_id = ureceiver.user_id
+      LEFT JOIN writers wreceiver ON m.receiver_id = wreceiver.writer_id
+      WHERE 1=1
+    `;
+
+    const queryParams = [writerId];
+
+    if (filter === "sent") {
+      query += ` AND m.sender_id = $1 AND m.sender_type = 'writer'`;
+    } else if (filter === "inbox") {
+      query += ` AND m.receiver_id = $1 AND m.is_read = false`;
+    } else if (filter === "unread") {
+      query += ` AND m.receiver_id = $1 AND m.is_read = false`;
+    } else if (filter === "archived") {
+      query += ` AND (m.sender_id = $1 OR m.receiver_id = $1) AND m.is_archived = true`;
+    } else if (filter === "trash") {
+      query += ` AND (m.sender_id = $1 OR m.receiver_id = $1) AND m.is_trashed = true`;
+    } else {
+      query += ` AND (m.sender_id = $1 OR m.receiver_id = $1)`; // all messages
+    }
+
+    query += ` ORDER BY m.sent_at DESC`;
+
+    const { rows: messages } = await client.query(query, queryParams);
+    return res.status(200).json({ messages });
+  } catch (error) {
+    console.error("Error fetching writer messages:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//Read Message as Writer
+const writerReadOrTrash = async (req, res) => {
+  const { id } = req.params;
+  const { is_read, is_trashed, is_archived } = req.body;
+  const writerId = req.writerId;
+
+  try {
+    // Collect updates dynamically
+    const updates = [];
+    const values = [];
+    let idx = 1;
+
+    if (typeof is_read === "boolean") {
+      updates.push(`is_read = $${idx++}`);
+      values.push(is_read);
+    }
+
+    if (typeof is_trashed === "boolean") {
+      updates.push(`is_trashed = $${idx++}`);
+      values.push(is_trashed);
+    }
+
+    if (typeof is_trashed === "archived") {
+      updates.push(`is_archived= $${idx++}`);
+      values.push(is_archived);
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ error: "No valid fields to update" });
+    }
+
+    // Add identifiers
+    values.push(id, writerId);
+
+    const query = `
+      UPDATE messages
+      SET ${updates.join(", ")}
+      WHERE message_id = $${idx++}
+      AND (sender_id = $${idx} OR receiver_id = $${idx})
+      RETURNING *;
+    `;
+
+    const { rows } = await client.query(query, values);
+
+    if (rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Message not found or unauthorized" });
+    }
+    return res.status(200).json({ message: rows[0] });
+  } catch (error) {
+    console.error("Error updating message:", error);
     return res.status(500).json({ error: "Internal server error" });
   }
 };
@@ -335,7 +499,11 @@ const getAdminMessages = async (req, res) => {
 
 module.exports = {
   sendMessageToWriter,
+  sendMessageToClient,
   getMyMessages,
+  userReadTrashOrArchive,
+  getWriterMessages,
+  writerReadOrTrash,
   administratorMessageService,
   getAdminMessages,
 };

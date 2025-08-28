@@ -102,7 +102,7 @@ const capturePayment = async (req, res) => {
         paymentType === "half" ? "Partially Paid" : "Paid"
       );
       await client.query(
-        `UPDATE orders SET order_status = $1 WHERE order_id = $2`,
+        `UPDATE orders SET payment_status = $1 WHERE order_id = $2`,
         [paymentType === "half" ? "Partially Paid" : "Paid", orderId]
       );
       console.log("✅ Order status updated");

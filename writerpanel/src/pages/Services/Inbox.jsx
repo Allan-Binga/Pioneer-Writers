@@ -8,6 +8,7 @@ import {
   Archive,
   Search,
   X,
+  ArchiveRestore,
 } from "lucide-react";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
@@ -33,7 +34,7 @@ function ComposeModal({ onClose }) {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${endpoint}/writers/all?field=${subjectField.toLowerCase()}`,
+          `${backend}/writers/all?field=${subjectField.toLowerCase()}`,
           { withCredentials: true }
         );
         setWriters(response.data);
@@ -75,7 +76,7 @@ function ComposeModal({ onClose }) {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${endpoint}/inbox/send/email/writer`,
+        `${backend}/inbox/send/email/writer`,
         {
           receiver_ids: selectedWriters.map((writer) => writer.id),
           subject,
@@ -285,7 +286,7 @@ function Inbox() {
       setLoading(true);
       try {
         const response = await axios.get(
-          `${endpoint}/inbox/messages/all?filter=${filter}`,
+          `${backend}/inbox/writer/messages/all?filter=${filter}`,
           {
             withCredentials: true,
           }
@@ -307,6 +308,33 @@ function Inbox() {
     setFilter(newFilter);
     setSelectedMessage(null); // Clear selected message when filter changes
   };
+
+  const handleReadOrTrash = async (messageId, data) => {
+    try {
+      const response = await axios.patch(
+        `${backend}/inbox/writer/read-or-trash/${messageId}`,
+        data,
+        { withCredentials: true }
+      );
+
+      // Update local state so UI reflects immediately
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.message_id === messageId ? { ...msg, ...data } : msg
+        )
+      );
+
+      // If trashed, unselect the message
+      if (data.is_trashed) {
+        setSelectedMessage(null);
+      }
+
+      return response.data.message;
+    } catch (error) {
+      console.error("Failed to update message:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-indigo-50">
       <Navbar />
@@ -406,13 +434,18 @@ function Inbox() {
                           {messages.map((message) => (
                             <li
                               key={message.message_id}
-                              onClick={() =>
+                              onClick={() => {
                                 setSelectedMessage((prev) =>
                                   prev?.message_id === message.message_id
                                     ? null
                                     : message
-                                )
-                              }
+                                );
+                                if (!message.is_read) {
+                                  handleReadOrTrash(message.message_id, {
+                                    is_read: true,
+                                  });
+                                }
+                              }}
                               className={`px-4 py-4 hover:bg-slate-50 cursor-pointer transition relative ${
                                 selectedMessage?.message_id ===
                                 message.message_id
@@ -474,7 +507,11 @@ function Inbox() {
                               </p>
                             </div>
                             <button
-                              onClick={() => setSelectedMessage(null)}
+                              onClick={() =>
+                                handleReadOrTrash(selectedMessage.message_id, {
+                                  is_trashed: true,
+                                })
+                              }
                               className="text-slate-400 hover:text-red-500 ml-4 flex-shrink-0"
                             >
                               <Trash2 className="w-5 h-5" />

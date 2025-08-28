@@ -42,7 +42,7 @@ const handlePaypalWebhook = async (req, res) => {
         const updatedStatus =
           paymentType === "half" ? "Partially Paid" : "Paid";
         await client.query(
-          `UPDATE orders SET order_status = $1 WHERE order_id = $2`,
+          `UPDATE orders SET payment_status = $1 WHERE order_id = $2`,
           [updatedStatus, orderId]
         );
 
@@ -107,7 +107,7 @@ const handlePaypalWebhook = async (req, res) => {
 
         // 2. Update order status
         await client.query(
-          `UPDATE orders SET payment_status = $1, order_status = $2 WHERE order_id = $3`,
+          `UPDATE orders SET payment_status = $1, payment_status = $2 WHERE order_id = $3`,
           ["Failed", "Failed", orderId]
         );
 

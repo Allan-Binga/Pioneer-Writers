@@ -23,7 +23,7 @@ import moment from "moment";
 import { useParams, Link } from "react-router-dom";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 
-function MyOrders() {
+function  MyOrders() {
   const { status } = useParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);

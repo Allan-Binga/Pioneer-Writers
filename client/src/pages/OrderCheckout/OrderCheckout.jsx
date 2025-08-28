@@ -12,7 +12,6 @@ import Navbar from "../../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import Visa from "../../assets/visa.png";
 import PayPal from "../../assets/paypal.png";
-import StripeLogo from "../../assets/stripe.png";
 import { endpoint } from "../../server";
 import axios from "axios";
 import { notify } from "../../utils/toast";
@@ -95,7 +94,6 @@ function OrderPayment() {
           if (!redirectUrl) throw new Error("No approval URL received");
           break;
 
-        case "stripe":
         case "visa":
           response = await axios.post(
             `${endpoint}/checkout/stripe`,
@@ -406,7 +404,6 @@ function OrderPayment() {
                   {[
                     { value: "paypal", label: "PayPal", logo: PayPal },
                     { value: "visa", label: "Visa", logo: Visa },
-                    { value: "stripe", label: "Stripe", logo: StripeLogo },
                   ].map((method) => (
                     <OptionCard
                       key={method.value}

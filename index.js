@@ -5,6 +5,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth");
 const ordersRoute = require("./routes/orders");
+const classOrdersRoute = require("./routes/classOrders")
 const bidsRoute = require("./routes/bids");
 const paymentsRoute = require("./routes/payments");
 const checkoutRoute = require("./routes/orderCheckout");
@@ -77,6 +78,7 @@ app.use(cookieParser());
 app.use("/pioneer-writers/v1/auth", authRoute);
 app.use("/pioneer-writers/v1/oauth2", oauth2Route);
 app.use("/pioneer-writers/v1/orders", ordersRoute);
+app.use("/pioneer-writers/v1/classes", classOrdersRoute)
 app.use("/pioneer-writers/v1/ratings", ratingsRoute);
 app.use("/pioneer-writers/v1/bids", bidsRoute);
 app.use("/pioneer-writers/v1/inbox", inboxRoute);

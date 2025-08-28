@@ -29,8 +29,22 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/profile-completion" element={<ProfileCompletion />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/payments" element={<Payments />} />
+        <Route
+          path="/profile"
+          element={
+            <AuthenticateRoute>
+              <Profile />
+            </AuthenticateRoute>
+          }
+        />
+        <Route
+          path="/payments"
+          element={
+            <AuthenticateRoute>
+              <Payments />
+            </AuthenticateRoute>
+          }
+        />
         <Route
           path="/public-orders"
           element={
@@ -39,7 +53,14 @@ function App() {
             </AuthenticateRoute>
           }
         />
-        <Route path="/my-orders/:status" element={<MyOrders />} />
+        <Route
+          path="/my-orders/:status"
+          element={
+            <AuthenticateRoute>
+              <MyOrders />
+            </AuthenticateRoute>
+          }
+        />
         <Route
           path="/order-details/:orderId"
           element={
@@ -49,8 +70,22 @@ function App() {
           }
         />
         <Route path="/classes" element={<Classes />} />
-        <Route path="/inbox" element={<Inbox />} />
-        <Route path="/news" element={<News />} />
+        <Route
+          path="/inbox"
+          element={
+            <AuthenticateRoute>
+              <Inbox />
+            </AuthenticateRoute>
+          }
+        />
+        <Route
+          path="/news"
+          element={
+            <AuthenticateRoute>
+              <News />
+            </AuthenticateRoute>
+          }
+        />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
       </Routes>
     </Router>

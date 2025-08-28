@@ -167,7 +167,7 @@ function Success() {
       <main className="flex-1 transition-all duration-300 pt-34 px-4">
         <div className="max-w-6xl mx-auto space-y-8">
           {loading ? (
-            <div className="flex justify-center items-center h-64">
+            <div className="flex justify-center items-center">
               <Spinner />
             </div>
           ) : (

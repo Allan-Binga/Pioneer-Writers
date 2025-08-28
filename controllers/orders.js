@@ -421,7 +421,7 @@ const getAdminSingleOrder = async (req, res) => {
 const getUsersOrders = async (req, res) => {
   const userId = req.userId;
   const { status } = req.query;
-
+  console.log(status)
   try {
     let query = `
       SELECT o.*, w.full_name AS writer_name
@@ -440,6 +440,16 @@ const getUsersOrders = async (req, res) => {
         query += " AND o.assignment_status = 'completed'";
       } else if (status === "public") {
         query += " AND o.assignment_status = 'public'";
+      } else if (status === "disputed") {
+        query += " AND o.assignment_status = 'disputed'";
+      } else if (status === "unconfirmed") {
+        query += " AND o.assignment_status = 'unconfirmed'";
+      } else if (status === "draft") {
+        query += " AND o.assignment_status = 'draft'";
+      } else if (status === "paid") {
+        query += " AND o.payment_status = 'Paid'";
+      } else if (status === "cancelled") {
+        query += " AND o.assignment_status = 'cancelled'";
       }
     }
 
