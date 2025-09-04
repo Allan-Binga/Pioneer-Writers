@@ -11,6 +11,7 @@ import {
   CircleCheck,
   List,
   CheckLine,
+  Scale,
 } from "lucide-react";
 import Logo from "../assets/logo.jpeg";
 import axios from "axios";
@@ -57,6 +58,11 @@ function Navbar() {
           path: "/my-orders/completed",
           icon: <CheckLine className="w-4 h-4 mr-2" />,
         },
+        // {
+        //   name: "Disputed",
+        //   path: "/my-orders/disputed",
+        //   icon: <Scale className="w-4 h-4 mr-2" />,
+        // },
         {
           name: "All Orders",
           path: "/my-orders/all",

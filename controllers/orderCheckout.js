@@ -116,6 +116,47 @@ const cancelPaypalCheckout = async (req, res) => {
   }
 };
 
+//Create Paypal Checkout for Class Orders
+const classOrdersPaypalCheckout = async (req, res) => {
+  const userId = req.userId;
+  const { classHelpId } = req.body;
+  console.log(classHelpId)
+  console.log(userId)
+
+  try {
+    const classOrderQuery = `SELECT * FROM class_help_orders WHERE class_help_id = $1 AND user_id = $2`;
+    const { rows } = await client.query(classOrderQuery, [classHelpId, userId]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Class not found." });
+    }
+
+    const classOrder = rows[0];
+    const totalAmount = classOrder.budget;
+    console.log(totalAmount)
+
+    const request = new paypal.orders.OrdersCreateRequest();
+    request.prefer("return=representation");
+    request.requestBody({
+      intent: "CAPTURE",
+      purchase_units: [
+        {
+          reference_id: orderId.toString(),
+          custom_id: orderId.toString(),
+          amount: {
+            currency_code: "USD",
+            value: totalAmount.toString(),
+          },
+        },
+      ],
+      application_context: {
+        return_url: `${process.env.CLIENT_URL}/payment/class/success`,
+        cancel_url: `${process.env.CLIENT_URL}/payment/class/failed`,
+      },
+    });
+  } catch (error) {}
+};
+
 //Stripe Checkout
 const stripeCheckout = async (req, res) => {
   const userId = req.userId;
@@ -202,5 +243,6 @@ const stripeCheckout = async (req, res) => {
 module.exports = {
   paypalCheckout,
   cancelPaypalCheckout,
+  classOrdersPaypalCheckout,
   stripeCheckout,
 };

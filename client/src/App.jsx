@@ -32,6 +32,8 @@ import OrderDetails from "./pages/Orders/OrderDetails";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import Payments from "./pages/Payments/Payments";
 import ClassHelp from "./pages/ClassHelp/ClassHelp";
+import ClassPayment from "./pages/ClassHelp/ClassPayment";
+import ClassSuccess from "./pages/Payment Messages/ClassSuccess";
 
 function App() {
   return (
@@ -63,6 +65,22 @@ function App() {
           element={
             <AuthenticateRoute>
               <ClassHelp />
+            </AuthenticateRoute>
+          }
+        />
+        <Route
+          path="/class-checkout"
+          element={
+            <AuthenticateRoute>
+              <ClassPayment />
+            </AuthenticateRoute>
+          }
+        />
+        <Route
+          path="/class/payment/success"
+          element={
+            <AuthenticateRoute>
+              <ClassSuccess />
             </AuthenticateRoute>
           }
         />
