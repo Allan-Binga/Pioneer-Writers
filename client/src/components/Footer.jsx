@@ -2,7 +2,7 @@ import PioneerLogo from "../assets/logo.jpg";
 
 function Footer() {
   return (
-    <footer className="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-700 border-t border-gray-200 mt-12">
+    <footer className="bg-gradient-to-br from-gray-50 to-gray-100 text-gray-700 border-t border-gray-200 ">
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8">
           {/* Left Section: Logo and Links (closer) */}
@@ -18,7 +18,7 @@ function Footer() {
             {/* Links */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2 text-xs">
               <a
-                href="/about"
+                href="/about-us"
                 title="About Us"
                 className="hover:text-blue-600 transition-colors duration-200"
               >
@@ -26,7 +26,7 @@ function Footer() {
               </a>
 
               <a
-                href="/contact"
+                href="/contact-us"
                 title="Contact Us"
                 className="hover:text-blue-600 transition-colors duration-200"
               >

@@ -25,6 +25,7 @@ import Success from "./pages/Payment Messages/Success";
 import Failure from "./pages/Payment Messages/Failure";
 import TermsAndConditions from "./pages/TermsOfUse/TermsAndConditions";
 import PrivacyPolicy from "./pages/TermsOfUse/PrivacyPolicy";
+import FairUsePolicy from "./pages/TermsOfUse/FairUsePolicy";
 import DataDeletion from "./pages/TermsOfUse/DataDeletion";
 import Drafts from "./pages/Orders/Drafts";
 import Home from "./pages/Home/Home";
@@ -34,6 +35,10 @@ import Payments from "./pages/Payments/Payments";
 import ClassHelp from "./pages/ClassHelp/ClassHelp";
 import ClassPayment from "./pages/ClassHelp/ClassPayment";
 import ClassSuccess from "./pages/Payment Messages/ClassSuccess";
+import AboutUs from "./pages/PioneerPages/AboutUs";
+import ContactUs from "./pages/PioneerPages/ContactUs";
+import Faqs from "./pages/PioneerPages/Faq";
+import PioneerHome from "./pages/PioneerPages/PioneerHome";
 
 function App() {
   return (
@@ -49,8 +54,12 @@ function App() {
         <Route path="/sign-up" element={<SignUp />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/use-policy" element={<FairUsePolicy />} />
         <Route path="/data-deletion" element={<DataDeletion />} />
-
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/faqs" element={<Faqs />} />
+        <Route path="/home/home" element={<PioneerHome />} />
         {/* Protected routes (wrapped with AuthenticateRoute) */}
         <Route
           path="/new-order"

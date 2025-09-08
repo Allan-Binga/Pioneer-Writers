@@ -398,8 +398,11 @@ const SignUp = () => {
                   Terms & Conditions
                 </Link>{" "}
                 and{" "}
-                <Link to="/sign-up" className="text-amber-600 font-semibold">
-                  Fair Use Policy
+                <Link
+                  to="/privacy-policy"
+                  className="text-amber-600 font-semibold"
+                >
+                  Privacy Policy
                 </Link>
               </label>
             </div>

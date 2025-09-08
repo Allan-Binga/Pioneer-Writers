@@ -120,8 +120,8 @@ const cancelPaypalCheckout = async (req, res) => {
 const classOrdersPaypalCheckout = async (req, res) => {
   const userId = req.userId;
   const { classHelpId } = req.body;
-  console.log(classHelpId)
-  console.log(userId)
+  console.log(classHelpId);
+  console.log(userId);
 
   try {
     const classOrderQuery = `SELECT * FROM class_help_orders WHERE class_help_id = $1 AND user_id = $2`;
@@ -133,7 +133,7 @@ const classOrdersPaypalCheckout = async (req, res) => {
 
     const classOrder = rows[0];
     const totalAmount = classOrder.budget;
-    console.log(totalAmount)
+    console.log(totalAmount);
 
     const request = new paypal.orders.OrdersCreateRequest();
     request.prefer("return=representation");
@@ -141,8 +141,8 @@ const classOrdersPaypalCheckout = async (req, res) => {
       intent: "CAPTURE",
       purchase_units: [
         {
-          reference_id: orderId.toString(),
-          custom_id: orderId.toString(),
+          reference_id: classHelpId.toString(),
+          custom_id: classHelpId.toString(),
           amount: {
             currency_code: "USD",
             value: totalAmount.toString(),
@@ -154,7 +154,17 @@ const classOrdersPaypalCheckout = async (req, res) => {
         cancel_url: `${process.env.CLIENT_URL}/payment/class/failed`,
       },
     });
-  } catch (error) {}
+
+    const paypalResponse = await paypalClient.execute(request);
+    const approvalUrl = paypalResponse.result.links.find(
+      (link) => link.rel === "approve"
+    ).href;
+
+    res.status(200).json({ approvalUrl });
+  } catch (error) {
+    console.error("Error creating PayPal order:", error);
+    res.status(500).json({ error: "Failed to create PayPal order." });
+  }
 };
 
 //Stripe Checkout

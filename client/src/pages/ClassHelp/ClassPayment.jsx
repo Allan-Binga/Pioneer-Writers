@@ -78,6 +78,7 @@ function ClassPayment() {
             localStorage.getItem("classStep1Data") || "{}"
           );
           const classHelpId = step1.class_help_id;
+          console.log(classHelpId)
 
           if (!classHelpId) {
             throw new Error("No class_help_id found in localStorage");
@@ -121,7 +122,7 @@ function ClassPayment() {
           selectedMethod,
           timestamp: new Date().toISOString(),
         };
-        localStorage.setItem("orderData", JSON.stringify(orderData));
+        localStorage.setItem("classOrderData", JSON.stringify(orderData));
       } catch (storageErr) {
         console.warn("Failed to save orderData to localStorage", storageErr);
       }
