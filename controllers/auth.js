@@ -396,7 +396,7 @@ const signInWriter = async (req, res) => {
         email: writer.rows[0].email,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "12h" }
+      { expiresIn: "24h" }
     );
 
     res.cookie("writerPioneerSession", writerToken, {
