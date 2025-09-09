@@ -33,7 +33,7 @@ function ClassSuccess() {
   const fetchClassPayments = async (classOrderId = null) => {
     try {
       const response = await axios.get(
-        `${endpoint}/payments/class/all/my-payments`,
+        `${endpoint}/payments/all/class/my-payments`,
         {
           withCredentials: true,
         }
@@ -93,7 +93,7 @@ function ClassSuccess() {
 
     const captureAndFetchPayments = async () => {
       if (!token || hasCaptured.current) {
-        const stopLoading = await fetchPayments();
+        const stopLoading = await fetchClassPayments();
         if (stopLoading) {
           isApiComplete = true;
           handleLoadingState();
@@ -104,7 +104,7 @@ function ClassSuccess() {
       try {
         hasCaptured.current = true; // Mark as captured
         const captureResponse = await axios.post(
-          `${endpoint}/payments/class-payments/capture`,
+          `${endpoint}/payments/capture/class`,
           { token },
           { withCredentials: true }
         );
@@ -114,22 +114,19 @@ function ClassSuccess() {
             captureResponse.data.message || "Payment captured successfully."
           );
 
-          localStorage.removeItem("step1Data");
-          localStorage.removeItem("step2Data");
-          localStorage.removeItem("checkoutAmount");
-          localStorage.removeItem("order_id");
+          localStorage.removeItem("classStep1Data");
           localStorage.removeItem("orderData");
 
           const orderId = captureResponse.data.orderId;
           if (orderId) {
-            const stopLoading = await fetchPayments(orderId);
+            const stopLoading = await fetchClassPayments(orderId);
             if (stopLoading) {
               isApiComplete = true;
               handleLoadingState();
             } else {
               interval = setInterval(async () => {
                 if (pollingAttempts < maxPollingAttempts) {
-                  const stopPolling = await fetchPayments(orderId);
+                  const stopPolling = await fetchClassPayments(orderId);
                   if (stopPolling) {
                     clearInterval(interval);
                     isApiComplete = true;
@@ -143,19 +140,154 @@ function ClassSuccess() {
               }, pollingInterval);
             }
           } else {
-            const stopLoading = await fetchPayments();
+            const stopLoading = await fetchClassPayments();
             if (stopLoading) {
               isApiComplete = true;
               handleLoadingState();
             }
           }
         }
-      } catch (error) {}
+      } catch (error) {
+        console.error("Capture failed:", error);
+        notify.error("Failed to capture PayPal payment.");
+        isApiComplete = true;
+        handleLoadingState();
+        clearInterval(interval);
+      }
     };
-  });
+
+    captureAndFetchPayments();
+
+    return () => {
+      clearTimeout(minTimeTimeout);
+      clearInterval(interval);
+    };
+  }, [pollingAttempts]);
+
   return (
-    <div>
-      <p>Payment Successful</p>
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-slate-50 to-slate-100">
+      <Navbar />
+      <main className="flex-1 transition-all duration-300 pt-34 px-4">
+        <div className="max-w-6xl mx-auto space-y-8">
+          {loading ? (
+            <div className="flex justify-center items-center">
+              <Spinner />
+            </div>
+          ) : (
+            <>
+              {showSuccessMessage && (
+                <div className="border bg-green-100 border-green-300 text-green-800 rounded-lg flex items-center gap-3 px-6 py-4">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  <div>
+                    <h2 className="font-semibold text-lg">
+                      Payment Successful!
+                    </h2>
+                    <p>Your payment has been processed. Thank you!</p>
+                  </div>
+                  <button
+                    className="ml-auto text-sm text-green-700 hover:underline cursor-pointer"
+                    onClick={() => setShowSuccessMessage(false)}
+                  >
+                    Dismiss
+                  </button>
+                </div>
+              )}
+
+              <div className="bg-white shadow rounded-xl p-6 border border-gray-100">
+                <h3 className="text-xl font-semibold text-slate-700 mb-4">
+                  Your Recent Payments
+                </h3>
+
+                {classPayments.length === 0 ? (
+                  <p className="text-gray-500">
+                    No payments found. If your payment is still processing,
+                    please check back later.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200 text-sm">
+                      <thead className="bg-slate-50">
+                        <tr>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Class Help ID
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Amount
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Type
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Method
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Status
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Reference
+                          </th>
+                          <th className="px-4 py-2 text-left font-semibold text-gray-700">
+                            Date
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-100">
+                        {classPayments.map((payment, idx) => (
+                          <tr key={idx}>
+                            <td className="px-4 py-2 text-blue-600 hover:underline">
+                              <Link to={`/order-details/${payment.class_help_id}`}>
+                                {payment.class_help_id}
+                              </Link>
+                            </td>
+                            <td className="px-4 py-2">${payment.amount}</td>
+                            <td className="px-4 py-2 capitalize">
+                              {payment.payment_type}
+                            </td>
+                            <td className="px-4 py-2">
+                              {payment.payment_method === "Stripe" ? (
+                                <img
+                                  src={StripeLogo}
+                                  alt="Stripe"
+                                  className="w-12"
+                                />
+                              ) : (
+                                <img
+                                  src={PayPal}
+                                  alt="PayPal"
+                                  className="w-12"
+                                />
+                              )}
+                            </td>
+                            <td className="px-4 py-2">
+                              <span
+                                className={`px-3 py-1 text-xs font-medium rounded-full capitalize ${
+                                  payment.payment_status?.toLowerCase() ===
+                                  "completed"
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-orange-100 text-orange-700"
+                                }`}
+                              >
+                                {payment.payment_status}
+                              </span>
+                            </td>
+                            <td className="px-4 py-2">
+                              {payment.transaction_reference || "—"}
+                            </td>
+                            <td className="px-4 py-2">
+                              {formatDate(payment.created_at)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </main>
+      <Footer />
     </div>
   );
 }

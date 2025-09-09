@@ -35,6 +35,7 @@ import Payments from "./pages/Payments/Payments";
 import ClassHelp from "./pages/ClassHelp/ClassHelp";
 import ClassPayment from "./pages/ClassHelp/ClassPayment";
 import ClassSuccess from "./pages/Payment Messages/ClassSuccess";
+import ClassFailure from "./pages/Payment Messages/ClassFailure";
 import AboutUs from "./pages/PioneerPages/AboutUs";
 import ContactUs from "./pages/PioneerPages/ContactUs";
 import Faqs from "./pages/PioneerPages/Faq";
@@ -86,10 +87,18 @@ function App() {
           }
         />
         <Route
-          path="/class/payment/success"
+          path="/payment/class/success"
           element={
             <AuthenticateRoute>
               <ClassSuccess />
+            </AuthenticateRoute>
+          }
+        />
+        <Route
+          path="/payment/class/failed"
+          element={
+            <AuthenticateRoute>
+              <ClassFailure />
             </AuthenticateRoute>
           }
         />

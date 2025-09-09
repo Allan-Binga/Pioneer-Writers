@@ -19,6 +19,7 @@ const dashboardRoute = require("./routes/dashboard");
 const passwordRoute = require("./routes/password");
 const newsRoute = require("./routes/news");
 const ratingsRoute = require("./routes/ratings");
+const writerPaymentRoute = require("./routes/writerPayments")
 const smsRoute = require("./routes/smsService");
 const {
   handlePaypalWebhook,
@@ -92,6 +93,7 @@ app.use("/pioneer-writers/v1/profile", profileRoute);
 app.use("/pioneer-writers/v1/news", newsRoute);
 app.use("/pioneer-writers/v1/password", passwordRoute);
 app.use("/pioneer-writers/v1/sms", smsRoute);
+app.use("/pioneer-writers/v1/payout", writerPaymentRoute)
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,83 +9,94 @@ datasource db {
 }
 
 model User {
-  user_id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  username       String
-  email          String   @unique
-  phone_number   String? 
-  password_hash  String? 
-  oauth_provider String? 
-  oauth_id       String? 
-  avatar_url     String? 
-  country        String? 
-  state          String?
-
-  // Relations
-  orders   Order[]   @relation("UserOrders")
-  payments Payment[]
+  user_id                     String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username                    String
+  email                       String           @unique
+  phone_number                String?
+  password_hash               String?
+  oauth_provider              String?
+  oauth_id                    String?
+  avatar_url                  String?
+  country                     String?
+  state                       String?
+  client_type                 String?          @default("assignment") @db.VarChar(20)
+  password_reset_token        String?
+  password_reset_token_expiry DateTime?        @db.Timestamp(6)
+  sms_updates                 Boolean?         @default(false)
+  classHelpOrders             ClassHelpOrder[] @relation("UserClassHelpOrders")
+  disputes                    Dispute[]
+  orders                      Order[]          @relation("UserOrders")
+  payments                    Payment[]
+  ratingsReceived             Rating[]         @relation("TargetUser")
 
   @@map("users")
 }
 
-
 model Writer {
-  writer_id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  full_name           String    @db.VarChar(100)
-  email               String    @unique @db.VarChar(100)
-  phone_number        String?   @db.VarChar(20)
+  writer_id           String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name           String           @db.VarChar(100)
+  email               String           @unique @db.VarChar(100)
+  phone_number        String?          @db.VarChar(20)
   password_hash       String?
-  country             String?   @db.VarChar(50)
-  state               String?   @db.VarChar(50)
+  country             String?          @db.VarChar(50)
+  state               String?          @db.VarChar(50)
   bio                 String?
   profile_picture_url String?
-  writer_level        String?   @db.VarChar(50)
-  writer_type         String?   @db.VarChar(50)
-  is_available        Boolean?  @default(true)
-  rating              Decimal?  @db.Decimal(2, 1)
-  completed_orders    Int?      @default(0)
-  joined_at           DateTime? @default(now())
-  primary_topic_field String?   @db.VarChar(50)
-
-  // Relations
-  orders Order[] @relation("WriterOrders")
+  writer_level        String?          @db.VarChar(50)
+  writer_type         String?          @db.VarChar(50)
+  is_available        Boolean?         @default(true)
+  rating              Decimal?         @db.Decimal(2, 1)
+  completed_orders    Int?             @default(0)
+  joined_at           DateTime?        @default(now()) @db.Timestamp(6)
+  primary_topic_field String?          @db.VarChar(50)
+  sms_updates         Boolean?         @default(false)
+  bids                Bid[]
+  classHelpOrders     ClassHelpOrder[] @relation("WriterClassHelpOrders")
+  orders              Order[]          @relation("WriterOrders")
+  ratingsReceived     Rating[]         @relation("TargetWriter")
 
   @@map("writers")
 }
 
 model Order {
   order_id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  topic_field       String    @db.VarChar(100)
+  subject           String    @db.VarChar(100)
   type_of_service   String    @db.VarChar(50)
   document_type     String    @db.VarChar(100)
   writer_level      String    @db.VarChar(20)
   paper_format      String    @db.VarChar(20)
   english_type      String    @db.VarChar(10)
   pages             Int       @db.SmallInt
-  number_of_words   Int
-  number_of_sources Int       @db.SmallInt
+  number_of_words   Int       @default(275)
+  number_of_sources Int       @default(1) @db.SmallInt
   topic             String
-  instructions      String? 
-  uploaded_file     String? 
-  writer_type       String?   @default("Standard") @db.VarChar(20)
-  deadline          DateTime
+  instructions      String?
+  uploaded_file     String?
+  writer_category   String?   @default("Standard") @db.VarChar(20)
+  deadline          DateTime  @db.Timestamp(6)
   writer_tip        Decimal?  @db.Decimal(6, 2)
   plagiarism_report Boolean?  @default(false)
   coupon_code       String?   @db.VarChar(30)
   total_price       Decimal   @db.Decimal(8, 2)
-  order_status      String?   @default("Pending") @db.VarChar(20)
-  created_at        DateTime? @default(now())
-  updated_at        DateTime? @default(now())
-  spacing           String? 
+  payment_status    String?   @default("Pending") @db.VarChar(20)
+  created_at        DateTime? @default(now()) @db.Timestamp(6)
+  updated_at        DateTime? @default(now()) @db.Timestamp(6)
+  spacing           String?
   checkout_amount   Decimal   @default(0.00) @db.Decimal(10, 2)
-  payment_option    String? 
+  payment_option    String?
   user_id           String?   @db.Uuid
   writer_id         String?   @db.Uuid
-
-  // Relations
-  user     User?     @relation("UserOrders", fields: [user_id], references: [user_id])
-  writer   Writer?   @relation("WriterOrders", fields: [writer_id], references: [writer_id])
-  payments Payment[]
-  messages Message[]
+  slides            Int       @default(0) @db.SmallInt
+  charts_or_graphs  Int       @default(0) @db.SmallInt
+  assignment_status String?   @default("public") @db.VarChar(20)
+  submitted_files   Json?     @default("[]")
+  bids              Bid[]
+  disputes          Dispute[]
+  messages          Message[]
+  user              User?     @relation("UserOrders", fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  writer            Writer?   @relation("WriterOrders", fields: [writer_id], references: [writer_id], onDelete: NoAction, onUpdate: NoAction)
+  payments          Payment[]
+  ratings           Rating[]
 
   @@map("orders")
 }
@@ -102,36 +107,125 @@ model Payment {
   user_id               String?   @db.Uuid
   amount                Decimal   @db.Decimal(10, 2)
   payment_type          String    @db.VarChar(10)
-  payment_status        String?   @default("completed") @db.VarChar(20)
+  payment_status        String?   @default("pending") @db.VarChar(20)
   payment_method        String?   @db.VarChar(50)
   transaction_reference String?
-  paid_at               DateTime? @default(now())
-  created_at            DateTime? @default(now())
-  updated_at            DateTime? @default(now())
-
-  // Relations
-  order Order @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
-  user  User? @relation(fields: [user_id], references: [user_id], onDelete: SetNull)
+  paid_at               DateTime? @default(now()) @db.Timestamp(6)
+  created_at            DateTime? @default(now()) @db.Timestamp(6)
+  updated_at            DateTime? @default(now()) @db.Timestamp(6)
+  order                 Order     @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
+  user                  User?     @relation(fields: [user_id], references: [user_id], onUpdate: NoAction)
 
   @@map("payments")
+}
+
+model ClassHelpOrder {
+  class_help_id      String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id            String?   @db.Uuid
+  assigned_writer_id String?   @db.Uuid
+  subject            String    @db.VarChar(100)
+  course_code        String    @db.VarChar(50)
+  academic_level     String    @db.VarChar(50)
+  week_range         String    @db.VarChar(50)
+  budget             Decimal   @db.Decimal(8, 2)
+  login_url          String
+  login_username     String    @db.VarChar(100)
+  login_password     String    @db.VarChar(100)
+  notes              String?
+  uploaded_syllabus  String
+  class_status       String?   @default("Pending") @db.VarChar(20)
+  payment_status     String?   @default("Unpaid") @db.VarChar(20)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  updated_at         DateTime? @default(now()) @db.Timestamp(6)
+  assignedWriter     Writer?   @relation("WriterClassHelpOrders", fields: [assigned_writer_id], references: [writer_id], onDelete: NoAction, onUpdate: NoAction)
+  user               User?     @relation("UserClassHelpOrders", fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("class_help_orders")
 }
 
 model Message {
   message_id  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   sender_id   String    @db.Uuid
   receiver_id String    @db.Uuid
-  sender_type String?   @db.VarChar(10) // 'client' or 'writer'
-  content     String
-  sent_at     DateTime? @default(now())
-  is_read     Boolean?  @default(false)
-  order_id    String?   @db.Uuid
+  sender_type String?   @db.VarChar(10)
   subject     String?
+  content     String
+  sent_at     DateTime? @default(now()) @db.Timestamp(6)
+  is_read     Boolean?  @default(false)
   is_archived Boolean?  @default(false)
   is_trashed  Boolean?  @default(false)
-
-  // Relations
-  order Order? @relation(fields: [order_id], references: [order_id])
+  order_id    String?   @db.Uuid
+  order       Order?    @relation(fields: [order_id], references: [order_id], onUpdate: NoAction)
 
   @@map("messages")
 }
 
+model News {
+  news_id   String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title     String
+  body      String
+  date      DateTime @default(dbgenerated("CURRENT_DATE")) @db.Date
+  is_unread Boolean? @default(true)
+
+  @@map("news")
+}
+
+model Bid {
+  bid_id     String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id   String    @db.Uuid
+  writer_id  String    @db.Uuid
+  message    String?
+  bid_status String?   @default("Pending") @db.VarChar(20)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  order      Order     @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
+  writer     Writer    @relation(fields: [writer_id], references: [writer_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([order_id, writer_id])
+  @@map("bids")
+}
+
+model Rating {
+  rating_id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id         String    @db.Uuid
+  rater_id         String    @db.Uuid
+  rater_type       String    @db.VarChar(10)
+  target_user_id   String?   @db.Uuid
+  target_writer_id String?   @db.Uuid
+  rating           Decimal?  @db.Decimal(2, 1)
+  comment          String?
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  order            Order     @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
+  targetUser       User?     @relation("TargetUser", fields: [target_user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+  targetWriter     Writer?   @relation("TargetWriter", fields: [target_writer_id], references: [writer_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([order_id, rater_id, rater_type])
+  @@map("ratings")
+}
+
+model Dispute {
+  dispute_id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  order_id           String    @db.Uuid
+  user_id            String    @db.Uuid
+  reason             String
+  status             String    @default("pending") @db.VarChar(20)
+  created_at         DateTime? @default(now()) @db.Timestamp(6)
+  updated_at         DateTime? @default(now()) @db.Timestamp(6)
+  resolution_comment String?
+  evidence_files     String[]
+  order              Order     @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: NoAction)
+  user               User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("disputes")
+}
+
+model Administrator {
+  admin_id       String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email          String  @unique @db.VarChar(255)
+  phone_number   String? @db.VarChar(20)
+  password_hash  String?
+  oauth_provider String?
+  oauth_id       String?
+  avatar_url     String?
+
+  @@map("administrators")
+}

@@ -147,6 +147,7 @@ const classOrdersPaypalCheckout = async (req, res) => {
             currency_code: "USD",
             value: totalAmount.toString(),
           },
+          description: `Class Help - ${classOrder.subject} (${classOrder.course_code})`,
         },
       ],
       application_context: {

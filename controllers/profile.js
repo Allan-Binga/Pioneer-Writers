@@ -114,7 +114,7 @@ const getWriterProfile = async (req, res) => {
 
   try {
     const result = await client.query(
-      `SELECT writer_id, full_name, email, phone_number, bio, writer_level, writer_type, rating, completed_orders, primary_topic_field, profile_picture_url FROM writers WHERE writer_id = $1`,
+      `SELECT writer_id, full_name, email, phone_number, bio, writer_level, writer_type, rating, completed_orders, primary_topic_field, profile_picture_url, paypal_email FROM writers WHERE writer_id = $1`,
       [writerId]
     );
     const writer = result.rows[0];

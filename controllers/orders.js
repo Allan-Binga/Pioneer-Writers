@@ -421,7 +421,7 @@ const getAdminSingleOrder = async (req, res) => {
 const getUsersOrders = async (req, res) => {
   const userId = req.userId;
   const { status } = req.query;
-  console.log(status)
+  console.log(status);
   try {
     let query = `
       SELECT o.*, w.full_name AS writer_name
@@ -744,14 +744,13 @@ const submitAssignment = async (req, res) => {
 
 //Complete Assignment
 const completeOrder = async (req, res) => {
-  const userId = req.userId;
   const { orderId } = req.params;
 
   try {
     // 1. Check if a rating exists for this order
     const rating = await client.query(
-      `SELECT * FROM ratings WHERE order_id = $1 AND user_id = $2`,
-      [orderId, userId]
+      `SELECT * FROM ratings WHERE order_id = $1`,
+      [orderId]
     );
 
     if (rating.rows.length === 0) {
@@ -764,6 +763,33 @@ const completeOrder = async (req, res) => {
     await client.query(
       `UPDATE orders SET assignment_status = 'completed' WHERE order_id = $1`,
       [orderId]
+    );
+
+    //3. Fetch order details
+    const orderResult = await client.query(
+      `SELECT writer_id, checkout_amount 
+       FROM orders 
+       WHERE order_id = $1`,
+      [orderId]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    const { writer_id, checkout_amount } = orderResult.rows[0];
+
+    if (!writer_id) {
+      return res
+        .status(400)
+        .json({ message: "No writer assigned to this order." });
+    }
+
+    // 4. Insert a row into writer_payouts
+    await client.query(
+      `INSERT INTO writer_payouts (writer_id, order_id, amount, matured_at)
+       VALUES ($1, $2, $3, NOW() + INTERVAL '14 days')`,
+      [writer_id, orderId, checkout_amount]
     );
 
     return res.status(200).json({

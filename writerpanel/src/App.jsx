@@ -18,10 +18,12 @@ import Classes from "./pages/Orders/Classes";
 import Inbox from "./pages/Services/Inbox";
 import News from "./pages/Services/News";
 import TermsAndConditions from "./pages/TermsAndConditions/TermsAndConditions";
+import BackgroundWaves from "./components/BackgroundWaves";
 
 function App() {
   return (
     <Router>
+      <BackgroundWaves />
       <Toaster richColors position="top-right" />
       <Routes>
         <Route path="/" element={<Navigate to="/sign-up" />} />

@@ -424,6 +424,130 @@ const orderPaymentEmail = async (email, order, amount, transactionId) => {
   }
 };
 
+// Class Payment Email
+const classHelpPaymentEmail = async (email, order, amount, transactionId) => {
+  const logoUrl =
+    "https://pioneer-writers-bucket.s3.eu-north-1.amazonaws.com/pioneer-writers/logo.webp";
+
+  const mailOptions = {
+    from: `"Pioneer Writers" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: `Payment received - Class Help Order #${order.class_help_id}`,
+    html: `
+      <div style="margin: 0; padding: 0; background-color: #f5f7fa; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Ubuntu, sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f7fa; padding: 20px 0;">
+          <tr>
+            <td align="center">
+              <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                
+                <!-- Header -->
+                <tr>
+                  <td style="padding: 32px 40px; text-align: center; background-color: #ffffff; border-bottom: 1px solid #e5e7eb;">
+                    <img src="${logoUrl}" alt="Pioneer Writers" style="height: 40px; width: auto;" />
+                  </td>
+                </tr>
+                
+                <!-- Success Banner -->
+                <tr>
+                  <td style="padding: 24px 40px; background-color: #f0fdf4; border-bottom: 1px solid #dcfce7;">
+                    <div style="display: flex; align-items: center;">
+                      <div style="width: 20px; height: 20px; background-color: #22c55e; border-radius: 50%; margin-right: 12px; display: inline-block;"></div>
+                      <span style="font-size: 14px; font-weight: 500; color: #166534;">
+                        Payment successfully processed
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 40px 40px 32px 40px; background-color: #ffffff;">
+                    <h1 style="margin: 0 0 16px 0; font-size: 24px; font-weight: 600; color: #111827; line-height: 1.2;">
+                      Payment received for your class
+                    </h1>
+                    <p style="margin: 0 0 8px 0; font-size: 16px; color: #374151; line-height: 1.5;">
+                      We've successfully processed your payment of <strong>$${amount}</strong> for Class Help Order #${
+      order.class_help_id
+    }.
+                    </p>
+                    <p style="margin: 0 0 32px 0; font-size: 16px; color: #374151; line-height: 1.5;">
+                      Our tutors will now begin working on your <strong>${
+                        order.subject
+                      }</strong> class (${
+      order.course_code
+    }). You can track progress and updates directly from your dashboard.
+                    </p>
+                    
+                    <table cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="border-radius: 6px; background-color: #3b82f6;">
+                          <a href="${process.env.CLIENT_URL}/class-help/${
+      order.class_help_id
+    }" style="display: inline-block; padding: 14px 24px; background-color: #3b82f6; color: #ffffff; font-size: 16px; font-weight: 500; text-decoration: none; border-radius: 6px;">
+                            View your class
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Payment Details -->
+                <tr>
+                  <td style="padding: 32px 40px; background-color: #f9fafb;">
+                    <h2 style="margin: 0 0 20px 0; font-size: 18px; font-weight: 600; color: #111827;">
+                      Payment details
+                    </h2>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #6b7280; width: 140px;">Amount paid:</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 600;">$${amount}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Payment method:</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 500;">PayPal</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Transaction ID:</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 500; font-family: monospace;">${transactionId}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; font-size: 14px; color: #6b7280;">Date:</td>
+                        <td style="padding: 8px 0; font-size: 14px; color: #111827; font-weight: 500;">${new Date().toLocaleString()}</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                
+                <!-- Footer -->
+                <tr>
+                  <td style="padding: 24px 40px; background-color: #f9fafb; border-top: 1px solid #e5e7eb;">
+                    <p style="margin: 0; font-size: 12px; color: #9ca3af; line-height: 1.4;">
+                      © ${new Date().getFullYear()} Pioneer Writers. All rights reserved.
+                    </p>
+                    <p style="margin: 8px 0 0 0; font-size: 12px; color: #9ca3af; line-height: 1.4;">
+                      Questions about your payment? Contact us at 
+                      <a href="mailto:team@pioneerwriters.com" style="color: #3b82f6; text-decoration: none;">team@pioneerwriters.com</a>
+                    </p>
+                  </td>
+                </tr>
+                
+              </table>
+            </td>
+          </tr>
+        </table>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    console.error("Failed to send class help payment email:", error);
+    throw error;
+  }
+};
+
 //Send Bid Email to Clients
 const sendBidStatusEmail = async (email, orderId) => {
   const logoUrl =
@@ -537,6 +661,70 @@ const sendWriterOrderAssignmentEmail = async (email, orderId) => {
     await transporter.sendMail(mailOptions);
   } catch (error) {
     console.error("Failed to send assignment email:", error);
+  }
+};
+
+//Send Payout Emai
+const sendPayoutWithdrawalEmail = async (
+  toEmail,
+  fullName,
+  paypalEmail,
+  amount,
+  orderId
+) => {
+  const logoUrl =
+    "https://pioneer-writers-bucket.s3.eu-north-1.amazonaws.com/pioneer-writers/logo.webp";
+
+  const mailOptions = {
+    from: `"Pioneer Writers" <${process.env.EMAIL_USER}>`,
+    to: toEmail,
+    subject: `Payout Sent – Order #${orderId}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif; background: #f9fafb; padding: 20px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:600px; margin:0 auto; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.1);">
+          
+          <tr>
+            <td style="padding:20px; text-align:center; border-bottom:1px solid #eee;">
+              <img src="${logoUrl}" alt="Pioneer Writers" style="height:40px;" />
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:30px; text-align:center;">
+              <h2 style="margin:0 0 15px; font-size:20px; color:#111;">Payout Successful</h2>
+              <p style="margin:0 0 20px; font-size:16px; color:#374151; line-height:1.5;">
+                Hello ${fullName}, <br/>
+                We’ve successfully sent <strong>$${Number(amount).toFixed(
+                  2
+                )} USD</strong>  
+                to your PayPal account <strong>${paypalEmail}</strong> for <strong>Order #${orderId}</strong>.
+              </p>
+              <p style="margin:0 0 20px; font-size:15px; color:#374151; line-height:1.5;">
+                Please log in to your PayPal account to confirm the deposit.
+              </p>
+              <a href="https://www.paypal.com/signin" 
+                 style="display:inline-block; padding:12px 24px; background:#2563eb; color:#fff; text-decoration:none; border-radius:6px; font-size:15px; font-weight:500;">
+                Go to PayPal
+              </a>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:15px; background:#f9fafb; font-size:12px; color:#9ca3af; text-align:center;">
+              © ${new Date().getFullYear()} Pioneer Writers
+            </td>
+          </tr>
+
+        </table>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`📧 Payout email sent to ${toEmail}`);
+  } catch (error) {
+    console.error("Failed to send payout email:", error);
   }
 };
 
@@ -688,8 +876,10 @@ module.exports = {
   sendPasswordResetEmail,
   sendOrderPlacementEmail,
   orderPaymentEmail,
+  classHelpPaymentEmail,
   sendBidStatusEmail,
   sendWriterOrderAssignmentEmail,
+  sendPayoutWithdrawalEmail,
   sendDeadlineExtensionEmail,
   sendOrderSubmissionEmail,
 };
