@@ -197,7 +197,7 @@ function TermsAndConditions() {
         <div className="max-w-4xl mx-auto px-6 py-16">
           {/* Header */}
           <div className="text-center mb-10 mt-14">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-4">
               Terms and Conditions
             </h1>
             {/* <p className="text-gray-600 text-lg">Last Updated: [Insert Date]</p> */}
@@ -206,7 +206,7 @@ function TermsAndConditions() {
           {/* Content */}
           <div className="bg-white rounded-2xl shadow-lg p-8 lg:p-12 relative z-20">
             <div className="prose prose-gray max-w-none">
-              <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+              <p className="text-md text-gray-700 mb-8 leading-relaxed">
                 Welcome to <b>Pioneer Writers</b>. By accessing or using our
                 website, blog, application, or services (collectively, the
                 "Services"), you agree to be bound by these Terms and Conditions
@@ -215,7 +215,7 @@ function TermsAndConditions() {
 
               {/* Section 1 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   1. Eligibility
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -227,7 +227,7 @@ function TermsAndConditions() {
 
               {/* Section 2 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   2. Accounts and Registration
                 </h2>
                 <ul className="text-gray-700 space-y-3 leading-relaxed">
@@ -253,7 +253,7 @@ function TermsAndConditions() {
 
               {/* Section 3 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   3. Acceptable Use
                 </h2>
                 <p className="text-gray-700 mb-4 leading-relaxed">
@@ -280,7 +280,7 @@ function TermsAndConditions() {
 
               {/* Section 4 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   4. Purchases and Payments
                 </h2>
                 <ul className="text-gray-700 space-y-3 leading-relaxed">
@@ -301,7 +301,7 @@ function TermsAndConditions() {
 
               {/* Section 5 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   5. Intellectual Property
                 </h2>
                 <ul className="text-gray-700 space-y-3 leading-relaxed">
@@ -323,7 +323,7 @@ function TermsAndConditions() {
 
               {/* Section 6 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   6. Privacy
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -336,7 +336,7 @@ function TermsAndConditions() {
 
               {/* Section 7 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   7. Third-Party Services
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -348,7 +348,7 @@ function TermsAndConditions() {
 
               {/* Section 8 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   8. Disclaimers
                 </h2>
                 <ul className="text-gray-700 space-y-3 leading-relaxed">
@@ -366,7 +366,7 @@ function TermsAndConditions() {
 
               {/* Section 9 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   9. Limitation of Liability
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -379,7 +379,7 @@ function TermsAndConditions() {
 
               {/* Section 10 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   10. Termination
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -391,7 +391,7 @@ function TermsAndConditions() {
 
               {/* Section 11 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   11. Governing Law
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -403,7 +403,7 @@ function TermsAndConditions() {
 
               {/* Section 12 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   12. Changes to Terms
                 </h2>
                 <p className="text-gray-700 leading-relaxed">
@@ -416,7 +416,7 @@ function TermsAndConditions() {
 
               {/* Section 13 */}
               <section className="mb-10">
-                <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">
                   13. Contact Us
                 </h2>
                 <div className="text-gray-700 leading-relaxed">

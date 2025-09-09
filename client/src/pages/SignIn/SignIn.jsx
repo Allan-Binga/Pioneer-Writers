@@ -283,7 +283,7 @@ function SignIn() {
               alt="Logo"
               className="mx-auto w-[180px] h-auto object-contain mb-4"
             />
-            <h1 className="text-xl font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold bg-gradient-to-r from-gray-500 to-gray-600 bg-clip-text text-transparent">
               Welcome back!
             </h1>
           </div>
@@ -299,7 +299,7 @@ function SignIn() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="Email"
-                className="w-full pl-10 py-2.5 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder:text-sm"
+                className="w-full pl-10 py-2.5 border border-slate-300 rounded-full focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder:text-xs"
               />
               {fieldErrors.email && (
                 <p className="text-red-500 text-sm mt-1">{fieldErrors.email}</p>
@@ -315,7 +315,7 @@ function SignIn() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Password"
-                className="w-full pl-10 pr-10 py-2.5 border border-stone-300 rounded-full focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder:text-sm"
+                className="w-full pl-10 pr-10 py-2.5 border border-stone-300 rounded-full focus:outline-none focus:ring-1 focus:ring-gray-200 placeholder:text-xs"
               />
               <button
                 type="button"
@@ -325,7 +325,7 @@ function SignIn() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
               {fieldErrors.password && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-red-500 text-xs mt-1">
                   {fieldErrors.password}
                 </p>
               )}
@@ -336,7 +336,7 @@ function SignIn() {
               <button
                 type="button"
                 onClick={() => setShowForgotModal(true)}
-                className="text-sm text-amber-600 hover:underline cursor-pointer"
+                className="text-xs text-amber-600 hover:underline cursor-pointer"
               >
                 Forgot password?
               </button>
@@ -379,7 +379,7 @@ function SignIn() {
           <div className="my-8">
             <div className="flex items-center justify-center">
               <div className="flex-grow border-t border-slate-300"></div>
-              <span className="mx-4 text-sm text-slate-600 bg-white px-3">
+              <span className="mx-4 text-xs text-slate-600 bg-white px-3">
                 Or sign in with
               </span>
               <div className="flex-grow border-t border-slate-300"></div>
@@ -407,7 +407,7 @@ function SignIn() {
             <p className="text-xs text-gray-600">Don’t have an account?</p>
             <Link
               to="/sign-up"
-              className="inline-block mt-2 px-6 text-sm py-2 text-amber-600 border border-amber-400 rounded-full hover:bg-amber-50 transition-all duration-200 font-medium"
+              className="inline-block mt-2 px-6 text-xs py-2 text-amber-600 border border-amber-400 rounded-full hover:bg-amber-50 transition-all duration-200 font-medium"
             >
               Sign Up Now
             </Link>

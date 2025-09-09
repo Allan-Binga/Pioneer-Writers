@@ -256,10 +256,10 @@ const SignUp = () => {
               alt="Logo"
               className="w-[160px] sm:w-[200px] h-auto object-contain mx-auto mb-4"
             />
-            <h1 className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">
+            <h1 className="text-lg sm:text-lg font-extrabold bg-gradient-to-r from-gray-600 to-gray-800 bg-clip-text text-transparent">
               Join us!
             </h1>
-            <p className="text-stone-600 mt-2 text-sm">Sign up now</p>
+            <p className="text-stone-600 mt-2 text-xs">Sign up now</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -274,7 +274,7 @@ const SignUp = () => {
                 value={formData.userName}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
+                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-xs"
               />
               {validationErrors.userName && (
                 <p className="text-amber-600 text-xs mt-1 ml-2">
@@ -294,7 +294,7 @@ const SignUp = () => {
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
+                className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-xs"
               />
               {validationErrors.email && (
                 <p className="text-amber-600 text-xs mt-1 ml-2">
@@ -308,14 +308,14 @@ const SignUp = () => {
               <div className="relative w-full sm:w-24" ref={dropdownRef}>
                 <button
                   type="button"
-                  className="w-full py-3 px-4 border border-stone-300 rounded-full bg-white text-gray-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-gray-100"
+                  className="w-full py-3 px-4 border border-stone-300 text-xs rounded-full bg-white text-gray-600 flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-gray-100"
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <span>{formData.countryCode}</span>
                   <ChevronDown className="w-4 h-4 text-gray-400" />
                 </button>
                 {isDropdownOpen && (
-                  <ul className="absolute z-10 mt-1 w-full bg-white border border-stone-300 rounded-lg shadow-md max-h-48 overflow-auto">
+                  <ul className="absolute z-10 mt-1 w-full bg-white border border-stone-300 rounded-lg shadow-md max-h-48 overflow-auto text-xs">
                     {countryCodes.map((code) => (
                       <li
                         key={code.value}
@@ -339,7 +339,7 @@ const SignUp = () => {
                   value={formData.phoneNumber}
                   onChange={handleInputChange}
                   required
-                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
+                  className="w-full pl-12 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-xs"
                 />
               </div>
             </div>
@@ -355,7 +355,7 @@ const SignUp = () => {
                 value={formData.password}
                 onChange={handleInputChange}
                 required
-                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-sm"
+                className="w-full pl-12 pr-10 py-3 rounded-full border border-stone-300 bg-white focus:outline-none focus:ring-2 focus:ring-gray-100 placeholder:text-xs"
               />
               <button
                 type="button"
