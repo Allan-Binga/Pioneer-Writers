@@ -17,8 +17,13 @@ import MyOrders from "./pages/Orders/MyOrders";
 import Classes from "./pages/Orders/Classes";
 import Inbox from "./pages/Services/Inbox";
 import News from "./pages/Services/News";
-import TermsAndConditions from "./pages/TermsAndConditions/TermsAndConditions";
+import TermsAndConditions from "./pages/PioneerPages/TermsAndConditions";
+import FairUsePolicy from "./pages/PioneerPages/FairUsePolicy";
 import BackgroundWaves from "./components/BackgroundWaves";
+import PrivacyPolicy from "./pages/PioneerPages/PrivacyPolicy";
+import AboutUs from "./pages/PioneerPages/AboutUs";
+import ContactUs from "./pages/PioneerPages/ContactUs";
+import Faqs from "./pages/PioneerPages/Faq";
 
 function App() {
   return (
@@ -89,6 +94,11 @@ function App() {
           }
         />
         <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+        <Route path="/fair-use-policy" element={<FairUsePolicy />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/about-us" element={<AboutUs />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/faqs" element={<Faqs />} />
       </Routes>
     </Router>
   );

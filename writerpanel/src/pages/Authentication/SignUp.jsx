@@ -321,10 +321,10 @@ function SignUp() {
               </Link>{" "}
               and{" "}
               <Link
-                to="/fair-use-policy"
+                to="/privacy-policy"
                 className="text-writerTeal font-semibold"
               >
-                Fair Use Policy
+                Privacy Policy
               </Link>
             </label>
           </div>
