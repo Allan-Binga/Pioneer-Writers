@@ -71,11 +71,11 @@ function Navbar() {
       ],
       color: "hover:text-green-500",
     },
-    {
-      name: "Classes",
-      path: "/classes",
-      color: "hover:text-amber-500",
-    },
+    // {
+    //   name: "Classes",
+    //   path: "/classes",
+    //   color: "hover:text-amber-500",
+    // },
     {
       name: "Funds",
       path: "/payments",
